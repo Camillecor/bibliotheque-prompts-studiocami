@@ -105,6 +105,12 @@
   letter-spacing: -0.03em;
 }
 
+@utility font-display {
+  font-family: "Instrument Serif", Georgia, serif;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
 @utility glass-card {
   background: linear-gradient(
     135deg,
