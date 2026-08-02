@@ -137,7 +137,7 @@ function GeneratorPage() {
                 onChange={(event) => setMetier(event.target.value)}
                 className="cami-input"
               >
-                <option value="">Laisser l'IA décider</option>
+                <option value="">Laisser Mario décider</option>
                 {METIERS.map((item) => (
                   <option key={item} value={item}>
                     {item}
