@@ -223,7 +223,7 @@
     @apply inline-flex h-10 w-10 items-center justify-center rounded-full bg-[var(--coral)] text-white shadow-md shadow-[rgba(255,107,53,0.28)] transition duration-200 hover:-translate-y-0.5 hover:bg-[var(--coral-dark)] hover:shadow-[0_0_24px_rgba(255,107,53,0.55)] active:scale-95 disabled:pointer-events-none disabled:opacity-40;
   }
 
-  .cami-new-btn {
-    @apply rounded-xl bg-muted px-3 py-2.5 text-sm font-semibold text-primary transition hover:bg-secondary;
+  .cami-side-item {
+    @apply flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition;
   }
 }

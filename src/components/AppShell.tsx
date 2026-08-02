@@ -26,10 +26,10 @@ function NavLink({
       to={to}
       onClick={onNavigate}
       className={[
-        "flex items-center gap-3 border-l-2 px-4 py-2.5 text-sm font-semibold transition",
+        "cami-side-item",
         active
-          ? "border-l-[var(--coral)] bg-secondary text-[var(--primary-dark)]"
-          : "border-l-transparent text-muted-foreground hover:bg-muted hover:text-primary",
+          ? "bg-secondary text-[var(--primary-dark)]"
+          : "text-muted-foreground hover:bg-muted hover:text-primary",
       ].join(" ")}
     >
       <Icon className="h-4 w-4" />
@@ -77,17 +77,15 @@ function RecentsList({ onNavigate }: { onNavigate?: (() => void) | undefined }) 
 function SidebarContent({ pathname, onNavigate }: { pathname: string; onNavigate?: (() => void) | undefined }) {
   return (
     <div className="flex h-full flex-col py-3">
-      <div className="px-3">
+      <div className="space-y-1 px-3">
         <Link
           to="/"
           onClick={onNavigate}
-          className="cami-new-btn flex w-full items-center justify-center gap-2"
+          className="cami-side-item bg-muted font-semibold text-primary hover:bg-secondary"
         >
           <Plus className="h-4 w-4" />
           Nouveau prompt
         </Link>
-      </div>
-      <nav className="mt-3 flex flex-col gap-1">
         <NavLink
           to="/bibliotheque"
           icon={Library}
@@ -95,7 +93,7 @@ function SidebarContent({ pathname, onNavigate }: { pathname: string; onNavigate
           active={pathname.startsWith("/bibliotheque")}
           onNavigate={onNavigate}
         />
-      </nav>
+      </div>
       <RecentsList onNavigate={onNavigate} />
     </div>
   );

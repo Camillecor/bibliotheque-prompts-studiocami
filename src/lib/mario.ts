@@ -13,6 +13,14 @@ export const METIERS = [
 
 export type Metier = (typeof METIERS)[number];
 
+export const MODELES = [
+  { value: "claude-haiku-4-5", label: "Haiku 4.5", note: "Rapide, léger" },
+  { value: "claude-sonnet-5", label: "Sonnet 5", note: "Équilibré" },
+  { value: "claude-opus-5", label: "Opus 5", note: "Le plus créatif" },
+] as const;
+
+export type ModeleValue = (typeof MODELES)[number]["value"];
+
 export type MarioResult = {
   titre_prompt: string;
   metier: string;

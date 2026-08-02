@@ -7,7 +7,7 @@ import { ArrowUp, Hash, Loader2, Save, Sparkles } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { PromptView } from "@/components/PromptView";
 import { useAuth } from "@/hooks/useAuth";
-import { METIERS, type MarioResult } from "@/lib/mario";
+import { METIERS, MODELES, type MarioResult, type ModeleValue } from "@/lib/mario";
 import { generateMarioPrompt, savePrompt } from "@/lib/mario.functions";
 
 export const Route = createFileRoute("/")({
@@ -40,6 +40,7 @@ function GeneratorPage() {
   const [motsCles, setMotsCles] = useState("");
   const [motsClesOuvert, setMotsClesOuvert] = useState(false);
   const [metier, setMetier] = useState("");
+  const [modele, setModele] = useState<ModeleValue>("claude-opus-5");
   const [result, setResult] = useState<MarioResult | null>(null);
 
   const [titreEdit, setTitreEdit] = useState("");
@@ -47,7 +48,7 @@ function GeneratorPage() {
   const [motsClesEdit, setMotsClesEdit] = useState("");
 
   const generation = useMutation({
-    mutationFn: () => generate({ data: { idee, motsCles, metier } }),
+    mutationFn: () => generate({ data: { idee, motsCles, metier, modele } }),
     onSuccess: (data) => {
       setResult(data);
       setTitreEdit(data.titre_prompt);
@@ -136,18 +137,32 @@ function GeneratorPage() {
           ) : null}
 
           <div className="mt-4 flex items-center justify-between gap-3 border-t border-border pt-4">
+            <select
+              id="metier"
+              value={metier}
+              onChange={(event) => setMetier(event.target.value)}
+              className="cami-select-pill"
+              aria-label="Type de prompt (métier)"
+            >
+              <option value="">Type de prompt : Mario décide</option>
+              {METIERS.map((item) => (
+                <option key={item} value={item}>
+                  {item}
+                </option>
+              ))}
+            </select>
+
             <div className="flex items-center gap-2">
               <select
-                id="metier"
-                value={metier}
-                onChange={(event) => setMetier(event.target.value)}
+                id="modele"
+                value={modele}
+                onChange={(event) => setModele(event.target.value as ModeleValue)}
                 className="cami-select-pill"
-                aria-label="Métier"
+                aria-label="Modèle Claude"
               >
-                <option value="">Métier : Mario décide</option>
-                {METIERS.map((item) => (
-                  <option key={item} value={item}>
-                    {item}
+                {MODELES.map((item) => (
+                  <option key={item.value} value={item.value}>
+                    {item.label}
                   </option>
                 ))}
               </select>
@@ -163,22 +178,21 @@ function GeneratorPage() {
               >
                 <Hash className="h-4 w-4" />
               </button>
+              {user ? (
+                <button
+                  type="submit"
+                  disabled={!peutGenerer}
+                  aria-label="Générer le prompt"
+                  className="cami-submit-btn"
+                >
+                  {generation.isPending ? (
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                  ) : (
+                    <ArrowUp className="h-5 w-5" />
+                  )}
+                </button>
+              ) : null}
             </div>
-
-            {user ? (
-              <button
-                type="submit"
-                disabled={!peutGenerer}
-                aria-label="Générer le prompt"
-                className="cami-submit-btn"
-              >
-                {generation.isPending ? (
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                ) : (
-                  <ArrowUp className="h-5 w-5" />
-                )}
-              </button>
-            ) : null}
           </div>
         </form>
 

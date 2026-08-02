@@ -58,12 +58,16 @@ Réponds uniquement avec ce JSON (pas de texte avant/après) :
 
 export const ANTHROPIC_MODEL = "claude-opus-5";
 
+export const MODELES_DISPONIBLES = ["claude-opus-5", "claude-sonnet-5", "claude-haiku-4-5"] as const;
+export type ModeleMario = (typeof MODELES_DISPONIBLES)[number];
+
 type AnthropicContentBlock = { type: string; text?: string };
 
 export async function callAnthropicMario(input: {
   idee: string;
   motsCles: string;
   metier: string;
+  modele: ModeleMario;
 }) {
   const apiKey = process.env["ANTHROPIC_API_KEY"];
   if (!apiKey) {
@@ -86,7 +90,7 @@ export async function callAnthropicMario(input: {
       "anthropic-version": "2023-06-01",
     },
     body: JSON.stringify({
-      model: ANTHROPIC_MODEL,
+      model: input.modele,
       max_tokens: 1500,
       temperature: 0.7,
       system: MARIO_SYSTEM_PROMPT,
