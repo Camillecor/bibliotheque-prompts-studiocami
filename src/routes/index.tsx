@@ -167,7 +167,7 @@ function GeneratorPage() {
               )}
             </button>
           ) : (
-            <div className="cami-block-resume flex flex-col items-start gap-3">
+            <div className="glass-card flex flex-col items-start gap-3 p-6">
               <p className="text-sm font-medium text-primary">
                 Connecte-toi pour générer des prompts et les ranger dans ta bibliothèque.
               </p>
