@@ -1,8 +1,9 @@
 import { useState, type ReactNode } from "react";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { Library, LogOut, Menu, Sparkles, Wand2, X } from "lucide-react";
+import { Library, LogOut, Menu, Wand2, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import logoAsset from "@/assets/studio-cami-logo.svg.asset.json";
 
 const NAV_ITEMS = [
   { title: "Générateur", url: "/", icon: Wand2, exact: true },
