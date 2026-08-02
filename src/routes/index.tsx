@@ -88,14 +88,14 @@ function GeneratorPage() {
     <AppShell>
       <div className="mx-auto w-full max-w-5xl">
         <div className="mx-auto max-w-2xl py-6 text-center md:py-10">
-          <span className="cami-pill">Méthode MARIO</span>
-          <h1 className="mt-5 text-3xl font-extrabold leading-tight md:text-5xl">
-            Transforme une idée en{" "}
-            <span className="font-chic text-[var(--coral)]">prompt</span> structuré
+          <span className="cami-pill">Bibliothèque de prompts de Studio Cami IA</span>
+          <h1 className="font-display mt-5 text-3xl leading-tight md:text-5xl">
+            Transforme une idée
+            <br />
+            en prompt IA structuré
           </h1>
           <p className="mt-3 text-base text-muted-foreground">
-            Décris ton idée en français. L'IA produit un prompt MARIO complet, une version
-            améliorée, et les étapes concrètes pour le lancer.
+            Décris ton besoin et Mario, mon agent IA produit un prompt avec sa méthode.
           </p>
         </div>
 
