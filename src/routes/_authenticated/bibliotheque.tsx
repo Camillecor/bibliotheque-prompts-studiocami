@@ -1,8 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+import { z } from "zod";
 import { ArrowLeft, Loader2, Search, Trash2 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { PromptView } from "@/components/PromptView";
@@ -10,6 +11,7 @@ import { METIERS, formatDateFr, type PromptRow } from "@/lib/mario";
 import { deletePrompt, listPrompts } from "@/lib/mario.functions";
 
 export const Route = createFileRoute("/_authenticated/bibliotheque")({
+  validateSearch: z.object({ id: z.string().uuid().optional() }),
   head: () => ({
     meta: [
       { title: "Ma bibliothèque de prompts — Studio Cami IA" },
@@ -31,6 +33,7 @@ export const Route = createFileRoute("/_authenticated/bibliotheque")({
 type Tri = "recent" | "ancien";
 
 function LibraryPage() {
+  const { id: idDeepLink } = Route.useSearch();
   const fetchPrompts = useServerFn(listPrompts);
   const removePrompt = useServerFn(deletePrompt);
   const queryClient = useQueryClient();
@@ -44,6 +47,12 @@ function LibraryPage() {
     queryKey: ["prompts"],
     queryFn: () => fetchPrompts(),
   });
+
+  useEffect(() => {
+    if (!idDeepLink || !data) return;
+    const trouve = data.find((prompt) => prompt.id === idDeepLink);
+    if (trouve) setSelection(trouve);
+  }, [idDeepLink, data]);
 
   const suppression = useMutation({
     mutationFn: (id: string) => removePrompt({ data: { id } }),

@@ -1,28 +1,29 @@
 import { useState, type ReactNode } from "react";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { Library, LogOut, Menu, Wand2, X } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { Library, LogOut, Menu, Plus, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { listPrompts } from "@/lib/mario.functions";
 import logoAsset from "@/assets/studio-cami-logo.svg.asset.json";
 
-const NAV_ITEMS = [
-  { title: "Générateur", url: "/", icon: Wand2, exact: true },
-  { title: "Bibliothèque", url: "/bibliotheque", icon: Library, exact: false },
-] as const;
-
 function NavLink({
-  item,
+  to,
+  icon: Icon,
+  label,
   active,
   onNavigate,
 }: {
-  item: (typeof NAV_ITEMS)[number];
+  to: string;
+  icon: typeof Library;
+  label: string;
   active: boolean;
   onNavigate?: (() => void) | undefined;
 }) {
-  const Icon = item.icon;
   return (
     <Link
-      to={item.url}
+      to={to}
       onClick={onNavigate}
       className={[
         "flex items-center gap-3 border-l-2 px-4 py-2.5 text-sm font-semibold transition",
@@ -32,23 +33,71 @@ function NavLink({
       ].join(" ")}
     >
       <Icon className="h-4 w-4" />
-      {item.title}
+      {label}
     </Link>
   );
 }
 
-function SidebarNav({ pathname, onNavigate }: { pathname: string; onNavigate?: (() => void) | undefined }) {
+function RecentsList({ onNavigate }: { onNavigate?: (() => void) | undefined }) {
+  const { user } = useAuth();
+  const fetchPrompts = useServerFn(listPrompts);
+  const { data } = useQuery({
+    queryKey: ["prompts"],
+    queryFn: () => fetchPrompts(),
+    enabled: !!user,
+  });
+
+  const recents = (data ?? []).slice(0, 5);
+  if (!user || recents.length === 0) return null;
+
   return (
-    <nav className="flex flex-col gap-1 py-4">
-      {NAV_ITEMS.map((item) => (
+    <div className="mt-4 border-t border-sidebar-border pt-4">
+      <p className="px-4 pb-2 text-[11px] font-bold uppercase tracking-[0.12em] text-muted-foreground">
+        Récents
+      </p>
+      <ul className="space-y-0.5">
+        {recents.map((prompt) => (
+          <li key={prompt.id}>
+            <Link
+              to="/bibliotheque"
+              search={{ id: prompt.id }}
+              onClick={onNavigate}
+              className="block truncate px-4 py-1.5 text-sm text-muted-foreground transition hover:bg-muted hover:text-primary"
+              title={prompt.titre}
+            >
+              {prompt.titre}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function SidebarContent({ pathname, onNavigate }: { pathname: string; onNavigate?: (() => void) | undefined }) {
+  return (
+    <div className="flex h-full flex-col py-3">
+      <div className="px-3">
+        <Link
+          to="/"
+          onClick={onNavigate}
+          className="cami-new-btn flex w-full items-center justify-center gap-2"
+        >
+          <Plus className="h-4 w-4" />
+          Nouveau prompt
+        </Link>
+      </div>
+      <nav className="mt-3 flex flex-col gap-1">
         <NavLink
-          key={item.url}
-          item={item}
+          to="/bibliotheque"
+          icon={Library}
+          label="Bibliothèque"
+          active={pathname.startsWith("/bibliotheque")}
           onNavigate={onNavigate}
-          active={item.exact ? pathname === item.url : pathname.startsWith(item.url)}
         />
-      ))}
-    </nav>
+      </nav>
+      <RecentsList onNavigate={onNavigate} />
+    </div>
   );
 }
 
@@ -109,7 +158,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </header>
 
       <aside className="fixed left-0 top-12 bottom-0 z-30 hidden w-60 border-r border-sidebar-border bg-sidebar lg:block">
-        <SidebarNav pathname={pathname} />
+        <SidebarContent pathname={pathname} />
       </aside>
 
       {open ? (
@@ -134,7 +183,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <X className="h-4 w-4" />
               </button>
             </div>
-            <SidebarNav pathname={pathname} onNavigate={() => setOpen(false)} />
+            <SidebarContent pathname={pathname} onNavigate={() => setOpen(false)} />
           </div>
         </div>
       ) : null}

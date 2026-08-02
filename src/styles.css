@@ -123,6 +123,52 @@
   border-radius: calc(var(--radius) + 12px);
 }
 
+/* Esprit tech/IA (inspiré minitap.ai) — dans la palette claire Studio Cami, pas en dark mode */
+@utility glow-orb {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(70px);
+  opacity: 0.32;
+  pointer-events: none;
+}
+
+@utility tech-grid-bg {
+  background-image: radial-gradient(color-mix(in srgb, var(--primary) 9%, transparent) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+@utility live-dot {
+  position: relative;
+  display: inline-flex;
+  height: 6px;
+  width: 6px;
+}
+@utility live-dot-ping {
+  position: absolute;
+  display: inline-flex;
+  height: 100%;
+  width: 100%;
+  border-radius: 9999px;
+  background: var(--coral);
+  opacity: 0.75;
+  animation: cami-ping 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+@utility live-dot-core {
+  position: relative;
+  display: inline-flex;
+  height: 6px;
+  width: 6px;
+  border-radius: 9999px;
+  background: var(--coral);
+}
+@keyframes cami-ping {
+  75%,
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
 @layer components {
   .cami-card {
     @apply rounded-3xl border border-border bg-card p-6 shadow-sm md:p-8;
@@ -162,5 +208,22 @@
 
   .cami-block-alerte {
     @apply rounded-3xl border border-[color-mix(in_srgb,var(--warning)_40%,transparent)] bg-[color-mix(in_srgb,var(--warning)_14%,white)] p-5;
+  }
+
+  .cami-select-pill {
+    @apply cursor-pointer appearance-none rounded-full border border-border bg-muted py-1.5 pl-3.5 pr-8 text-xs font-semibold text-primary outline-none transition [background-position:right_0.6rem_center] [background-repeat:no-repeat] [background-size:0.7rem] hover:border-[var(--coral)] focus:border-[var(--info)];
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%235a6690'%3E%3Cpath fill-rule='evenodd' d='M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z' clip-rule='evenodd'/%3E%3C/svg%3E");
+  }
+
+  .cami-icon-btn {
+    @apply inline-flex h-8 w-8 items-center justify-center rounded-full border border-border bg-card text-muted-foreground transition hover:border-[var(--coral)] hover:text-[var(--coral)];
+  }
+
+  .cami-submit-btn {
+    @apply inline-flex h-10 w-10 items-center justify-center rounded-full bg-[var(--coral)] text-white shadow-md shadow-[rgba(255,107,53,0.28)] transition duration-200 hover:-translate-y-0.5 hover:bg-[var(--coral-dark)] hover:shadow-[0_0_24px_rgba(255,107,53,0.55)] active:scale-95 disabled:pointer-events-none disabled:opacity-40;
+  }
+
+  .cami-new-btn {
+    @apply rounded-xl bg-muted px-3 py-2.5 text-sm font-semibold text-primary transition hover:bg-secondary;
   }
 }

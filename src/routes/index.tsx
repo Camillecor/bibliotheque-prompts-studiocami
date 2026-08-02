@@ -3,7 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Loader2, Save, Sparkles, Wand2 } from "lucide-react";
+import { ArrowUp, Hash, Loader2, Save, Sparkles } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { PromptView } from "@/components/PromptView";
 import { useAuth } from "@/hooks/useAuth";
@@ -38,6 +38,7 @@ function GeneratorPage() {
 
   const [idee, setIdee] = useState("");
   const [motsCles, setMotsCles] = useState("");
+  const [motsClesOuvert, setMotsClesOuvert] = useState(false);
   const [metier, setMetier] = useState("");
   const [result, setResult] = useState<MarioResult | null>(null);
 
@@ -84,11 +85,22 @@ function GeneratorPage() {
     onError: (error: Error) => toast.error(error.message),
   });
 
+  const peutGenerer = idee.trim().length >= 5 && !generation.isPending;
+
   return (
     <AppShell>
-      <div className="mx-auto w-full max-w-5xl">
-        <div className="mx-auto max-w-2xl py-6 text-center md:py-10">
-          <span className="cami-pill">Bibliothèque de prompts de Studio Cami IA</span>
+      <div className="tech-grid-bg relative mx-auto w-full max-w-5xl overflow-hidden rounded-[2rem]">
+        <div className="glow-orb -left-20 -top-16 h-72 w-72 bg-[var(--info)]" />
+        <div className="glow-orb -right-16 top-24 h-64 w-64 bg-[var(--coral)]" />
+
+        <div className="relative mx-auto max-w-2xl py-6 text-center md:py-12">
+          <span className="cami-pill">
+            <span className="live-dot">
+              <span className="live-dot-ping" />
+              <span className="live-dot-core" />
+            </span>
+            Bibliothèque de prompts de Studio Cami IA
+          </span>
           <h1 className="font-display mt-5 text-3xl leading-tight md:text-5xl">
             Transforme une idée
             <br />
@@ -99,91 +111,94 @@ function GeneratorPage() {
           </p>
         </div>
 
-        <div className="cami-card-hero mx-auto mt-8 max-w-3xl space-y-5">
-          <div>
-            <label htmlFor="idee" className="mb-2 block text-sm font-semibold text-primary">
-              Décris ton idée de prompt
-            </label>
-            <textarea
-              id="idee"
-              rows={4}
-              value={idee}
-              onChange={(event) => setIdee(event.target.value)}
-              placeholder="Un prompt pour aider mon équipe marketing à rédiger des posts LinkedIn engageants"
-              className="cami-input resize-none"
-            />
-          </div>
+        <form
+          className="cami-card-hero relative mx-auto mt-8 max-w-3xl"
+          onSubmit={(event) => {
+            event.preventDefault();
+            if (user && peutGenerer) generation.mutate();
+          }}
+        >
+          <textarea
+            rows={3}
+            value={idee}
+            onChange={(event) => setIdee(event.target.value)}
+            placeholder="Décris ton besoin de prompt — comme tu le dirais à un collègue."
+            className="w-full resize-none border-0 bg-transparent text-lg text-primary outline-none placeholder:text-muted-foreground"
+          />
 
-          <div className="grid gap-4 md:grid-cols-2">
-            <div>
-              <label htmlFor="motscles" className="mb-2 block text-sm font-semibold text-primary">
-                Mots-clés <span className="font-normal text-muted-foreground">(optionnel)</span>
-              </label>
-              <input
-                id="motscles"
-                value={motsCles}
-                onChange={(event) => setMotsCles(event.target.value)}
-                placeholder="linkedin, copywriting, b2b"
-                className="cami-input"
-              />
-            </div>
-            <div>
-              <label htmlFor="metier" className="mb-2 block text-sm font-semibold text-primary">
-                Métier <span className="font-normal text-muted-foreground">(optionnel)</span>
-              </label>
+          {motsClesOuvert ? (
+            <input
+              value={motsCles}
+              onChange={(event) => setMotsCles(event.target.value)}
+              placeholder="Mots-clés, séparés par une virgule (optionnel)"
+              className="mt-1 w-full border-0 bg-transparent text-sm text-muted-foreground outline-none placeholder:text-muted-foreground/70"
+            />
+          ) : null}
+
+          <div className="mt-4 flex items-center justify-between gap-3 border-t border-border pt-4">
+            <div className="flex items-center gap-2">
               <select
                 id="metier"
                 value={metier}
                 onChange={(event) => setMetier(event.target.value)}
-                className="cami-input"
+                className="cami-select-pill"
+                aria-label="Métier"
               >
-                <option value="">Laisser Mario décider</option>
+                <option value="">Métier : Mario décide</option>
                 {METIERS.map((item) => (
                   <option key={item} value={item}>
                     {item}
                   </option>
                 ))}
               </select>
-            </div>
-          </div>
-
-          {user ? (
-            <button
-              type="button"
-              className="cami-cta w-full"
-              disabled={generation.isPending || idee.trim().length < 5}
-              onClick={() => generation.mutate()}
-            >
-              {generation.isPending ? (
-                <>
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                  Génération en cours…
-                </>
-              ) : (
-                <>
-                  <Wand2 className="h-5 w-5" />
-                  Générer le prompt
-                </>
-              )}
-            </button>
-          ) : (
-            <div className="glass-card flex flex-col items-start gap-3 p-6">
-              <p className="text-sm font-medium text-primary">
-                Connecte-toi pour générer des prompts et les ranger dans ta bibliothèque.
-              </p>
-              <button type="button" className="cami-btn" onClick={() => navigate({ to: "/auth" })}>
-                <Sparkles className="h-4 w-4" />
-                Se connecter
+              <button
+                type="button"
+                onClick={() => setMotsClesOuvert((v) => !v)}
+                aria-pressed={motsClesOuvert}
+                title="Ajouter des mots-clés"
+                className={[
+                  "cami-icon-btn",
+                  motsClesOuvert ? "bg-secondary text-[var(--primary-dark)]" : "",
+                ].join(" ")}
+              >
+                <Hash className="h-4 w-4" />
               </button>
             </div>
-          )}
-        </div>
 
-        <section className="mx-auto mt-12 max-w-4xl">
+            {user ? (
+              <button
+                type="submit"
+                disabled={!peutGenerer}
+                aria-label="Générer le prompt"
+                className="cami-submit-btn"
+              >
+                {generation.isPending ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : (
+                  <ArrowUp className="h-5 w-5" />
+                )}
+              </button>
+            ) : null}
+          </div>
+        </form>
+
+        {!user ? (
+          <div className="glass-card mx-auto mt-4 flex max-w-3xl flex-col items-start gap-3 p-6">
+            <p className="text-sm font-medium text-primary">
+              Connecte-toi pour générer des prompts et les ranger dans ta bibliothèque.
+            </p>
+            <button type="button" className="cami-btn" onClick={() => navigate({ to: "/auth" })}>
+              <Sparkles className="h-4 w-4" />
+              Se connecter
+            </button>
+          </div>
+        ) : null}
+
+        <section className="mx-auto mt-16 max-w-4xl">
           <p className="text-center text-[11px] font-bold uppercase tracking-[0.16em] text-muted-foreground">
             En 3 étapes
           </p>
-          <div className="mt-5 grid gap-4 md:grid-cols-3">
+          <div className="mt-6 grid gap-4 md:grid-cols-3">
             {[
               {
                 titre: "Décris ton besoin",
@@ -209,10 +224,8 @@ function GeneratorPage() {
           </div>
         </section>
 
-
-
         {result ? (
-          <div className="cami-card mx-auto mt-8 max-w-5xl space-y-8">
+          <div className="cami-card mx-auto mt-16 max-w-5xl space-y-8">
             <PromptView
               data={{
                 titre: result.titre_prompt,
