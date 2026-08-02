@@ -63,13 +63,13 @@ function AuthPage() {
 
   return (
     <AppShell>
-      <div className="mx-auto w-full max-w-5xl">
+      <div className="mx-auto w-full max-w-md py-6">
         <div className="cami-card-hero space-y-5">
           <div>
             <h1 className="text-2xl font-extrabold">
               {mode === "login" ? "Se connecter" : "Créer un compte"}
             </h1>
-            <p className="mt-2 text-sm text-slate-600">
+            <p className="mt-2 text-sm text-muted-foreground">
               Ta bibliothèque de prompts MARIO est privée et rattachée à ton compte.
             </p>
           </div>

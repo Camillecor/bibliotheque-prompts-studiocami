@@ -21,7 +21,7 @@ export function PromptView({ data }: { data: PromptViewData }) {
           <span className="cami-pill">{data.metier}</span>
           <span className="cami-pill">Complexité : {data.complexite}</span>
           {data.mots_cles.map((mot) => (
-            <span key={mot} className="cami-pill text-slate-500">
+            <span key={mot} className="cami-pill text-muted-foreground">
               #{mot}
             </span>
           ))}
@@ -30,8 +30,8 @@ export function PromptView({ data }: { data: PromptViewData }) {
 
       {data.alerte_pii ? (
         <div className="cami-block-alerte flex gap-3">
-          <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" />
-          <p className="text-sm font-medium text-amber-900">
+          <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-[var(--warning)]" />
+          <p className="text-sm font-medium text-foreground">
             Vigilance : cette idée touche à des données personnelles (PII). Anonymise tes exemples
             et évite d'injecter des données réelles dans le prompt.
           </p>
@@ -42,17 +42,17 @@ export function PromptView({ data }: { data: PromptViewData }) {
         <section className="cami-block-resume space-y-4">
           <div className="flex items-center justify-between gap-3">
             <h3 className="flex items-center gap-2 text-base font-bold">
-              <Sparkles className="h-4 w-4 text-sky-500" />
+              <Sparkles className="h-4 w-4 text-[var(--info)]" />
               Version 1
             </h3>
             <CopyButton value={data.version_1.prompt ?? ""} />
           </div>
-          <pre className="whitespace-pre-wrap rounded-2xl bg-white/70 p-4 text-sm leading-relaxed text-navy">
+          <pre className="whitespace-pre-wrap rounded-2xl bg-card/70 p-4 text-sm leading-relaxed text-primary">
             {data.version_1.prompt}
           </pre>
           {data.version_1.note ? (
-            <p className="text-sm text-slate-600">
-              <span className="font-semibold text-navy">Ce que couvre cette V1 : </span>
+            <p className="text-sm text-muted-foreground">
+              <span className="font-semibold text-primary">Ce que couvre cette V1 : </span>
               {data.version_1.note}
             </p>
           ) : null}
@@ -61,20 +61,20 @@ export function PromptView({ data }: { data: PromptViewData }) {
         <section className="cami-block-amelioration space-y-4">
           <div className="flex items-center justify-between gap-3">
             <h3 className="flex items-center gap-2 text-base font-bold">
-              <Wand2 className="h-4 w-4 text-[#ff7a45]" />
+              <Wand2 className="h-4 w-4 text-[var(--coral)]" />
               Version 2 — améliorée
             </h3>
             <CopyButton value={data.version_2.prompt ?? ""} />
           </div>
-          <pre className="whitespace-pre-wrap rounded-2xl bg-white/70 p-4 text-sm leading-relaxed text-navy">
+          <pre className="whitespace-pre-wrap rounded-2xl bg-card/70 p-4 text-sm leading-relaxed text-primary">
             {data.version_2.prompt}
           </pre>
           {data.version_2.amelioration ? (
-            <div className="rounded-2xl border border-orange-100 bg-white/80 p-4">
-              <p className="text-xs font-bold uppercase tracking-[0.08em] text-[#ff7a45]">
+            <div className="rounded-2xl border border-[color-mix(in_srgb,var(--coral)_28%,transparent)] bg-card/80 p-4">
+              <p className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--coral)]">
                 Ce qui a changé
               </p>
-              <p className="mt-1 text-sm text-slate-600">{data.version_2.amelioration}</p>
+              <p className="mt-1 text-sm text-muted-foreground">{data.version_2.amelioration}</p>
             </div>
           ) : null}
         </section>
@@ -83,13 +83,13 @@ export function PromptView({ data }: { data: PromptViewData }) {
       {data.etapes_lancement.length > 0 ? (
         <section className="cami-block-positif space-y-3">
           <h3 className="flex items-center gap-2 text-base font-bold">
-            <ListOrdered className="h-4 w-4 text-emerald-600" />
+            <ListOrdered className="h-4 w-4 text-[var(--success)]" />
             Étapes pour lancer ce prompt
           </h3>
           <ol className="space-y-2">
             {data.etapes_lancement.map((etape, index) => (
-              <li key={etape} className="flex gap-3 text-sm text-slate-700">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-xs font-bold text-emerald-700">
+              <li key={etape} className="flex gap-3 text-sm text-muted-foreground">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--success)_18%,white)] text-xs font-bold text-[var(--success)]">
                   {index + 1}
                 </span>
                 <span>{etape}</span>
