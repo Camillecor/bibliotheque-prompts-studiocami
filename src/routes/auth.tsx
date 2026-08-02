@@ -62,9 +62,8 @@ function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen">
-      <Header />
-      <main className="mx-auto max-w-md px-5 py-14">
+    <AppShell>
+      <div className="mx-auto w-full max-w-5xl">
         <div className="cami-card-hero space-y-5">
           <div>
             <h1 className="text-2xl font-extrabold">
@@ -107,7 +106,7 @@ function AuthPage() {
             {mode === "login" ? "Pas encore de compte ? S'inscrire" : "J'ai déjà un compte"}
           </button>
         </div>
-      </main>
-    </div>
+      </div>
+    </AppShell>
   );
 }

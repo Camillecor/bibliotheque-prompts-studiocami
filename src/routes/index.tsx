@@ -85,10 +85,8 @@ function GeneratorPage() {
   });
 
   return (
-    <div className="min-h-screen">
-      <Header />
-
-      <main className="mx-auto max-w-6xl px-5 py-10 md:py-14">
+    <AppShell>
+      <div className="mx-auto w-full max-w-5xl">
         <div className="mx-auto max-w-2xl text-center">
           <span className="cami-pill">Méthode MARIO</span>
           <h1 className="mt-4 text-3xl font-extrabold leading-tight md:text-5xl">
@@ -255,7 +253,7 @@ function GeneratorPage() {
             </div>
           </div>
         ) : null}
-      </main>
-    </div>
+      </div>
+    </AppShell>
   );
 }

@@ -73,9 +73,8 @@ function LibraryPage() {
   }, [data, recherche, metierFiltre, tri]);
 
   return (
-    <div className="min-h-screen">
-      <Header />
-      <main className="mx-auto max-w-6xl px-5 py-10 md:py-14">
+    <AppShell>
+      <div className="mx-auto w-full max-w-5xl">
         {selection ? (
           <div className="space-y-6">
             <div className="flex flex-wrap items-center justify-between gap-3">
@@ -189,7 +188,7 @@ function LibraryPage() {
             )}
           </>
         )}
-      </main>
-    </div>
+      </div>
+    </AppShell>
   );
 }
