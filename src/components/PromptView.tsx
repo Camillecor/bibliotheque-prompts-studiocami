@@ -20,11 +20,11 @@ export function PromptView({ data }: { data: PromptViewData }) {
         <div className="flex flex-wrap gap-2">
           <span className="cami-pill">{data.metier}</span>
           <span className="cami-pill">Complexité : {data.complexite}</span>
-          {data.mots_cles.map((mot) => (
-            <span key={mot} className="cami-pill text-muted-foreground">
-              #{mot}
+          {data.mots_cles.length > 0 ? (
+            <span className="cami-pill text-muted-foreground">
+              Mots-clés : {data.mots_cles.join(", ")}
             </span>
-          ))}
+          ) : null}
         </div>
       </div>
 

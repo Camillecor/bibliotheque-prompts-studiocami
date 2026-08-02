@@ -1,3 +1,5 @@
+import { TYPES_PROMPT } from "@/lib/mario";
+
 export const MARIO_SYSTEM_PROMPT = `[M] MISE EN SITUATION
 Tu es un expert senior en prompt engineering, spécialisé dans la méthode MARIO
 (Mettre en situation, Attente, Règles, Informations, Output). Tu travailles pour
@@ -68,6 +70,7 @@ export async function callAnthropicMario(input: {
   motsCles: string;
   metier: string;
   modele: ModeleMario;
+  typePrompt: string;
 }) {
   const apiKey = process.env["ANTHROPIC_API_KEY"];
   if (!apiKey) {
@@ -76,10 +79,13 @@ export async function callAnthropicMario(input: {
     );
   }
 
+  const typeLabel = TYPES_PROMPT.find((t) => t.value === input.typePrompt)?.label;
+
   const userMessage = [
     `Idée brute : ${input.idee}`,
     input.motsCles ? `Mots-clés suggérés : ${input.motsCles}` : "Mots-clés suggérés : (aucun)",
     input.metier ? `Métier indiqué : ${input.metier}` : "Métier indiqué : (non précisé)",
+    typeLabel ? `Type de tâche demandé : ${typeLabel}` : "Type de tâche demandé : (laisse Mario déduire)",
   ].join("\n");
 
   const response = await fetch("https://api.anthropic.com/v1/messages", {

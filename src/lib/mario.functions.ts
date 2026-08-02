@@ -8,6 +8,7 @@ const GenerateInput = z.object({
   motsCles: z.string().default(""),
   metier: z.string().default(""),
   modele: z.enum(["claude-opus-5", "claude-sonnet-5", "claude-haiku-4-5"]).default("claude-opus-5"),
+  typePrompt: z.string().default(""),
 });
 
 export const generateMarioPrompt = createServerFn({ method: "POST" })

@@ -188,9 +188,11 @@ function LibraryPage() {
                       <span className="cami-pill">{prompt.metier}</span>
                       <span className="cami-pill text-muted-foreground">{prompt.complexite}</span>
                     </div>
-                    <p className="mt-3 text-xs text-muted-foreground">
-                      {(prompt.mots_cles ?? []).map((mot) => `#${mot}`).join("  ")}
-                    </p>
+                    {(prompt.mots_cles ?? []).length > 0 ? (
+                      <p className="mt-3 text-xs text-muted-foreground">
+                        Mots-clés : {(prompt.mots_cles ?? []).join(", ")}
+                      </p>
+                    ) : null}
                   </button>
                 ))}
               </div>

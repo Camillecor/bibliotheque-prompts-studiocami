@@ -169,13 +169,32 @@
   }
 }
 
+@keyframes cami-aura {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--info) 40%, transparent),
+      0 32px 64px -16px rgba(5, 12, 156, 0.12);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--coral) 40%, transparent),
+      0 32px 64px -16px rgba(5, 12, 156, 0.12);
+  }
+}
+
 @layer components {
   .cami-card {
     @apply rounded-3xl border border-border bg-card p-6 shadow-sm md:p-8;
   }
 
   .cami-card-hero {
-    @apply rounded-3xl border border-border bg-card p-6 shadow-[0_32px_64px_-16px_rgba(5,12,156,0.12)] md:p-8;
+    @apply rounded-3xl border border-border bg-card p-6 md:p-8;
+    animation: cami-aura 5s ease-in-out infinite;
+  }
+
+  .cami-card-hero:focus-within {
+    animation-duration: 2s;
   }
 
   .cami-input {

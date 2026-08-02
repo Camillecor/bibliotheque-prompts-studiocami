@@ -1,14 +1,71 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { ArrowUp, Hash, Loader2, Save, Sparkles } from "lucide-react";
+import { ArrowUp, Check, ChevronDown, Hash, Loader2, Save, Sparkles } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { PromptView } from "@/components/PromptView";
 import { useAuth } from "@/hooks/useAuth";
-import { METIERS, MODELES, type MarioResult, type ModeleValue } from "@/lib/mario";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  METIERS,
+  MODELES,
+  TYPES_PROMPT,
+  type MarioResult,
+  type ModeleValue,
+  type TypePromptValue,
+} from "@/lib/mario";
 import { generateMarioPrompt, savePrompt } from "@/lib/mario.functions";
+
+const SUGGESTIONS_IDEE = [
+  "Un prompt pour rédiger des posts LinkedIn qui convertissent",
+  "Un prompt pour préparer un entretien de recrutement structuré",
+  "Un prompt pour analyser un contrat et repérer les clauses à risque",
+] as const;
+
+function useTypewriterPlaceholder(phrases: readonly string[], active: boolean) {
+  const [text, setText] = useState("");
+
+  useEffect(() => {
+    if (!active) {
+      setText("");
+      return;
+    }
+
+    let phraseIndex = 0;
+    let charIndex = 0;
+    let deleting = false;
+    let timeoutId: ReturnType<typeof setTimeout>;
+
+    const tick = () => {
+      const phrase = phrases[phraseIndex % phrases.length] ?? "";
+      if (!deleting) {
+        charIndex += 1;
+        setText(phrase.slice(0, charIndex));
+        timeoutId = setTimeout(tick, charIndex >= phrase.length ? 1600 : 32);
+        if (charIndex >= phrase.length) deleting = true;
+      } else {
+        charIndex -= 1;
+        setText(phrase.slice(0, charIndex));
+        timeoutId = setTimeout(tick, charIndex <= 0 ? 400 : 16);
+        if (charIndex <= 0) {
+          deleting = false;
+          phraseIndex += 1;
+        }
+      }
+    };
+
+    timeoutId = setTimeout(tick, 300);
+    return () => clearTimeout(timeoutId);
+  }, [active, phrases]);
+
+  return text;
+}
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -39,16 +96,17 @@ function GeneratorPage() {
   const [idee, setIdee] = useState("");
   const [motsCles, setMotsCles] = useState("");
   const [motsClesOuvert, setMotsClesOuvert] = useState(false);
-  const [metier, setMetier] = useState("");
+  const [typePrompt, setTypePrompt] = useState<TypePromptValue | "">("");
   const [modele, setModele] = useState<ModeleValue>("claude-opus-5");
   const [result, setResult] = useState<MarioResult | null>(null);
+  const placeholderAnime = useTypewriterPlaceholder(SUGGESTIONS_IDEE, idee.length === 0);
 
   const [titreEdit, setTitreEdit] = useState("");
   const [metierEdit, setMetierEdit] = useState("Autre");
   const [motsClesEdit, setMotsClesEdit] = useState("");
 
   const generation = useMutation({
-    mutationFn: () => generate({ data: { idee, motsCles, metier, modele } }),
+    mutationFn: () => generate({ data: { idee, motsCles, modele, typePrompt } }),
     onSuccess: (data) => {
       setResult(data);
       setTitreEdit(data.titre_prompt);
@@ -123,7 +181,7 @@ function GeneratorPage() {
             rows={3}
             value={idee}
             onChange={(event) => setIdee(event.target.value)}
-            placeholder="Décris ton besoin de prompt — comme tu le dirais à un collègue."
+            placeholder={placeholderAnime}
             className="w-full resize-none border-0 bg-transparent text-lg text-primary outline-none placeholder:text-muted-foreground"
           />
 
@@ -137,20 +195,45 @@ function GeneratorPage() {
           ) : null}
 
           <div className="mt-4 flex items-center justify-between gap-3 border-t border-border pt-4">
-            <select
-              id="metier"
-              value={metier}
-              onChange={(event) => setMetier(event.target.value)}
-              className="cami-select-pill"
-              aria-label="Type de prompt (métier)"
-            >
-              <option value="">Type de prompt : Mario décide</option>
-              {METIERS.map((item) => (
-                <option key={item} value={item}>
-                  {item}
-                </option>
-              ))}
-            </select>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button type="button" className="cami-select-pill inline-flex items-center gap-1.5">
+                  Type de prompt :{" "}
+                  {TYPES_PROMPT.find((t) => t.value === typePrompt)?.label ?? "Auto"}
+                  <ChevronDown className="h-3 w-3" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="start"
+                className="w-80 rounded-3xl border border-white/60 bg-white/75 p-2 shadow-2xl backdrop-blur-xl"
+              >
+                <button
+                  type="button"
+                  onClick={() => setTypePrompt("")}
+                  className="flex w-full items-center justify-between gap-2 rounded-2xl px-3 py-2 text-left text-sm font-semibold text-primary transition hover:bg-secondary"
+                >
+                  Type de prompt : Auto
+                  {typePrompt === "" ? <Check className="h-4 w-4 text-[var(--coral)]" /> : null}
+                </button>
+                <div className="my-1 h-px bg-border" />
+                {TYPES_PROMPT.map((item) => (
+                  <button
+                    key={item.value}
+                    type="button"
+                    onClick={() => setTypePrompt(item.value)}
+                    className="flex w-full flex-col items-start gap-0.5 rounded-2xl px-3 py-2 text-left transition hover:bg-secondary"
+                  >
+                    <span className="flex w-full items-center justify-between gap-2 text-sm font-semibold text-primary">
+                      {item.label}
+                      {typePrompt === item.value ? (
+                        <Check className="h-4 w-4 text-[var(--coral)]" />
+                      ) : null}
+                    </span>
+                    <span className="text-xs text-muted-foreground">{item.description}</span>
+                  </button>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
 
             <div className="flex items-center gap-2">
               <select
