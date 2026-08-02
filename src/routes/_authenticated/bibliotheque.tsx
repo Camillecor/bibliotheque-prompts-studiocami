@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { ArrowLeft, Loader2, Search, Trash2 } from "lucide-react";
-import { Header } from "@/components/Header";
+import { AppShell } from "@/components/AppShell";
 import { PromptView } from "@/components/PromptView";
 import { METIERS, formatDateFr, type PromptRow } from "@/lib/mario";
 import { deletePrompt, listPrompts } from "@/lib/mario.functions";

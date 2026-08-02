@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Loader2, Save, Sparkles, Wand2 } from "lucide-react";
-import { Header } from "@/components/Header";
+import { AppShell } from "@/components/AppShell";
 import { PromptView } from "@/components/PromptView";
 import { useAuth } from "@/hooks/useAuth";
 import { METIERS, type MarioResult } from "@/lib/mario";
