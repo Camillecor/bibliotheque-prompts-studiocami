@@ -16,7 +16,7 @@ function NavLink({
 }: {
   item: (typeof NAV_ITEMS)[number];
   active: boolean;
-  onNavigate?: () => void;
+  onNavigate?: (() => void) | undefined;
 }) {
   const Icon = item.icon;
   return (
