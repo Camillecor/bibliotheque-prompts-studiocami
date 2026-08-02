@@ -36,7 +36,7 @@ function NavLink({
   );
 }
 
-function SidebarNav({ pathname, onNavigate }: { pathname: string; onNavigate?: () => void }) {
+function SidebarNav({ pathname, onNavigate }: { pathname: string; onNavigate?: (() => void) | undefined }) {
   return (
     <nav className="flex flex-col gap-1 py-4">
       <p className="px-4 pb-2 text-[11px] font-bold uppercase tracking-[0.12em] text-muted-foreground">
