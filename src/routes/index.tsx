@@ -179,6 +179,38 @@ function GeneratorPage() {
           )}
         </div>
 
+        <section className="mx-auto mt-12 max-w-4xl">
+          <p className="text-center text-[11px] font-bold uppercase tracking-[0.16em] text-muted-foreground">
+            En 3 étapes
+          </p>
+          <div className="mt-5 grid gap-4 md:grid-cols-3">
+            {[
+              {
+                titre: "Décris ton besoin",
+                texte: "En français, comme tu le dirais à un collègue. Pas de jargon requis.",
+              },
+              {
+                titre: "Mario génère 2 versions",
+                texte: "Un prompt MARIO complet, une version améliorée et les étapes de lancement.",
+              },
+              {
+                titre: "Sauvegarde et retrouve-le",
+                texte: "Classé par métier et mots-clés, disponible à tout moment dans ta bibliothèque.",
+              },
+            ].map((etape, index) => (
+              <div key={etape.titre} className="cami-card">
+                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-secondary font-chic text-sm text-[var(--primary-dark)]">
+                  {index + 1}
+                </span>
+                <h2 className="mt-4 text-base font-bold">{etape.titre}</h2>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{etape.texte}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+
+
         {result ? (
           <div className="cami-card mx-auto mt-8 max-w-5xl space-y-8">
             <PromptView
