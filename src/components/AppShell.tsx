@@ -79,17 +79,9 @@ export function AppShell({ children }: { children: ReactNode }) {
           >
             <Menu className="h-4 w-4" />
           </button>
-          <Link to="/" className="flex items-center gap-2">
-            <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-primary">
-              <Sparkles className="h-3.5 w-3.5 text-[var(--info)]" />
-            </span>
-            <span className="font-chic text-sm uppercase tracking-[0.16em] text-primary">
-              Studio Cami
-            </span>
-          </Link>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           {user ? (
             <>
               <span className="flex h-7 w-7 items-center justify-center rounded-full bg-secondary text-[11px] font-bold text-[var(--primary-dark)]">
@@ -112,6 +104,9 @@ export function AppShell({ children }: { children: ReactNode }) {
               Se connecter
             </Link>
           )}
+          <Link to="/" aria-label="Studio Cami — accueil" className="flex items-center">
+            <img src={logoAsset.url} alt="Studio Cami" className="h-8 w-auto" />
+          </Link>
         </div>
       </header>
 
