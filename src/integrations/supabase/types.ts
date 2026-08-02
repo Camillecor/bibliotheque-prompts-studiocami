@@ -14,7 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      prompts: {
+        Row: {
+          alerte_pii: boolean
+          complexite: string
+          created_at: string
+          date_ajout: string
+          etapes_lancement: Json
+          id: string
+          idee_source: string | null
+          metier: string
+          mots_cles: string[]
+          titre: string
+          user_id: string
+          version_1: Json
+          version_2: Json
+        }
+        Insert: {
+          alerte_pii?: boolean
+          complexite?: string
+          created_at?: string
+          date_ajout?: string
+          etapes_lancement?: Json
+          id?: string
+          idee_source?: string | null
+          metier?: string
+          mots_cles?: string[]
+          titre: string
+          user_id: string
+          version_1?: Json
+          version_2?: Json
+        }
+        Update: {
+          alerte_pii?: boolean
+          complexite?: string
+          created_at?: string
+          date_ajout?: string
+          etapes_lancement?: Json
+          id?: string
+          idee_source?: string | null
+          metier?: string
+          mots_cles?: string[]
+          titre?: string
+          user_id?: string
+          version_1?: Json
+          version_2?: Json
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
