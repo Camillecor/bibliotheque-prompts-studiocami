@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
-import { Header } from "@/components/Header";
+import { AppShell } from "@/components/AppShell";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -62,15 +62,14 @@ function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen">
-      <Header />
-      <main className="mx-auto max-w-md px-5 py-14">
+    <AppShell>
+      <div className="mx-auto w-full max-w-md py-6">
         <div className="cami-card-hero space-y-5">
           <div>
             <h1 className="text-2xl font-extrabold">
               {mode === "login" ? "Se connecter" : "Créer un compte"}
             </h1>
-            <p className="mt-2 text-sm text-slate-600">
+            <p className="mt-2 text-sm text-muted-foreground">
               Ta bibliothèque de prompts MARIO est privée et rattachée à ton compte.
             </p>
           </div>
@@ -107,7 +106,7 @@ function AuthPage() {
             {mode === "login" ? "Pas encore de compte ? S'inscrire" : "J'ai déjà un compte"}
           </button>
         </div>
-      </main>
-    </div>
+      </div>
+    </AppShell>
   );
 }

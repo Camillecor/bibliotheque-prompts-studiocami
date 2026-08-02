@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Loader2, Save, Sparkles, Wand2 } from "lucide-react";
-import { Header } from "@/components/Header";
+import { AppShell } from "@/components/AppShell";
 import { PromptView } from "@/components/PromptView";
 import { useAuth } from "@/hooks/useAuth";
 import { METIERS, type MarioResult } from "@/lib/mario";
@@ -85,16 +85,15 @@ function GeneratorPage() {
   });
 
   return (
-    <div className="min-h-screen">
-      <Header />
-
-      <main className="mx-auto max-w-6xl px-5 py-10 md:py-14">
-        <div className="mx-auto max-w-2xl text-center">
+    <AppShell>
+      <div className="mx-auto w-full max-w-5xl">
+        <div className="mx-auto max-w-2xl py-6 text-center md:py-10">
           <span className="cami-pill">Méthode MARIO</span>
-          <h1 className="mt-4 text-3xl font-extrabold leading-tight md:text-5xl">
-            Transforme une idée en prompt structuré
+          <h1 className="mt-5 text-3xl font-extrabold leading-tight md:text-5xl">
+            Transforme une idée en{" "}
+            <span className="font-chic text-[var(--coral)]">prompt</span> structuré
           </h1>
-          <p className="mt-3 text-base text-slate-600">
+          <p className="mt-3 text-base text-muted-foreground">
             Décris ton idée en français. L'IA produit un prompt MARIO complet, une version
             améliorée, et les étapes concrètes pour le lancer.
           </p>
@@ -102,7 +101,7 @@ function GeneratorPage() {
 
         <div className="cami-card-hero mx-auto mt-8 max-w-3xl space-y-5">
           <div>
-            <label htmlFor="idee" className="mb-2 block text-sm font-semibold text-navy">
+            <label htmlFor="idee" className="mb-2 block text-sm font-semibold text-primary">
               Décris ton idée de prompt
             </label>
             <textarea
@@ -117,8 +116,8 @@ function GeneratorPage() {
 
           <div className="grid gap-4 md:grid-cols-2">
             <div>
-              <label htmlFor="motscles" className="mb-2 block text-sm font-semibold text-navy">
-                Mots-clés <span className="font-normal text-slate-400">(optionnel)</span>
+              <label htmlFor="motscles" className="mb-2 block text-sm font-semibold text-primary">
+                Mots-clés <span className="font-normal text-muted-foreground">(optionnel)</span>
               </label>
               <input
                 id="motscles"
@@ -129,8 +128,8 @@ function GeneratorPage() {
               />
             </div>
             <div>
-              <label htmlFor="metier" className="mb-2 block text-sm font-semibold text-navy">
-                Métier <span className="font-normal text-slate-400">(optionnel)</span>
+              <label htmlFor="metier" className="mb-2 block text-sm font-semibold text-primary">
+                Métier <span className="font-normal text-muted-foreground">(optionnel)</span>
               </label>
               <select
                 id="metier"
@@ -168,8 +167,8 @@ function GeneratorPage() {
               )}
             </button>
           ) : (
-            <div className="cami-block-resume flex flex-col items-start gap-3">
-              <p className="text-sm font-medium text-navy">
+            <div className="glass-card flex flex-col items-start gap-3 p-6">
+              <p className="text-sm font-medium text-primary">
                 Connecte-toi pour générer des prompts et les ranger dans ta bibliothèque.
               </p>
               <button type="button" className="cami-btn" onClick={() => navigate({ to: "/auth" })}>
@@ -195,7 +194,7 @@ function GeneratorPage() {
               }}
             />
 
-            <div className="space-y-4 border-t border-slate-100 pt-6">
+            <div className="space-y-4 border-t border-border pt-6">
               <h3 className="text-base font-bold">Classement dans la bibliothèque</h3>
               <div className="grid gap-4 md:grid-cols-3">
                 <div>
@@ -255,7 +254,7 @@ function GeneratorPage() {
             </div>
           </div>
         ) : null}
-      </main>
-    </div>
+      </div>
+    </AppShell>
   );
 }

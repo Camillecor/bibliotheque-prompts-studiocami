@@ -5,8 +5,8 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Studio Cami IA — design system
- * navy #0a1a3d · sky #38bdf8 · orange #ff7a45 · page #f8fbff
+ * Studio Cami — design system officiel
+ * primary #050c9c · coral #ff6b35 · info #3abef9 · page #f4f8ff
  */
 
 @theme inline {
@@ -24,6 +24,7 @@
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
+  --color-primary-dark: var(--primary-dark);
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
@@ -36,45 +37,56 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --color-navy: var(--navy);
-  --color-sky: var(--sky);
-  --color-orange: var(--orange);
+  --color-coral: var(--coral);
+  --color-info: var(--info);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-navy: var(--primary);
 }
 
 :root {
   --radius: 1rem;
-  --navy: oklch(0.256 0.093 264.1);
-  --sky: oklch(0.762 0.13 227.6);
-  --orange: oklch(0.72 0.163 41.2);
-  --background: oklch(0.985 0.008 240);
-  --foreground: oklch(0.256 0.093 264.1);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.256 0.093 264.1);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.256 0.093 264.1);
-  --primary: oklch(0.72 0.163 41.2);
-  --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.968 0.007 247.896);
-  --secondary-foreground: oklch(0.256 0.093 264.1);
-  --muted: oklch(0.968 0.007 247.896);
-  --muted-foreground: oklch(0.554 0.046 257.417);
-  --accent: oklch(0.762 0.13 227.6);
-  --accent-foreground: oklch(0.256 0.093 264.1);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(1 0 0);
-  --border: oklch(0.94 0.008 247);
-  --input: oklch(0.94 0.008 247);
-  --ring: oklch(0.762 0.13 227.6);
+  --background: #f4f8ff;
+  --foreground: #111a3d;
+  --card: #ffffff;
+  --card-foreground: #111a3d;
+  --popover: #ffffff;
+  --popover-foreground: #111a3d;
+  --primary: #050c9c;
+  --primary-dark: #030873;
+  --primary-foreground: #ffffff;
+  --secondary: #e4f1fe;
+  --secondary-foreground: #050c9c;
+  --muted: #eef4ff;
+  --muted-foreground: #5a6690;
+  --accent: #d7ecff;
+  --accent-foreground: #050c9c;
+  --coral: #ff6b35;
+  --coral-dark: #e85a26;
+  --info: #3abef9;
+  --success: #0f9d6d;
+  --warning: #f0a839;
+  --destructive: #e0483c;
+  --destructive-foreground: #ffffff;
+  --border: #dee9fa;
+  --input: #cbdbf3;
+  --ring: #3abef9;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #111a3d;
+  --sidebar-border: #dee9fa;
 }
 
 @layer base {
   * {
-    border-color: var(--color-border);
+    border-color: var(--border);
   }
 
   body {
-    background-color: var(--color-background);
-    color: var(--color-foreground);
+    background-color: var(--background);
+    color: var(--foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
   }
@@ -82,49 +94,66 @@
   h1,
   h2,
   h3 {
-    color: var(--navy);
+    color: var(--primary);
     letter-spacing: -0.02em;
   }
 }
 
+@utility font-chic {
+  font-family: var(--font-sans);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+@utility glass-card {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--card) 85%, transparent),
+    color-mix(in srgb, var(--secondary) 70%, transparent)
+  );
+  backdrop-filter: blur(20px) saturate(140%);
+  border: 1px solid color-mix(in srgb, #ffffff 60%, transparent);
+  border-radius: calc(var(--radius) + 12px);
+}
+
 @layer components {
   .cami-card {
-    @apply rounded-3xl border border-slate-100 bg-white p-6 shadow-sm md:p-8;
+    @apply rounded-3xl border border-border bg-card p-6 shadow-sm md:p-8;
   }
 
   .cami-card-hero {
-    @apply rounded-3xl border border-slate-100 bg-white p-6 shadow-xl shadow-slate-200/60 md:p-8;
+    @apply rounded-3xl border border-border bg-card p-6 shadow-[0_32px_64px_-16px_rgba(5,12,156,0.12)] md:p-8;
   }
 
   .cami-input {
-    @apply w-full rounded-2xl border-2 border-transparent bg-slate-50 px-5 py-4 text-[15px] text-navy outline-none transition placeholder:text-slate-400 focus:border-sky-400 focus:bg-white;
+    @apply w-full rounded-2xl border-2 border-transparent bg-muted px-5 py-4 text-[15px] text-foreground outline-none transition placeholder:text-muted-foreground focus:border-[var(--info)] focus:bg-card;
   }
 
   .cami-cta {
-    @apply inline-flex items-center justify-center gap-2 rounded-2xl bg-[#ff7a45] px-8 py-5 text-lg font-bold text-white shadow-lg shadow-orange-200 transition hover:-translate-y-0.5 hover:bg-[#e66a39] active:scale-95 disabled:pointer-events-none disabled:opacity-60;
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl bg-[var(--coral)] px-8 py-5 text-lg font-bold text-white shadow-lg shadow-[rgba(255,107,53,0.28)] transition duration-200 hover:-translate-y-0.5 hover:bg-[var(--coral-dark)] active:scale-95 disabled:pointer-events-none disabled:opacity-60;
   }
 
   .cami-btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-navy transition hover:border-[#ff7a45] hover:text-[#ff7a45];
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm font-semibold text-primary transition duration-200 hover:-translate-y-0.5 hover:border-[var(--coral)] hover:text-[var(--coral)] active:scale-95;
   }
 
   .cami-pill {
-    @apply inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-4 py-1.5 text-[11px] font-medium uppercase tracking-[0.08em] text-navy;
+    @apply inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-4 py-1.5 text-[11px] font-medium uppercase tracking-[0.08em] text-primary;
   }
 
   .cami-block-resume {
-    @apply rounded-3xl border border-sky-100 bg-[#ebf5ff] p-6;
+    @apply rounded-3xl border border-[color-mix(in_srgb,var(--info)_35%,transparent)] bg-[color-mix(in_srgb,var(--info)_12%,white)] p-6;
   }
 
   .cami-block-amelioration {
-    @apply rounded-3xl border border-orange-100 bg-[#fff5f0] p-6;
+    @apply rounded-3xl border border-[color-mix(in_srgb,var(--coral)_28%,transparent)] bg-[color-mix(in_srgb,var(--coral)_10%,white)] p-6;
   }
 
   .cami-block-positif {
-    @apply rounded-3xl border border-emerald-100 bg-emerald-50 p-6;
+    @apply rounded-3xl border border-[color-mix(in_srgb,var(--success)_28%,transparent)] bg-[color-mix(in_srgb,var(--success)_10%,white)] p-6;
   }
 
   .cami-block-alerte {
-    @apply rounded-3xl border border-amber-200 bg-amber-50 p-5;
+    @apply rounded-3xl border border-[color-mix(in_srgb,var(--warning)_40%,transparent)] bg-[color-mix(in_srgb,var(--warning)_14%,white)] p-5;
   }
 }

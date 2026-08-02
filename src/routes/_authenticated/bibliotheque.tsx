@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { ArrowLeft, Loader2, Search, Trash2 } from "lucide-react";
-import { Header } from "@/components/Header";
+import { AppShell } from "@/components/AppShell";
 import { PromptView } from "@/components/PromptView";
 import { METIERS, formatDateFr, type PromptRow } from "@/lib/mario";
 import { deletePrompt, listPrompts } from "@/lib/mario.functions";
@@ -73,9 +73,8 @@ function LibraryPage() {
   }, [data, recherche, metierFiltre, tri]);
 
   return (
-    <div className="min-h-screen">
-      <Header />
-      <main className="mx-auto max-w-6xl px-5 py-10 md:py-14">
+    <AppShell>
+      <div className="mx-auto w-full max-w-5xl">
         {selection ? (
           <div className="space-y-6">
             <div className="flex flex-wrap items-center justify-between gap-3">
@@ -94,7 +93,7 @@ function LibraryPage() {
               </button>
             </div>
             <div className="cami-card">
-              <p className="mb-4 text-xs font-medium uppercase tracking-[0.08em] text-slate-400">
+              <p className="mb-4 text-xs font-medium uppercase tracking-[0.08em] text-muted-foreground">
                 Ajouté le {formatDateFr(selection.date_ajout)}
               </p>
               <PromptView
@@ -116,7 +115,7 @@ function LibraryPage() {
             <div className="flex flex-wrap items-end justify-between gap-4">
               <div>
                 <h1 className="text-3xl font-extrabold md:text-4xl">Ma bibliothèque</h1>
-                <p className="mt-2 text-sm text-slate-600">
+                <p className="mt-2 text-sm text-muted-foreground">
                   {(data ?? []).length} prompt{(data ?? []).length > 1 ? "s" : ""} dans ta
                   bibliothèque
                 </p>
@@ -125,7 +124,7 @@ function LibraryPage() {
 
             <div className="cami-card mt-6 grid gap-4 md:grid-cols-[2fr_1fr_1fr]">
               <div className="relative">
-                <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <input
                   value={recherche}
                   onChange={(event) => setRecherche(event.target.value)}
@@ -157,10 +156,10 @@ function LibraryPage() {
 
             {isLoading ? (
               <div className="mt-10 flex justify-center">
-                <Loader2 className="h-6 w-6 animate-spin text-slate-400" />
+                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
               </div>
             ) : prompts.length === 0 ? (
-              <div className="cami-block-resume mt-6 text-center text-sm text-slate-600">
+              <div className="cami-block-resume mt-6 text-center text-sm text-muted-foreground">
                 Aucun prompt pour l'instant. Génère ton premier prompt depuis le générateur.
               </div>
             ) : (
@@ -172,15 +171,15 @@ function LibraryPage() {
                     onClick={() => setSelection(prompt)}
                     className="cami-card text-left transition hover:-translate-y-0.5 hover:shadow-md"
                   >
-                    <p className="text-xs font-medium uppercase tracking-[0.08em] text-slate-400">
+                    <p className="text-xs font-medium uppercase tracking-[0.08em] text-muted-foreground">
                       {formatDateFr(prompt.date_ajout)}
                     </p>
                     <h2 className="mt-2 text-lg font-bold leading-snug">{prompt.titre}</h2>
                     <div className="mt-4 flex flex-wrap gap-2">
                       <span className="cami-pill">{prompt.metier}</span>
-                      <span className="cami-pill text-slate-500">{prompt.complexite}</span>
+                      <span className="cami-pill text-muted-foreground">{prompt.complexite}</span>
                     </div>
-                    <p className="mt-3 text-xs text-slate-500">
+                    <p className="mt-3 text-xs text-muted-foreground">
                       {(prompt.mots_cles ?? []).map((mot) => `#${mot}`).join("  ")}
                     </p>
                   </button>
@@ -189,7 +188,7 @@ function LibraryPage() {
             )}
           </>
         )}
-      </main>
-    </div>
+      </div>
+    </AppShell>
   );
 }
