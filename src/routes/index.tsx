@@ -88,14 +88,14 @@ function GeneratorPage() {
     <AppShell>
       <div className="mx-auto w-full max-w-5xl">
         <div className="mx-auto max-w-2xl py-6 text-center md:py-10">
-          <span className="cami-pill">Méthode MARIO</span>
-          <h1 className="mt-5 text-3xl font-extrabold leading-tight md:text-5xl">
-            Transforme une idée en{" "}
-            <span className="font-chic text-[var(--coral)]">prompt</span> structuré
+          <span className="cami-pill">Bibliothèque de prompts de Studio Cami IA</span>
+          <h1 className="font-display mt-5 text-3xl leading-tight md:text-5xl">
+            Transforme une idée
+            <br />
+            en prompt IA structuré
           </h1>
           <p className="mt-3 text-base text-muted-foreground">
-            Décris ton idée en français. L'IA produit un prompt MARIO complet, une version
-            améliorée, et les étapes concrètes pour le lancer.
+            Décris ton besoin et Mario, mon agent IA produit un prompt avec sa méthode.
           </p>
         </div>
 
@@ -137,7 +137,7 @@ function GeneratorPage() {
                 onChange={(event) => setMetier(event.target.value)}
                 className="cami-input"
               >
-                <option value="">Laisser l'IA décider</option>
+                <option value="">Laisser Mario décider</option>
                 {METIERS.map((item) => (
                   <option key={item} value={item}>
                     {item}
@@ -178,6 +178,38 @@ function GeneratorPage() {
             </div>
           )}
         </div>
+
+        <section className="mx-auto mt-12 max-w-4xl">
+          <p className="text-center text-[11px] font-bold uppercase tracking-[0.16em] text-muted-foreground">
+            En 3 étapes
+          </p>
+          <div className="mt-5 grid gap-4 md:grid-cols-3">
+            {[
+              {
+                titre: "Décris ton besoin",
+                texte: "En français, comme tu le dirais à un collègue. Pas de jargon requis.",
+              },
+              {
+                titre: "Mario génère 2 versions",
+                texte: "Un prompt MARIO complet, une version améliorée et les étapes de lancement.",
+              },
+              {
+                titre: "Sauvegarde et retrouve-le",
+                texte: "Classé par métier et mots-clés, disponible à tout moment dans ta bibliothèque.",
+              },
+            ].map((etape, index) => (
+              <div key={etape.titre} className="cami-card">
+                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-secondary font-chic text-sm text-[var(--primary-dark)]">
+                  {index + 1}
+                </span>
+                <h2 className="mt-4 text-base font-bold">{etape.titre}</h2>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{etape.texte}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+
 
         {result ? (
           <div className="cami-card mx-auto mt-8 max-w-5xl space-y-8">

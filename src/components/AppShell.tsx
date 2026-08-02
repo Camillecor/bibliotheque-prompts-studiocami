@@ -1,8 +1,9 @@
 import { useState, type ReactNode } from "react";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { Library, LogOut, Menu, Sparkles, Wand2, X } from "lucide-react";
+import { Library, LogOut, Menu, Wand2, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import logoAsset from "@/assets/studio-cami-logo.svg.asset.json";
 
 const NAV_ITEMS = [
   { title: "Générateur", url: "/", icon: Wand2, exact: true },
@@ -39,9 +40,6 @@ function NavLink({
 function SidebarNav({ pathname, onNavigate }: { pathname: string; onNavigate?: (() => void) | undefined }) {
   return (
     <nav className="flex flex-col gap-1 py-4">
-      <p className="px-4 pb-2 text-[11px] font-bold uppercase tracking-[0.12em] text-muted-foreground">
-        Navigation
-      </p>
       {NAV_ITEMS.map((item) => (
         <NavLink
           key={item.url}
@@ -79,17 +77,9 @@ export function AppShell({ children }: { children: ReactNode }) {
           >
             <Menu className="h-4 w-4" />
           </button>
-          <Link to="/" className="flex items-center gap-2">
-            <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-primary">
-              <Sparkles className="h-3.5 w-3.5 text-[var(--info)]" />
-            </span>
-            <span className="font-chic text-sm uppercase tracking-[0.16em] text-primary">
-              Studio Cami
-            </span>
-          </Link>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           {user ? (
             <>
               <span className="flex h-7 w-7 items-center justify-center rounded-full bg-secondary text-[11px] font-bold text-[var(--primary-dark)]">
@@ -112,6 +102,9 @@ export function AppShell({ children }: { children: ReactNode }) {
               Se connecter
             </Link>
           )}
+          <Link to="/" aria-label="Studio Cami — accueil" className="flex items-center">
+            <img src={logoAsset.url} alt="Studio Cami" className="h-8 w-auto" />
+          </Link>
         </div>
       </header>
 
