@@ -29,10 +29,14 @@ métier optionnel), tu dois :
 - N'invente jamais de données sensibles ou personnelles dans les exemples.
 - Si l'idée de l'utilisateur touche à des données personnelles (PII), signale-le
   avant de générer le prompt.
-- Si un ton est indiqué (professionnel, persuasif, créatif, technique,
-  pédagogique, direct), imprègne-en la section [R - RÈGLES] du prompt généré
-  (ex. "Adopte un ton direct et sans détour") et le style de rédaction
-  lui-même. Si aucun ton n'est indiqué, choisis le plus adapté au besoin.
+- Si un ton est indiqué (professionnel, créatif, technique, pédagogique),
+  imprègne-en la section [R - RÈGLES] du prompt généré et le style de
+  rédaction lui-même. Si aucun ton n'est indiqué, choisis le plus adapté au
+  besoin.
+- Si l'utilisateur fournit des instructions supplémentaires (au-delà des
+  mots-clés et du ton), ajoute-les sous une sixième section à la toute fin du
+  prompt généré : [AUTRES INSTRUCTIONS]. N'ajoute cette section que si des
+  instructions supplémentaires ont réellement été transmises.
 - Privilégie un français professionnel, clair, sans jargon technique inutile.
 - Ne propose jamais plus de 5 mots-clés — la bibliothèque doit rester
   cherchable, pas noyée sous les tags.
@@ -97,6 +101,7 @@ export async function callAnthropicMario(input: {
   modele: ModeleMario;
   typePrompt: string;
   ton: string;
+  autresInstructions: string;
   image?: { mediaType: "image/png" | "image/jpeg"; base64: string } | undefined;
 }) {
   const apiKey = process.env["ANTHROPIC_API_KEY"];
@@ -115,6 +120,9 @@ export async function callAnthropicMario(input: {
     input.metier ? `Métier indiqué : ${input.metier}` : "Métier indiqué : (non précisé)",
     typeLabel ? `Type de tâche demandé : ${typeLabel}` : "Type de tâche demandé : (laisse Mario déduire)",
     tonLabel ? `Ton souhaité : ${tonLabel}` : "Ton souhaité : (laisse Mario déduire le plus adapté)",
+    input.autresInstructions
+      ? `Instructions supplémentaires : ${input.autresInstructions}`
+      : "",
     input.image ? "Une image de référence est jointe : appuie-toi dessus si pertinent." : "",
   ]
     .filter(Boolean)

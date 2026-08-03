@@ -18,6 +18,7 @@ const GenerateInput = z.object({
   modele: z.enum(["claude-sonnet-5", "claude-haiku-4-5"]).default("claude-sonnet-5"),
   typePrompt: z.string().default(""),
   ton: z.string().default(""),
+  autresInstructions: z.string().default(""),
   image: z
     .object({
       mediaType: z.enum(["image/png", "image/jpeg"]),

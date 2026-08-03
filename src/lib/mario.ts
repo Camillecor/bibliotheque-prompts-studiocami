@@ -36,11 +36,9 @@ export type TypePromptValue = (typeof TYPES_PROMPT)[number]["value"];
 
 export const TONS = [
   { value: "professionnel", label: "Professionnel" },
-  { value: "persuasif", label: "Persuasif" },
   { value: "creatif", label: "Créatif" },
   { value: "technique", label: "Technique" },
   { value: "pedagogique", label: "Pédagogique" },
-  { value: "direct", label: "Direct" },
 ] as const;
 
 export type TonValue = (typeof TONS)[number]["value"];

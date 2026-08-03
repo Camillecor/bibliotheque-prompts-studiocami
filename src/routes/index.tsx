@@ -3,7 +3,17 @@ import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { ArrowUp, Check, ChevronDown, Hash, ImagePlus, Loader2, Save, X } from "lucide-react";
+import {
+  ArrowUp,
+  Check,
+  ChevronDown,
+  Hash,
+  ImagePlus,
+  ListPlus,
+  Loader2,
+  Save,
+  X,
+} from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { IaLogo, IA_LOGO_NAMES } from "@/components/IaLogos";
 import { PromptView } from "@/components/PromptView";
@@ -147,18 +157,27 @@ function GeneratorPage() {
   const [motsCles, setMotsCles] = useState("");
   const [motsClesOuvert, setMotsClesOuvert] = useState(false);
   const [typePrompt, setTypePrompt] = useState<TypePromptValue | "">("");
-  const [ton, setTon] = useState<TonValue | "">("");
+  const [ton, setTon] = useState<TonValue>(TONS[0].value);
   const [modele, setModele] = useState<ModeleValue>("claude-sonnet-5");
+  const [autresInstructions, setAutresInstructions] = useState("");
+  const [autresInstructionsOuvert, setAutresInstructionsOuvert] = useState(false);
   const [image, setImage] = useState<ImageAttachment | null>(null);
   const [imageEnCours, setImageEnCours] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [result, setResult] = useState<MarioResult | null>(null);
+  const resultRef = useRef<HTMLDivElement>(null);
   const placeholderAnime = useTypewriterPlaceholder(SUGGESTIONS_IDEE, idee.length === 0);
 
   const [titreEdit, setTitreEdit] = useState("");
   const [metierEdit, setMetierEdit] = useState("Autre");
   const [motsClesEdit, setMotsClesEdit] = useState("");
   const [dateEdit, setDateEdit] = useState(() => new Date().toISOString().slice(0, 10));
+
+  useEffect(() => {
+    if (result) {
+      resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [result]);
 
   async function handleImageChange(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
@@ -182,6 +201,7 @@ function GeneratorPage() {
           modele,
           typePrompt,
           ton,
+          autresInstructions,
           image: image ? { mediaType: image.mediaType, base64: image.base64 } : undefined,
         },
       }),
@@ -282,6 +302,16 @@ function GeneratorPage() {
             />
           ) : null}
 
+          {autresInstructionsOuvert ? (
+            <textarea
+              rows={2}
+              value={autresInstructions}
+              onChange={(event) => setAutresInstructions(event.target.value)}
+              placeholder="Autres instructions à respecter (optionnel)"
+              className="mt-1 w-full resize-none border-0 bg-transparent text-sm text-muted-foreground outline-none placeholder:text-muted-foreground/70"
+            />
+          ) : null}
+
           {image ? (
             <div className="mt-2 inline-flex items-center gap-2 rounded-2xl border border-border bg-muted px-3 py-2">
               <img src={image.previewUrl} alt="" className="h-8 w-8 rounded-lg object-cover" />
@@ -297,10 +327,13 @@ function GeneratorPage() {
             </div>
           ) : null}
 
-          <div className="mt-4 flex items-center justify-between gap-3 border-t border-border pt-4">
+          <div className="mt-4 flex flex-col gap-3 border-t border-border pt-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button type="button" className="cami-select-pill inline-flex items-center gap-1.5">
+                <button
+                  type="button"
+                  className="cami-select-pill inline-flex w-fit items-center gap-1.5"
+                >
                   Type de prompt :{" "}
                   {TYPES_PROMPT.find((t) => t.value === typePrompt)?.label ?? "Auto"}
                   <ChevronDown className="h-3 w-3" />
@@ -338,75 +371,88 @@ function GeneratorPage() {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <div className="flex flex-wrap items-center gap-2">
-              <select
-                id="ton"
-                value={ton}
-                onChange={(event) => setTon(event.target.value as TonValue | "")}
-                className="cami-select-pill"
-                aria-label="Ton du prompt"
-              >
-                <option value="">Ton : Auto</option>
-                {TONS.map((item) => (
-                  <option key={item.value} value={item.value}>
-                    Ton : {item.label}
-                  </option>
-                ))}
-              </select>
-              <select
-                id="modele"
-                value={modele}
-                onChange={(event) => setModele(event.target.value as ModeleValue)}
-                className="cami-select-pill"
-                aria-label="Modèle Claude"
-              >
-                {MODELES.map((item) => (
-                  <option key={item.value} value={item.value}>
-                    {item.label}
-                  </option>
-                ))}
-              </select>
-              <button
-                type="button"
-                onClick={() => setMotsClesOuvert((v) => !v)}
-                aria-pressed={motsClesOuvert}
-                title="Ajouter des mots-clés"
-                className={[
-                  "cami-icon-btn",
-                  motsClesOuvert ? "bg-secondary text-[var(--primary-dark)]" : "",
-                ].join(" ")}
-              >
-                <Hash className="h-4 w-4" />
-              </button>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/png,image/jpeg"
-                onChange={handleImageChange}
-                className="hidden"
-              />
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                disabled={imageEnCours}
-                aria-pressed={!!image}
-                title="Joindre une image (PNG ou JPG, 5 Mo max)"
-                className={[
-                  "cami-icon-btn",
-                  image ? "bg-secondary text-[var(--primary-dark)]" : "",
-                ].join(" ")}
-              >
-                {imageEnCours ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <ImagePlus className="h-4 w-4" />
-                )}
-              </button>
+            <div className="flex flex-wrap items-center justify-between gap-2 sm:justify-end">
+              <div className="flex flex-wrap items-center gap-2">
+                <select
+                  id="ton"
+                  value={ton}
+                  onChange={(event) => setTon(event.target.value as TonValue)}
+                  className="cami-select-pill"
+                  aria-label="Ton du prompt"
+                >
+                  {TONS.map((item) => (
+                    <option key={item.value} value={item.value}>
+                      Ton : {item.label}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  id="modele"
+                  value={modele}
+                  onChange={(event) => setModele(event.target.value as ModeleValue)}
+                  className="cami-select-pill"
+                  aria-label="Modèle Claude"
+                >
+                  {MODELES.map((item) => (
+                    <option key={item.value} value={item.value}>
+                      {item.label}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  onClick={() => setMotsClesOuvert((v) => !v)}
+                  aria-pressed={motsClesOuvert}
+                  title="Ajouter des mots-clés"
+                  className={[
+                    "cami-icon-btn",
+                    motsClesOuvert ? "bg-secondary text-[var(--primary-dark)]" : "",
+                  ].join(" ")}
+                >
+                  <Hash className="h-4 w-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setAutresInstructionsOuvert((v) => !v)}
+                  aria-pressed={autresInstructionsOuvert}
+                  title="Ajouter d'autres instructions"
+                  className={[
+                    "cami-icon-btn",
+                    autresInstructionsOuvert ? "bg-secondary text-[var(--primary-dark)]" : "",
+                  ].join(" ")}
+                >
+                  <ListPlus className="h-4 w-4" />
+                </button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/png,image/jpeg"
+                  onChange={handleImageChange}
+                  className="hidden"
+                />
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={imageEnCours}
+                  aria-pressed={!!image}
+                  title="Joindre une image (PNG ou JPG, 5 Mo max)"
+                  className={[
+                    "cami-icon-btn",
+                    image ? "bg-secondary text-[var(--primary-dark)]" : "",
+                  ].join(" ")}
+                >
+                  {imageEnCours ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <ImagePlus className="h-4 w-4" />
+                  )}
+                </button>
+              </div>
               <button
                 type="submit"
                 disabled={!peutGenerer}
                 aria-label="Générer le prompt"
-                className="cami-submit-btn"
+                className="cami-submit-btn shrink-0"
               >
                 {generation.isPending ? (
                   <Loader2 className="h-5 w-5 animate-spin" />
@@ -470,7 +516,11 @@ function GeneratorPage() {
         </section>
 
         {result ? (
-          <div className="cami-card mx-auto mt-16 max-w-5xl space-y-8">
+          <div
+            ref={resultRef}
+            id="prompt-genere"
+            className="cami-card mx-auto mt-16 max-w-5xl scroll-mt-20 space-y-8"
+          >
             <PromptView
               data={{
                 titre: result.titre_prompt,
@@ -486,7 +536,7 @@ function GeneratorPage() {
 
             <div className="space-y-4 border-t border-border pt-6">
               <h3 className="text-base font-bold">Classement dans la bibliothèque</h3>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <div className="flex flex-col gap-4">
                 <div>
                   <label htmlFor="titre-edit" className="mb-2 block text-sm font-semibold">
                     Titre
@@ -542,7 +592,7 @@ function GeneratorPage() {
 
               <button
                 type="button"
-                className="cami-cta w-full md:w-auto"
+                className="cami-save-btn"
                 disabled={sauvegarde.isPending}
                 onClick={() => sauvegarde.mutate()}
               >

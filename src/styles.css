@@ -272,6 +272,10 @@
     @apply inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[var(--coral)] px-6 py-4 text-base font-bold text-white shadow-lg shadow-[rgba(255,107,53,0.3)] transition duration-200 hover:-translate-y-0.5 hover:bg-[var(--coral-dark)] active:scale-95 sm:w-auto;
   }
 
+  .cami-save-btn {
+    @apply inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[var(--info)] px-6 py-4 text-base font-bold text-white shadow-lg shadow-[rgba(58,190,249,0.32)] transition duration-200 hover:-translate-y-0.5 hover:bg-[#2aa8e0] active:scale-95 disabled:pointer-events-none disabled:opacity-60 sm:w-auto;
+  }
+
   .cami-marquee-mask {
     -webkit-mask-image: linear-gradient(
       to right,

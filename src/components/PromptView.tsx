@@ -53,7 +53,7 @@ export function PromptView({ data }: { data: PromptViewData }) {
         <pre className="cami-code-body relative">{data.prompt}</pre>
       </section>
 
-      <div className="flex justify-center sm:justify-end">
+      <div className="flex justify-center">
         <CopyButton value={data.prompt} label="Copier le prompt" className="cami-copy-btn" />
       </div>
 
