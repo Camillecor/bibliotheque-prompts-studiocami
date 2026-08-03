@@ -1,0 +1,7 @@
+ALTER TABLE public.prompts
+  ADD COLUMN IF NOT EXISTS prompt text NOT NULL DEFAULT '',
+  ADD COLUMN IF NOT EXISTS note text NOT NULL DEFAULT '';
+
+ALTER TABLE public.prompts
+  DROP COLUMN IF EXISTS version_1,
+  DROP COLUMN IF EXISTS version_2;

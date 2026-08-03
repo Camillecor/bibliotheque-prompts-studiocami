@@ -25,10 +25,10 @@ export type Database = {
           idee_source: string | null
           metier: string
           mots_cles: string[]
+          note: string
+          prompt: string
           titre: string
           user_id: string
-          version_1: Json
-          version_2: Json
         }
         Insert: {
           alerte_pii?: boolean
@@ -40,10 +40,10 @@ export type Database = {
           idee_source?: string | null
           metier?: string
           mots_cles?: string[]
+          note?: string
+          prompt?: string
           titre: string
           user_id: string
-          version_1?: Json
-          version_2?: Json
         }
         Update: {
           alerte_pii?: boolean
@@ -55,10 +55,10 @@ export type Database = {
           idee_source?: string | null
           metier?: string
           mots_cles?: string[]
+          note?: string
+          prompt?: string
           titre?: string
           user_id?: string
-          version_1?: Json
-          version_2?: Json
         }
         Relationships: []
       }
