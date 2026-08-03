@@ -232,7 +232,7 @@ function GeneratorPage() {
               <span className="live-dot-ping" />
               <span className="live-dot-core" />
             </span>
-            Bibliothèque de prompts de Studio Cami IA
+            Générateur de prompt • Bibliothèque • Glossaire • Studio Cami IA
           </span>
           <h1 className="font-display mt-5 text-3xl leading-tight md:text-5xl">
             Transforme une idée
