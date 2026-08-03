@@ -1,4 +1,4 @@
-import { AlertTriangle, ListOrdered, Sparkles } from "lucide-react";
+import { AlertTriangle, Sparkles } from "lucide-react";
 import { CopyButton } from "@/components/CopyButton";
 
 type PromptViewData = {
@@ -16,7 +16,10 @@ export function PromptView({ data }: { data: PromptViewData }) {
   return (
     <div className="space-y-6">
       <div className="space-y-4">
-        <h2 className="text-2xl font-extrabold md:text-3xl">{data.titre}</h2>
+        <div className="flex items-center gap-3">
+          <span className="cami-step-badge">1</span>
+          <h2 className="text-2xl font-extrabold md:text-3xl">{data.titre}</h2>
+        </div>
         <div className="flex flex-wrap gap-2">
           <span className="cami-pill">{data.metier}</span>
           <span className="cami-pill">Complexité : {data.complexite}</span>
@@ -66,8 +69,8 @@ export function PromptView({ data }: { data: PromptViewData }) {
 
       {data.etapes_lancement.length > 0 ? (
         <section className="space-y-4">
-          <h3 className="flex items-center gap-2 text-base font-bold">
-            <ListOrdered className="h-4 w-4 text-[var(--success)]" />
+          <h3 className="flex items-center gap-3 text-lg font-bold">
+            <span className="cami-step-badge bg-[var(--success)]">2</span>
             Je suis ces étapes pour lancer mon prompt
           </h3>
           <ol>

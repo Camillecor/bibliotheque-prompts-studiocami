@@ -531,7 +531,10 @@ function GeneratorPage() {
             />
 
             <div className="space-y-4 border-t border-border pt-6">
-              <h3 className="text-base font-bold">Je range mon nouveau prompt dans ma bibliothèque</h3>
+              <h3 className="flex items-center gap-3 text-lg font-bold">
+                <span className="cami-step-badge bg-[var(--coral)]">3</span>
+                Je range mon nouveau prompt dans ma bibliothèque
+              </h3>
               <div className="flex flex-col gap-4">
                 <div>
                   <label htmlFor="titre-edit" className="mb-2 block text-sm font-semibold">

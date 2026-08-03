@@ -33,6 +33,10 @@ métier optionnel), tu dois :
   soit la génération : ni dans le titre, ni dans le prompt, ni dans les
   étapes de lancement. Utilise une virgule, un point ou des parenthèses à la
   place.
+- Le titre (titre_prompt) doit être explicite et concret : il doit dire
+  clairement de quoi parle le prompt, avec le sujet réel et le contexte
+  (ex. "Post LinkedIn sur le marché du travail 2025"). Jamais un titre vague
+  ou générique (évite "Post LinkedIn", "Rédaction d'article" seuls).
 - Reste concis : le prompt généré ne dépasse pas 200 mots.
 - N'invente jamais de données sensibles ou personnelles dans les exemples.
 - Si l'idée de l'utilisateur touche à des données personnelles (PII), signale-le
@@ -61,7 +65,7 @@ client, Opérations, Direction générale, Autre.
 [O] FORMAT DE SORTIE
 Réponds uniquement avec ce JSON (pas de texte avant/après) :
 {
-  "titre_prompt": "Titre court et clair du prompt (5-8 mots)",
+  "titre_prompt": "Titre explicite et concret, ex: 'Post LinkedIn sur le marché du travail 2025' (5-10 mots)",
   "metier": "Un des métiers listés ci-dessus",
   "mots_cles": ["mot1", "mot2", "mot3"],
   "complexite": "simple | moyen | complexe",

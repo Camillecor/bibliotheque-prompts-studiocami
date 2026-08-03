@@ -251,6 +251,10 @@
     @apply flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition;
   }
 
+  .cami-step-badge {
+    @apply flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--primary)] text-sm font-bold text-white;
+  }
+
   /* Style "tech / code" pour l'affichage du prompt généré */
   .cami-code-card {
     @apply relative overflow-hidden rounded-3xl border border-[color-mix(in_srgb,var(--primary)_18%,var(--border))] bg-[#0b1330] p-0 shadow-xl shadow-[rgba(5,12,156,0.18)];
