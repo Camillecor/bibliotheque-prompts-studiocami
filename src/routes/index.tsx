@@ -221,39 +221,39 @@ function GeneratorPage() {
         <div className="glow-orb -left-20 -top-16 h-72 w-72 bg-[var(--info)]" />
         <div className="glow-orb -right-16 top-24 h-64 w-64 bg-[var(--coral)]" />
 
-        <div className="relative mx-auto max-w-2xl py-6 text-center md:py-12">
+        <div className="grid items-center gap-8 py-6 md:py-12 lg:grid-cols-[minmax(0,320px)_1fr] lg:gap-10">
           <img
-            src="/mario-fox.png"
+            src="/mario-fox-point.png"
             alt="Mario, la mascotte de Studio Cami IA"
-            className="mx-auto h-24 w-24 md:h-28 md:w-28"
+            className="mx-auto w-48 sm:w-56 lg:mx-0 lg:w-full"
           />
-          <span className="cami-pill mt-3">
-            <span className="live-dot">
-              <span className="live-dot-ping" />
-              <span className="live-dot-core" />
-            </span>
-            GÉNÉRATEUR DE PROMPT • BIBLIOTHÈQUE • GLOSSAIRE
-          </span>
-          <h1 className="font-display mt-5 text-3xl leading-tight md:text-5xl">
-            Transforme ton idée
-            <br />
-            en un prompt IA structuré
-          </h1>
-          <p className="mt-3 text-base text-muted-foreground">
-            Décris ton besoin.
-            <br />
-            Mario le renard, mon super agent, te génère un prompt structuré et optimisé.
-          </p>
-        </div>
 
-        <div className="mx-auto mt-8 grid max-w-4xl grid-cols-1 items-center gap-6 xl:grid-cols-[minmax(0,1fr)_auto]">
-        <form
-          className="cami-card-hero relative mx-auto w-full max-w-2xl xl:mx-0"
-          onSubmit={(event) => {
-            event.preventDefault();
-            if (peutGenerer) generation.mutate();
-          }}
-        >
+          <div className="text-center lg:text-left">
+            <span className="cami-pill">
+              <span className="live-dot">
+                <span className="live-dot-ping" />
+                <span className="live-dot-core" />
+              </span>
+              GÉNÉRATEUR DE PROMPT • BIBLIOTHÈQUE • GLOSSAIRE
+            </span>
+            <h1 className="font-display mt-5 text-3xl leading-tight md:text-5xl">
+              Transforme ton idée
+              <br />
+              en un prompt IA structuré
+            </h1>
+            <p className="mt-3 text-base text-muted-foreground">
+              Décris ton besoin.
+              <br />
+              Mario le renard, mon super agent, te génère un prompt structuré et optimisé.
+            </p>
+
+            <form
+              className="cami-card-hero relative mx-auto mt-8 w-full max-w-2xl lg:mx-0"
+              onSubmit={(event) => {
+                event.preventDefault();
+                if (peutGenerer) generation.mutate();
+              }}
+            >
           <textarea
             rows={2}
             value={idee}
@@ -392,12 +392,7 @@ function GeneratorPage() {
             </div>
           </div>
         </form>
-
-          <img
-            src="/mario-fox-point.png"
-            alt="Mario le renard te montre le générateur"
-            className="mx-auto hidden w-56 shrink-0 xl:mx-0 xl:block"
-          />
+          </div>
         </div>
 
         <section className="mx-auto mt-16 max-w-4xl">
