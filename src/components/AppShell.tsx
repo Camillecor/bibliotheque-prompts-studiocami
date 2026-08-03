@@ -113,7 +113,8 @@ export function AppShell({ children }: { children: ReactNode }) {
           </button>
         </div>
 
-        <Link to="/" aria-label="Studio Cami — accueil" className="flex items-center">
+        <Link to="/" aria-label="Studio Cami — accueil" className="flex items-center gap-2">
+          <img src="/mario-fox-head.png" alt="" className="h-8 w-8 rounded-full" />
           <img src={logoAsset.url} alt="Studio Cami" className="h-8 w-auto" />
         </Link>
       </header>

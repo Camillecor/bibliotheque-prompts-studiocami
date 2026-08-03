@@ -240,19 +240,21 @@ function GeneratorPage() {
             en prompt IA structuré
           </h1>
           <p className="mt-3 text-base text-muted-foreground">
-            Décris ton besoin et Mario, mon agent IA produit un prompt avec sa méthode.
+            Décris ton besoin et Mario le renard, mon super agent IA te génère un prompt structuré
+            et optimisé.
           </p>
         </div>
 
+        <div className="mx-auto mt-8 flex max-w-5xl items-center justify-center gap-6">
         <form
-          className="cami-card-hero relative mx-auto mt-8 max-w-3xl"
+          className="cami-card-hero relative w-full max-w-3xl"
           onSubmit={(event) => {
             event.preventDefault();
             if (peutGenerer) generation.mutate();
           }}
         >
           <textarea
-            rows={3}
+            rows={2}
             value={idee}
             onChange={(event) => setIdee(event.target.value)}
             placeholder={placeholderAnime}
@@ -389,6 +391,13 @@ function GeneratorPage() {
             </div>
           </div>
         </form>
+
+          <img
+            src="/mario-fox-point.png"
+            alt="Mario le renard te montre le générateur"
+            className="hidden w-48 shrink-0 lg:block xl:w-56"
+          />
+        </div>
 
         <section className="mx-auto mt-16 max-w-4xl">
           <p className="text-center text-[11px] font-bold uppercase tracking-[0.16em] text-muted-foreground">
