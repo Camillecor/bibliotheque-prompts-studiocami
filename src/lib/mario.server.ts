@@ -65,12 +65,37 @@ export type ModeleMario = (typeof MODELES_DISPONIBLES)[number];
 
 type AnthropicContentBlock = { type: string; text?: string };
 
+const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+const IMAGE_SIGNATURES: { mediaType: "image/png" | "image/jpeg"; bytes: number[] }[] = [
+  { mediaType: "image/png", bytes: [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a] },
+  { mediaType: "image/jpeg", bytes: [0xff, 0xd8, 0xff] },
+];
+
+// Sécurité : le client a déjà validé le fichier, mais un appel direct à cette fonction
+// (hors navigateur) pourrait contourner ce filtre. On ne fait donc jamais confiance à
+// mediaType déclaré : on décode le base64 et on relit les vrais octets d'en-tête avant
+// d'accepter l'image, et on plafonne sa taille réelle décodée.
+function verifierImage(image: { mediaType: "image/png" | "image/jpeg"; base64: string }) {
+  const buffer = Buffer.from(image.base64, "base64");
+  if (buffer.byteLength === 0 || buffer.byteLength > MAX_IMAGE_BYTES) {
+    throw new Error("Image invalide ou trop lourde (5 Mo maximum).");
+  }
+  const signatureValide = IMAGE_SIGNATURES.some(
+    (sig) => sig.mediaType === image.mediaType && sig.bytes.every((b, i) => buffer[i] === b),
+  );
+  if (!signatureValide) {
+    throw new Error("Le fichier joint n'est pas une image PNG/JPEG valide.");
+  }
+  return buffer;
+}
+
 export async function callAnthropicMario(input: {
   idee: string;
   motsCles: string;
   metier: string;
   modele: ModeleMario;
   typePrompt: string;
+  image?: { mediaType: "image/png" | "image/jpeg"; base64: string };
 }) {
   const apiKey = process.env["ANTHROPIC_API_KEY"];
   if (!apiKey) {
@@ -86,7 +111,20 @@ export async function callAnthropicMario(input: {
     input.motsCles ? `Mots-clés suggérés : ${input.motsCles}` : "Mots-clés suggérés : (aucun)",
     input.metier ? `Métier indiqué : ${input.metier}` : "Métier indiqué : (non précisé)",
     typeLabel ? `Type de tâche demandé : ${typeLabel}` : "Type de tâche demandé : (laisse Mario déduire)",
-  ].join("\n");
+    input.image ? "Une image de référence est jointe : appuie-toi dessus si pertinent." : "",
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+  const content: Array<Record<string, unknown>> = [];
+  if (input.image) {
+    verifierImage(input.image);
+    content.push({
+      type: "image",
+      source: { type: "base64", media_type: input.image.mediaType, data: input.image.base64 },
+    });
+  }
+  content.push({ type: "text", text: userMessage });
 
   const response = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
@@ -99,7 +137,7 @@ export async function callAnthropicMario(input: {
       model: input.modele,
       max_tokens: 1500,
       system: MARIO_SYSTEM_PROMPT,
-      messages: [{ role: "user", content: userMessage }],
+      messages: [{ role: "user", content }],
     }),
   });
 

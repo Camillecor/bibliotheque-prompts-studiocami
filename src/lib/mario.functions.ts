@@ -9,12 +9,20 @@ import type { MarioResult, PromptRow } from "@/lib/mario";
 // remplacer TEST_USER_ID par context.userId partout ci-dessous.
 const TEST_USER_ID = "00000000-0000-0000-0000-000000000001";
 
+// 5 Mo max en binaire ≈ 6,99M caractères en base64 — plafond large pour laisser
+// passer une vraie image de 5 Mo tout en bloquant les payloads absurdes en amont.
 const GenerateInput = z.object({
   idee: z.string().min(5, "Décris ton idée en quelques mots de plus."),
   motsCles: z.string().default(""),
   metier: z.string().default(""),
   modele: z.enum(["claude-opus-5", "claude-sonnet-5", "claude-haiku-4-5"]).default("claude-opus-5"),
   typePrompt: z.string().default(""),
+  image: z
+    .object({
+      mediaType: z.enum(["image/png", "image/jpeg"]),
+      base64: z.string().max(7_000_000),
+    })
+    .optional(),
 });
 
 export const generateMarioPrompt = createServerFn({ method: "POST" })
