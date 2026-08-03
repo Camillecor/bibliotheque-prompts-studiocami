@@ -232,16 +232,17 @@ function GeneratorPage() {
               <span className="live-dot-ping" />
               <span className="live-dot-core" />
             </span>
-            Générateur de prompt • Bibliothèque • Glossaire • Studio Cami IA
+            GÉNÉRATEUR DE PROMPT • BIBLIOTHÈQUE • GLOSSAIRE
           </span>
           <h1 className="font-display mt-5 text-3xl leading-tight md:text-5xl">
-            Transforme une idée
+            Transforme ton idée
             <br />
-            en prompt IA structuré
+            en un prompt IA structuré
           </h1>
           <p className="mt-3 text-base text-muted-foreground">
-            Décris ton besoin et Mario le renard, mon super agent IA te génère un prompt structuré
-            et optimisé.
+            Décris ton besoin.
+            <br />
+            Mario le renard, mon super agent, te génère un prompt structuré et optimisé.
           </p>
         </div>
 
