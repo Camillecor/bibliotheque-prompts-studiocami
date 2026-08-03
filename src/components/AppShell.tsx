@@ -1,7 +1,19 @@
 import type { ReactNode } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { Library, Plus } from "lucide-react";
+import { listPrompts } from "@/lib/mario.functions";
 import logoAsset from "@/assets/studio-cami-logo.svg.asset.json";
+
+// Précharge silencieusement la bibliothèque dès qu'on est sur l'app (peu importe l'écran),
+// pour que le clic sur "Bibliothèque" retrouve les données déjà en cache React Query
+// au lieu de déclencher un aller-retour réseau à ce moment-là. Ne rend rien à l'écran.
+function PrechargementBibliotheque() {
+  const fetchPrompts = useServerFn(listPrompts);
+  useQuery({ queryKey: ["prompts"], queryFn: () => fetchPrompts() });
+  return null;
+}
 
 function NavLink({
   to,
@@ -35,6 +47,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-screen bg-background">
+      <PrechargementBibliotheque />
       <header className="fixed inset-x-0 top-0 z-40 flex h-14 items-center gap-4 bg-transparent px-4 backdrop-blur-sm">
         <Link to="/" aria-label="Studio Cami — accueil" className="flex shrink-0 items-center gap-2">
           <img src="/mario-fox-head.png" alt="" className="h-8 w-8 rounded-full" />
