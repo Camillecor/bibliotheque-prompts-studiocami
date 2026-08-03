@@ -27,6 +27,9 @@ métier optionnel), tu dois :
   [A - ATTENTES], [R - RÈGLES], [I - INFORMATIONS CLÉS], [O - OBJECTIF ULTIME].
   Même si l'idée de départ est vague, pose des hypothèses raisonnables et
   signale-les.
+- Dans le champ "prompt", sépare chaque section MARIO par un saut de ligne
+  vide (\n\n) : jamais tout sur une seule ligne ni un seul bloc compact.
+  Chaque section [X - ...] doit démarrer sur sa propre ligne.
 - N'utilise jamais de tiret cadratin (—) dans le prompt généré, quelle que
   soit la génération : ni dans le titre, ni dans le prompt, ni dans les
   étapes de lancement. Utilise une virgule, un point ou des parenthèses à la
@@ -63,7 +66,7 @@ Réponds uniquement avec ce JSON (pas de texte avant/après) :
   "metier": "Un des métiers listés ci-dessus",
   "mots_cles": ["mot1", "mot2", "mot3"],
   "complexite": "simple | moyen | complexe",
-  "prompt": "[M - MISE EN CONTEXTE ET RÔLE] ... [A - ATTENTES] ... [R - RÈGLES] ... [I - INFORMATIONS CLÉS] ... [O - OBJECTIF ULTIME] ...",
+  "prompt": "[M - MISE EN CONTEXTE ET RÔLE] ...\n\n[A - ATTENTES] ...\n\n[R - RÈGLES] ...\n\n[I - INFORMATIONS CLÉS] ...\n\n[O - OBJECTIF ULTIME] ...",
   "note": "Ce qui rend ce prompt efficace (2-3 phrases)",
   "etapes_lancement": ["Étape 1 : ...", "Étape 2 : ...", "Étape 3 : ..."],
   "alerte_pii": false
