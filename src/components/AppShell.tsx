@@ -1,10 +1,8 @@
 import { useState, type ReactNode } from "react";
-import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Library, LogOut, Menu, Plus, X } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/useAuth";
+import { Library, Menu, Plus, X } from "lucide-react";
 import { listPrompts } from "@/lib/mario.functions";
 import logoAsset from "@/assets/studio-cami-logo.svg.asset.json";
 
@@ -39,16 +37,14 @@ function NavLink({
 }
 
 function RecentsList({ onNavigate }: { onNavigate?: (() => void) | undefined }) {
-  const { user } = useAuth();
   const fetchPrompts = useServerFn(listPrompts);
   const { data } = useQuery({
     queryKey: ["prompts"],
     queryFn: () => fetchPrompts(),
-    enabled: !!user,
   });
 
   const recents = (data ?? []).slice(0, 5);
-  if (!user || recents.length === 0) return null;
+  if (recents.length === 0) return null;
 
   return (
     <div className="mt-4 border-t border-sidebar-border pt-4">
@@ -100,17 +96,8 @@ function SidebarContent({ pathname, onNavigate }: { pathname: string; onNavigate
 }
 
 export function AppShell({ children }: { children: ReactNode }) {
-  const { user } = useAuth();
-  const navigate = useNavigate();
   const pathname = useRouterState({ select: (router) => router.location.pathname });
   const [open, setOpen] = useState(false);
-
-  const initiales = (user?.email ?? "")
-    .split(/[.@]/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase() ?? "")
-    .join("");
 
   return (
     <div className="min-h-screen bg-background">
@@ -126,33 +113,9 @@ export function AppShell({ children }: { children: ReactNode }) {
           </button>
         </div>
 
-        <div className="flex items-center gap-3">
-          {user ? (
-            <>
-              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-secondary text-[11px] font-bold text-[var(--primary-dark)]">
-                {initiales || "SC"}
-              </span>
-              <button
-                type="button"
-                aria-label="Se déconnecter"
-                className="rounded-full p-1.5 text-muted-foreground transition hover:bg-muted hover:text-[var(--coral)]"
-                onClick={async () => {
-                  await supabase.auth.signOut();
-                  navigate({ to: "/auth" });
-                }}
-              >
-                <LogOut className="h-4 w-4" />
-              </button>
-            </>
-          ) : (
-            <Link to="/auth" className="cami-btn py-1.5 text-xs">
-              Se connecter
-            </Link>
-          )}
-          <Link to="/" aria-label="Studio Cami — accueil" className="flex items-center">
-            <img src={logoAsset.url} alt="Studio Cami" className="h-8 w-auto" />
-          </Link>
-        </div>
+        <Link to="/" aria-label="Studio Cami — accueil" className="flex items-center">
+          <img src={logoAsset.url} alt="Studio Cami" className="h-8 w-auto" />
+        </Link>
       </header>
 
       <aside className="fixed left-0 top-12 bottom-0 z-30 hidden w-60 border-r border-sidebar-border bg-sidebar lg:block">

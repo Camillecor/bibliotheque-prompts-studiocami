@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Poppins:wght@700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap");
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
@@ -6,8 +6,8 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Studio Cami — thème glassmorphism
- * navy #0b1250 → sky #3abef9 (fond) · coral #ff6633 (accent CTA) · Poppins (titres) / Lora (texte)
+ * Studio Cami — design system officiel
+ * primary #050c9c · coral #ff6b35 · info #3abef9 · page #f4f8ff
  */
 
 @theme inline {
@@ -17,8 +17,7 @@
   --radius-xl: calc(var(--radius) + 4px);
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
-  --font-sans: "Lora", ui-serif, Georgia, serif;
-  --font-heading: "Poppins", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -50,51 +49,35 @@
 }
 
 :root {
-  --radius: 1.25rem;
-  --background: #0b1250;
-  --foreground: #f5f7ff;
-  --card: rgba(255, 255, 255, 0.1);
-  --card-foreground: #ffffff;
-  --popover: rgba(11, 18, 80, 0.94);
-  --popover-foreground: #ffffff;
-  --primary: #3abef9;
-  --primary-dark: #a7e6ff;
-  --primary-foreground: #0b1250;
-  --secondary: rgba(255, 255, 255, 0.14);
-  --secondary-foreground: #ffffff;
-  --muted: rgba(255, 255, 255, 0.08);
-  --muted-foreground: rgba(245, 247, 255, 0.68);
-  --accent: rgba(58, 190, 249, 0.18);
-  --accent-foreground: #ffffff;
-  --coral: #ff6633;
-  --coral-dark: #e6551f;
+  --radius: 1rem;
+  --background: #f4f8ff;
+  --foreground: #111a3d;
+  --card: #ffffff;
+  --card-foreground: #111a3d;
+  --popover: #ffffff;
+  --popover-foreground: #111a3d;
+  --primary: #050c9c;
+  --primary-dark: #030873;
+  --primary-foreground: #ffffff;
+  --secondary: #e4f1fe;
+  --secondary-foreground: #050c9c;
+  --muted: #eef4ff;
+  --muted-foreground: #5a6690;
+  --accent: #d7ecff;
+  --accent-foreground: #050c9c;
+  --coral: #ff6b35;
+  --coral-dark: #e85a26;
   --info: #3abef9;
-  --success: #34d399;
-  --warning: #fbbf24;
-  --destructive: #f87171;
+  --success: #0f9d6d;
+  --warning: #f0a839;
+  --destructive: #e0483c;
   --destructive-foreground: #ffffff;
-  --border: rgba(255, 255, 255, 0.22);
-  --input: rgba(255, 255, 255, 0.18);
+  --border: #dee9fa;
+  --input: #cbdbf3;
   --ring: #3abef9;
-  --sidebar: rgba(11, 18, 80, 0.55);
-  --sidebar-foreground: #ffffff;
-  --sidebar-border: rgba(255, 255, 255, 0.18);
-}
-
-@keyframes cami-bg-drift {
-  0%,
-  100% {
-    background-position:
-      8% -5%,
-      95% 105%,
-      0% 0%;
-  }
-  50% {
-    background-position:
-      14% 0%,
-      88% 98%,
-      0% 6%;
-  }
+  --sidebar: #ffffff;
+  --sidebar-foreground: #111a3d;
+  --sidebar-border: #dee9fa;
 }
 
 @layer base {
@@ -103,19 +86,7 @@
   }
 
   body {
-    min-height: 100vh;
     background-color: var(--background);
-    background-image:
-      radial-gradient(560px circle at 8% -5%, color-mix(in srgb, var(--coral) 50%, transparent), transparent 70%),
-      radial-gradient(620px circle at 95% 105%, color-mix(in srgb, var(--info) 55%, transparent), transparent 70%),
-      linear-gradient(160deg, #0b1250 0%, #16268f 45%, color-mix(in srgb, var(--info) 55%, white) 100%);
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    background-size:
-      100% 100%,
-      100% 100%,
-      100% 160%;
-    animation: cami-bg-drift 26s ease-in-out infinite;
     color: var(--foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
@@ -124,44 +95,45 @@
   h1,
   h2,
   h3 {
-    font-family: var(--font-heading);
-    font-weight: 700;
-    color: var(--foreground);
+    color: var(--primary);
     letter-spacing: -0.02em;
   }
 }
 
 @utility font-chic {
-  font-family: var(--font-heading);
+  font-family: var(--font-sans);
   font-weight: 800;
   letter-spacing: -0.03em;
 }
 
 @utility font-display {
-  font-family: var(--font-heading);
-  font-weight: 800;
+  font-family: "Instrument Serif", Georgia, serif;
+  font-weight: 400;
   letter-spacing: -0.01em;
 }
 
 @utility glass-card {
-  background: rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(22px) saturate(140%);
-  -webkit-backdrop-filter: blur(22px) saturate(140%);
-  border: 1px solid rgba(255, 255, 255, 0.24);
-  border-radius: calc(var(--radius) + 8px);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--card) 85%, transparent),
+    color-mix(in srgb, var(--secondary) 70%, transparent)
+  );
+  backdrop-filter: blur(20px) saturate(140%);
+  border: 1px solid color-mix(in srgb, #ffffff 60%, transparent);
+  border-radius: calc(var(--radius) + 12px);
 }
 
-/* Esprit tech/IA (inspiré minitap.ai) */
+/* Esprit tech/IA (inspiré minitap.ai) — dans la palette claire Studio Cami, pas en dark mode */
 @utility glow-orb {
   position: absolute;
   border-radius: 9999px;
   filter: blur(70px);
-  opacity: 0.35;
+  opacity: 0.32;
   pointer-events: none;
 }
 
 @utility tech-grid-bg {
-  background-image: radial-gradient(color-mix(in srgb, white 14%, transparent) 1px, transparent 1px);
+  background-image: radial-gradient(color-mix(in srgb, var(--primary) 9%, transparent) 1px, transparent 1px);
   background-size: 24px 24px;
 }
 
@@ -201,33 +173,23 @@
   0%,
   100% {
     box-shadow:
-      0 0 0 1px color-mix(in srgb, var(--info) 45%, transparent),
-      0 8px 32px rgba(0, 0, 0, 0.18);
+      0 0 0 1px color-mix(in srgb, var(--info) 40%, transparent),
+      0 32px 64px -16px rgba(5, 12, 156, 0.12);
   }
   50% {
     box-shadow:
-      0 0 0 1px color-mix(in srgb, var(--coral) 45%, transparent),
-      0 8px 32px rgba(0, 0, 0, 0.18);
+      0 0 0 1px color-mix(in srgb, var(--coral) 40%, transparent),
+      0 32px 64px -16px rgba(5, 12, 156, 0.12);
   }
 }
 
 @layer components {
   .cami-card {
-    @apply rounded-[20px] border p-6 md:p-8;
-    background: var(--card);
-    backdrop-filter: blur(22px) saturate(140%);
-    -webkit-backdrop-filter: blur(22px) saturate(140%);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-    transition:
-      transform 250ms ease-in-out,
-      box-shadow 250ms ease-in-out;
+    @apply rounded-3xl border border-border bg-card p-6 shadow-sm md:p-8;
   }
 
   .cami-card-hero {
-    @apply rounded-[20px] border p-6 md:p-8;
-    background: var(--card);
-    backdrop-filter: blur(22px) saturate(140%);
-    -webkit-backdrop-filter: blur(22px) saturate(140%);
+    @apply rounded-3xl border border-border bg-card p-6 md:p-8;
     animation: cami-aura 5s ease-in-out infinite;
   }
 
@@ -236,89 +198,51 @@
   }
 
   .cami-input {
-    @apply w-full rounded-2xl border-2 border-transparent bg-muted px-5 py-4 text-[15px] text-foreground outline-none transition placeholder:text-muted-foreground focus:border-[var(--info)] focus:bg-[color-mix(in_srgb,var(--card)_140%,transparent)];
+    @apply w-full rounded-2xl border-2 border-transparent bg-muted px-5 py-4 text-[15px] text-foreground outline-none transition placeholder:text-muted-foreground focus:border-[var(--info)] focus:bg-card;
   }
 
   .cami-cta {
-    @apply inline-flex items-center justify-center gap-2 rounded-2xl px-8 py-5 text-lg font-bold text-white transition duration-200 hover:-translate-y-0.5 active:scale-95 disabled:pointer-events-none disabled:opacity-60;
-    background: linear-gradient(135deg, var(--info), var(--coral));
-    box-shadow: 0 8px 24px rgba(255, 102, 51, 0.35);
-  }
-
-  .cami-cta:hover {
-    box-shadow: 0 12px 32px rgba(255, 102, 51, 0.5);
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl bg-[var(--coral)] px-8 py-5 text-lg font-bold text-white shadow-lg shadow-[rgba(255,107,53,0.28)] transition duration-200 hover:-translate-y-0.5 hover:bg-[var(--coral-dark)] active:scale-95 disabled:pointer-events-none disabled:opacity-60;
   }
 
   .cami-btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold text-white transition duration-200 hover:-translate-y-0.5 active:scale-95;
-    background: rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(12px);
-  }
-
-  .cami-btn:hover {
-    background: rgba(255, 255, 255, 0.18);
-    border-color: var(--coral);
-    color: var(--coral);
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm font-semibold text-primary transition duration-200 hover:-translate-y-0.5 hover:border-[var(--coral)] hover:text-[var(--coral)] active:scale-95;
   }
 
   .cami-pill {
-    @apply inline-flex items-center gap-1.5 rounded-full border px-4 py-1.5 text-[11px] font-medium uppercase tracking-[0.08em];
-    background: var(--muted);
-    color: var(--primary-dark);
-    backdrop-filter: blur(12px);
+    @apply inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-4 py-1.5 text-[11px] font-medium uppercase tracking-[0.08em] text-primary;
   }
 
   .cami-block-resume {
-    @apply rounded-[20px] border p-6;
-    background: color-mix(in srgb, var(--info) 16%, transparent);
-    border-color: color-mix(in srgb, var(--info) 40%, transparent);
-    backdrop-filter: blur(18px);
+    @apply rounded-3xl border border-[color-mix(in_srgb,var(--info)_35%,transparent)] bg-[color-mix(in_srgb,var(--info)_12%,white)] p-6;
   }
 
   .cami-block-amelioration {
-    @apply rounded-[20px] border p-6;
-    background: color-mix(in srgb, var(--coral) 14%, transparent);
-    border-color: color-mix(in srgb, var(--coral) 35%, transparent);
-    backdrop-filter: blur(18px);
+    @apply rounded-3xl border border-[color-mix(in_srgb,var(--coral)_28%,transparent)] bg-[color-mix(in_srgb,var(--coral)_10%,white)] p-6;
   }
 
   .cami-block-positif {
-    @apply rounded-[20px] border p-6;
-    background: color-mix(in srgb, var(--success) 14%, transparent);
-    border-color: color-mix(in srgb, var(--success) 35%, transparent);
-    backdrop-filter: blur(18px);
+    @apply rounded-3xl border border-[color-mix(in_srgb,var(--success)_28%,transparent)] bg-[color-mix(in_srgb,var(--success)_10%,white)] p-6;
   }
 
   .cami-block-alerte {
-    @apply rounded-[20px] border p-5;
-    background: color-mix(in srgb, var(--warning) 18%, transparent);
-    border-color: color-mix(in srgb, var(--warning) 45%, transparent);
-    backdrop-filter: blur(18px);
+    @apply rounded-3xl border border-[color-mix(in_srgb,var(--warning)_40%,transparent)] bg-[color-mix(in_srgb,var(--warning)_14%,white)] p-5;
   }
 
   .cami-select-pill {
-    @apply cursor-pointer appearance-none rounded-full border bg-muted py-1.5 pl-3.5 pr-8 text-xs font-semibold text-white outline-none transition [background-position:right_0.6rem_center] [background-repeat:no-repeat] [background-size:0.7rem] hover:border-[var(--coral)] focus:border-[var(--info)];
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%23f5f7ff'%3E%3Cpath fill-rule='evenodd' d='M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z' clip-rule='evenodd'/%3E%3C/svg%3E");
-    backdrop-filter: blur(12px);
+    @apply cursor-pointer appearance-none rounded-full border border-border bg-muted py-1.5 pl-3.5 pr-8 text-xs font-semibold text-primary outline-none transition [background-position:right_0.6rem_center] [background-repeat:no-repeat] [background-size:0.7rem] hover:border-[var(--coral)] focus:border-[var(--info)];
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%235a6690'%3E%3Cpath fill-rule='evenodd' d='M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z' clip-rule='evenodd'/%3E%3C/svg%3E");
   }
 
   .cami-icon-btn {
-    @apply inline-flex h-8 w-8 items-center justify-center rounded-full border text-muted-foreground transition hover:border-[var(--coral)] hover:text-[var(--coral)];
-    background: var(--muted);
-    backdrop-filter: blur(12px);
+    @apply inline-flex h-8 w-8 items-center justify-center rounded-full border border-border bg-card text-muted-foreground transition hover:border-[var(--coral)] hover:text-[var(--coral)];
   }
 
   .cami-submit-btn {
-    @apply inline-flex h-10 w-10 items-center justify-center rounded-full text-white transition duration-200 hover:-translate-y-0.5 active:scale-95 disabled:pointer-events-none disabled:opacity-40;
-    background: linear-gradient(135deg, var(--info), var(--coral));
-    box-shadow: 0 4px 16px rgba(255, 102, 51, 0.35);
-  }
-
-  .cami-submit-btn:hover {
-    box-shadow: 0 0 24px rgba(255, 102, 51, 0.6);
+    @apply inline-flex h-10 w-10 items-center justify-center rounded-full bg-[var(--coral)] text-white shadow-md shadow-[rgba(255,107,53,0.28)] transition duration-200 hover:-translate-y-0.5 hover:bg-[var(--coral-dark)] hover:shadow-[0_0_24px_rgba(255,107,53,0.55)] active:scale-95 disabled:pointer-events-none disabled:opacity-40;
   }
 
   .cami-side-item {
-    @apply flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-white/80 transition;
+    @apply flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition;
   }
 }

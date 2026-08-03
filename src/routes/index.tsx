@@ -3,10 +3,9 @@ import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { ArrowUp, Check, ChevronDown, Hash, Loader2, Save, Sparkles } from "lucide-react";
+import { ArrowUp, Check, ChevronDown, Hash, Loader2, Save } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { PromptView } from "@/components/PromptView";
-import { useAuth } from "@/hooks/useAuth";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -88,7 +87,6 @@ export const Route = createFileRoute("/")({
 });
 
 function GeneratorPage() {
-  const { user } = useAuth();
   const navigate = useNavigate();
   const generate = useServerFn(generateMarioPrompt);
   const save = useServerFn(savePrompt);
@@ -174,7 +172,7 @@ function GeneratorPage() {
           className="cami-card-hero relative mx-auto mt-8 max-w-3xl"
           onSubmit={(event) => {
             event.preventDefault();
-            if (user && peutGenerer) generation.mutate();
+            if (peutGenerer) generation.mutate();
           }}
         >
           <textarea
@@ -205,7 +203,7 @@ function GeneratorPage() {
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="start"
-                className="glass-card w-80 p-2 text-white shadow-2xl"
+                className="w-80 rounded-3xl border border-white/60 bg-white/75 p-2 shadow-2xl backdrop-blur-xl"
               >
                 <button
                   type="button"
@@ -261,35 +259,21 @@ function GeneratorPage() {
               >
                 <Hash className="h-4 w-4" />
               </button>
-              {user ? (
-                <button
-                  type="submit"
-                  disabled={!peutGenerer}
-                  aria-label="Générer le prompt"
-                  className="cami-submit-btn"
-                >
-                  {generation.isPending ? (
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                  ) : (
-                    <ArrowUp className="h-5 w-5" />
-                  )}
-                </button>
-              ) : null}
+              <button
+                type="submit"
+                disabled={!peutGenerer}
+                aria-label="Générer le prompt"
+                className="cami-submit-btn"
+              >
+                {generation.isPending ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : (
+                  <ArrowUp className="h-5 w-5" />
+                )}
+              </button>
             </div>
           </div>
         </form>
-
-        {!user ? (
-          <div className="glass-card mx-auto mt-4 flex max-w-3xl flex-col items-start gap-3 p-6">
-            <p className="text-sm font-medium text-primary">
-              Connecte-toi pour générer des prompts et les ranger dans ta bibliothèque.
-            </p>
-            <button type="button" className="cami-btn" onClick={() => navigate({ to: "/auth" })}>
-              <Sparkles className="h-4 w-4" />
-              Se connecter
-            </button>
-          </div>
-        ) : null}
 
         <section className="mx-auto mt-16 max-w-4xl">
           <p className="text-center text-[11px] font-bold uppercase tracking-[0.16em] text-muted-foreground">
