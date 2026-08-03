@@ -50,9 +50,10 @@ export const savePrompt = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => SaveInput.parse(input))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { date_ajout, ...rest } = data;
     const { data: row, error } = await supabaseAdmin
       .from("prompts")
-      .insert({ ...data, user_id: TEST_USER_ID })
+      .insert({ ...rest, user_id: TEST_USER_ID, ...(date_ajout ? { date_ajout } : {}) })
       .select("id")
       .single();
 

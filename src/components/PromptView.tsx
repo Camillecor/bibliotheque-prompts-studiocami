@@ -7,7 +7,7 @@ type PromptViewData = {
   mots_cles: string[];
   complexite: string;
   prompt: string;
-  note?: string;
+  note?: string | undefined;
   etapes_lancement: string[];
   alerte_pii?: boolean;
 };
