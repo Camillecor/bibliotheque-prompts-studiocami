@@ -3,8 +3,9 @@ import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { ArrowUp, Bot, Check, ChevronDown, Hash, ImagePlus, Loader2, Save, X } from "lucide-react";
+import { ArrowUp, Check, ChevronDown, Hash, ImagePlus, Loader2, Save, X } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { IaLogo, IA_LOGO_NAMES } from "@/components/IaLogos";
 import { PromptView } from "@/components/PromptView";
 import {
   DropdownMenu,
@@ -68,17 +69,6 @@ async function validerEtLireImage(file: File): Promise<ImageAttachment | null> {
     name: file.name,
   };
 }
-
-const IA_COMPATIBLES = [
-  "ChatGPT",
-  "Claude",
-  "Gemini",
-  "Copilot",
-  "Mistral",
-  "Perplexity",
-  "Le Chat",
-  "Llama",
-] as const;
 
 const SUGGESTIONS_IDEE = [
   "Un prompt pour rédiger des posts LinkedIn qui convertissent…",
@@ -436,12 +426,12 @@ function GeneratorPage() {
           </p>
           <div className="cami-marquee-mask relative mt-5 overflow-hidden">
             <div className="cami-marquee-track flex w-max items-center gap-3">
-              {[...IA_COMPATIBLES, ...IA_COMPATIBLES].map((nom, index) => (
+              {[...IA_LOGO_NAMES, ...IA_LOGO_NAMES].map((nom, index) => (
                 <span
                   key={`${nom}-${index}`}
                   className="inline-flex shrink-0 items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm font-semibold text-primary"
                 >
-                  <Bot className="h-4 w-4 text-[var(--info)]" />
+                  <IaLogo nom={nom} />
                   {nom}
                 </span>
               ))}
