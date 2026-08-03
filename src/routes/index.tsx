@@ -334,7 +334,7 @@ function GeneratorPage() {
                   type="button"
                   className="cami-select-pill inline-flex w-fit items-center gap-1.5"
                 >
-                  Type de prompt :{" "}
+                  Type :{" "}
                   {TYPES_PROMPT.find((t) => t.value === typePrompt)?.label ?? "Auto"}
                   <ChevronDown className="h-3 w-3" />
                 </button>
@@ -348,7 +348,7 @@ function GeneratorPage() {
                   onClick={() => setTypePrompt("")}
                   className="flex w-full items-center justify-between gap-2 rounded-2xl px-3 py-2 text-left text-sm font-semibold text-primary transition hover:bg-secondary"
                 >
-                  Type de prompt : Auto
+                  Type : Auto
                   {typePrompt === "" ? <Check className="h-4 w-4 text-[var(--coral)]" /> : null}
                 </button>
                 <div className="my-1 h-px bg-border" />
