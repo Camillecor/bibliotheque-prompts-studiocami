@@ -17,6 +17,7 @@ const GenerateInput = z.object({
   metier: z.string().default(""),
   modele: z.enum(["claude-sonnet-5", "claude-haiku-4-5"]).default("claude-sonnet-5"),
   typePrompt: z.string().default(""),
+  ton: z.string().default(""),
   image: z
     .object({
       mediaType: z.enum(["image/png", "image/jpeg"]),
@@ -37,11 +38,12 @@ const SaveInput = z.object({
   metier: z.string().min(1),
   mots_cles: z.array(z.string()).default([]),
   complexite: z.string().min(1),
-  version_1: z.object({ prompt: z.string(), note: z.string() }),
-  version_2: z.object({ prompt: z.string(), amelioration: z.string() }),
+  prompt: z.string(),
+  note: z.string().default(""),
   etapes_lancement: z.array(z.string()).default([]),
   alerte_pii: z.boolean().default(false),
   idee_source: z.string().default(""),
+  date_ajout: z.string().datetime().optional(),
 });
 
 export const savePrompt = createServerFn({ method: "POST" })
@@ -64,7 +66,7 @@ export const listPrompts = createServerFn({ method: "GET" }).handler(
     const { data, error } = await supabaseAdmin
       .from("prompts")
       .select(
-        "id, titre, metier, mots_cles, complexite, version_1, version_2, etapes_lancement, alerte_pii, date_ajout",
+        "id, titre, metier, mots_cles, complexite, prompt, note, etapes_lancement, alerte_pii, date_ajout",
       )
       .eq("user_id", TEST_USER_ID)
       .order("date_ajout", { ascending: false });

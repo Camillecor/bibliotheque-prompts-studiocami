@@ -3,7 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { ArrowUp, Check, ChevronDown, Hash, ImagePlus, Loader2, Save, X } from "lucide-react";
+import { ArrowUp, Bot, Check, ChevronDown, Hash, ImagePlus, Loader2, Save, X } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { PromptView } from "@/components/PromptView";
 import {
@@ -14,9 +14,11 @@ import {
 import {
   METIERS,
   MODELES,
+  TONS,
   TYPES_PROMPT,
   type MarioResult,
   type ModeleValue,
+  type TonValue,
   type TypePromptValue,
 } from "@/lib/mario";
 import { generateMarioPrompt, savePrompt } from "@/lib/mario.functions";
@@ -67,6 +69,17 @@ async function validerEtLireImage(file: File): Promise<ImageAttachment | null> {
   };
 }
 
+const IA_COMPATIBLES = [
+  "ChatGPT",
+  "Claude",
+  "Gemini",
+  "Copilot",
+  "Mistral",
+  "Perplexity",
+  "Le Chat",
+  "Llama",
+] as const;
+
 const SUGGESTIONS_IDEE = [
   "Un prompt pour rédiger des posts LinkedIn qui convertissent…",
   "Un prompt pour préparer un entretien de recrutement structuré…",
@@ -115,17 +128,20 @@ function useTypewriterPlaceholder(phrases: readonly string[], active: boolean) {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Générateur de prompts MARIO — Studio Cami IA" },
+      { title: "Générateur de page de bibliothèque de prompts triable — Studio Cami IA" },
       {
         name: "description",
         content:
-          "Transforme une idée en prompt structuré MARIO en deux versions, avec étapes de lancement et classement automatique dans ta bibliothèque.",
+          "Transforme une idée en prompt structuré MARIO optimisé, avec étapes de lancement et classement dans une bibliothèque triable.",
       },
-      { property: "og:title", content: "Générateur de prompts MARIO — Studio Cami IA" },
+      {
+        property: "og:title",
+        content: "Générateur de page de bibliothèque de prompts triable — Studio Cami IA",
+      },
       {
         property: "og:description",
         content:
-          "Décris ton idée, obtiens un prompt MARIO en V1 et V2 améliorée, puis range-le dans ta bibliothèque.",
+          "Décris ton idée, obtiens un prompt MARIO optimisé, puis range-le dans ta bibliothèque triable.",
       },
     ],
   }),
@@ -141,6 +157,7 @@ function GeneratorPage() {
   const [motsCles, setMotsCles] = useState("");
   const [motsClesOuvert, setMotsClesOuvert] = useState(false);
   const [typePrompt, setTypePrompt] = useState<TypePromptValue | "">("");
+  const [ton, setTon] = useState<TonValue | "">("");
   const [modele, setModele] = useState<ModeleValue>("claude-sonnet-5");
   const [image, setImage] = useState<ImageAttachment | null>(null);
   const [imageEnCours, setImageEnCours] = useState(false);
@@ -151,6 +168,7 @@ function GeneratorPage() {
   const [titreEdit, setTitreEdit] = useState("");
   const [metierEdit, setMetierEdit] = useState("Autre");
   const [motsClesEdit, setMotsClesEdit] = useState("");
+  const [dateEdit, setDateEdit] = useState(() => new Date().toISOString().slice(0, 10));
 
   async function handleImageChange(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
@@ -173,6 +191,7 @@ function GeneratorPage() {
           motsCles,
           modele,
           typePrompt,
+          ton,
           image: image ? { mediaType: image.mediaType, base64: image.base64 } : undefined,
         },
       }),
@@ -181,6 +200,7 @@ function GeneratorPage() {
       setTitreEdit(data.titre_prompt);
       setMetierEdit(data.metier);
       setMotsClesEdit(data.mots_cles.join(", "));
+      setDateEdit(new Date().toISOString().slice(0, 10));
     },
     onError: (error: Error) => toast.error(error.message),
   });
@@ -198,11 +218,12 @@ function GeneratorPage() {
             .filter(Boolean)
             .slice(0, 5),
           complexite: result.complexite,
-          version_1: result.version_1,
-          version_2: result.version_2,
+          prompt: result.prompt,
+          note: result.note,
           etapes_lancement: result.etapes_lancement,
           alerte_pii: result.alerte_pii,
           idee_source: idee,
+          date_ajout: new Date(`${dateEdit}T12:00:00`).toISOString(),
         },
       });
     },
@@ -327,7 +348,21 @@ function GeneratorPage() {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <select
+                id="ton"
+                value={ton}
+                onChange={(event) => setTon(event.target.value as TonValue | "")}
+                className="cami-select-pill"
+                aria-label="Ton du prompt"
+              >
+                <option value="">Ton : Auto</option>
+                {TONS.map((item) => (
+                  <option key={item.value} value={item.value}>
+                    Ton : {item.label}
+                  </option>
+                ))}
+              </select>
               <select
                 id="modele"
                 value={modele}
@@ -395,6 +430,25 @@ function GeneratorPage() {
           </div>
         </div>
 
+        <div className="mx-auto mt-12 max-w-3xl text-center">
+          <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-muted-foreground">
+            Compatible avec toutes les IA
+          </p>
+          <div className="cami-marquee-mask relative mt-5 overflow-hidden">
+            <div className="cami-marquee-track flex w-max items-center gap-3">
+              {[...IA_COMPATIBLES, ...IA_COMPATIBLES].map((nom, index) => (
+                <span
+                  key={`${nom}-${index}`}
+                  className="inline-flex shrink-0 items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm font-semibold text-primary"
+                >
+                  <Bot className="h-4 w-4 text-[var(--info)]" />
+                  {nom}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+
         <section className="mx-auto mt-16 max-w-4xl">
           <p className="text-center text-[11px] font-bold uppercase tracking-[0.16em] text-muted-foreground">
             En 3 étapes
@@ -406,8 +460,8 @@ function GeneratorPage() {
                 texte: "En français, comme tu le dirais à un collègue. Pas de jargon requis.",
               },
               {
-                titre: "Mario génère 2 versions",
-                texte: "Un prompt MARIO complet, une version améliorée et les étapes de lancement.",
+                titre: "Mario génère ton prompt",
+                texte: "Un prompt MARIO complet, déjà optimisé, avec les étapes pour le lancer.",
               },
               {
                 titre: "Sauvegarde et retrouve-le",
@@ -433,8 +487,8 @@ function GeneratorPage() {
                 metier: result.metier,
                 mots_cles: result.mots_cles,
                 complexite: result.complexite,
-                version_1: result.version_1,
-                version_2: result.version_2,
+                prompt: result.prompt,
+                note: result.note,
                 etapes_lancement: result.etapes_lancement,
                 alerte_pii: result.alerte_pii,
               }}
@@ -442,7 +496,7 @@ function GeneratorPage() {
 
             <div className="space-y-4 border-t border-border pt-6">
               <h3 className="text-base font-bold">Classement dans la bibliothèque</h3>
-              <div className="grid gap-4 md:grid-cols-3">
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <div>
                   <label htmlFor="titre-edit" className="mb-2 block text-sm font-semibold">
                     Titre
@@ -479,6 +533,18 @@ function GeneratorPage() {
                     id="mots-edit"
                     value={motsClesEdit}
                     onChange={(event) => setMotsClesEdit(event.target.value)}
+                    className="cami-input"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="date-edit" className="mb-2 block text-sm font-semibold">
+                    Date
+                  </label>
+                  <input
+                    id="date-edit"
+                    type="date"
+                    value={dateEdit}
+                    onChange={(event) => setDateEdit(event.target.value)}
                     className="cami-input"
                   />
                 </div>

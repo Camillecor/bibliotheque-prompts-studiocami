@@ -1,13 +1,21 @@
 import { useState } from "react";
 import { Check, Copy } from "lucide-react";
 
-export function CopyButton({ value, label = "Copier" }: { value: string; label?: string }) {
+export function CopyButton({
+  value,
+  label = "Copier",
+  className = "cami-btn",
+}: {
+  value: string;
+  label?: string;
+  className?: string;
+}) {
   const [copied, setCopied] = useState(false);
 
   return (
     <button
       type="button"
-      className="cami-btn"
+      className={className}
       onClick={async () => {
         try {
           await navigator.clipboard.writeText(value);

@@ -1,4 +1,4 @@
-import { TYPES_PROMPT } from "@/lib/mario";
+import { TONS, TYPES_PROMPT } from "@/lib/mario";
 
 export const MARIO_SYSTEM_PROMPT = `[M] MISE EN SITUATION
 Tu es un expert senior en prompt engineering, spécialisé dans la méthode MARIO
@@ -9,11 +9,10 @@ Studio Cami IA, une bibliothèque de prompts d'entreprise organisée par métier
 [A] ATTENTE PRINCIPALE
 À partir d'une idée brute donnée par l'utilisateur (texte libre + mots-clés +
 métier optionnel), tu dois :
-1. Générer un prompt structuré au format MARIO (Version 1)
-2. Produire une Version 2 : une itération améliorée de la V1, en corrigeant ou
-   renforçant un aspect précis (précision du rôle, contraintes plus fortes,
-   format de sortie plus exploitable, ou contexte enrichi — choisis l'axe
-   d'amélioration le plus pertinent selon le prompt initial)
+1. Réfléchir mentalement à un premier jet, puis le retravailler pour ne
+   restituer QUE la version finale, aboutie et directement utilisable — pas
+   de brouillon intermédiaire visible dans ta réponse.
+2. Générer ce prompt final structuré au format MARIO.
 3. Expliquer en 3 à 5 étapes claires comment lancer ce prompt / ce projet
    concrètement (quel outil, quel modèle Claude utiliser, quelles infos
    préparer avant de lancer)
@@ -21,19 +20,19 @@ métier optionnel), tu dois :
    niveau de complexité (simple / moyen / complexe)
 
 [R] RÈGLES ET CONTRAINTES
-- Respecte STRICTEMENT la structure MARIO pour les deux versions : chaque
-  prompt généré doit contenir les 5 sections, avec leur intitulé COMPLET
-  entre crochets (jamais la lettre seule) — dans cet ordre exact :
-  [M - MISE EN CONTEXTE], [A - ATTENTES], [R - RÈGLES], [I - INFORMATIONS CLÉS],
-  [O - OBJECTIF ULTIME]. Même si l'idée de départ est vague, pose des
-  hypothèses raisonnables et signale-les.
-- La V2 n'est pas une reformulation cosmétique de la V1. Elle doit apporter
-  une amélioration fonctionnelle identifiable (plus de précision, moins
-  d'ambiguïté, meilleur format de sortie).
-- Reste concis : chaque prompt généré (V1 et V2) ne dépasse pas 200 mots.
+- Respecte STRICTEMENT la structure MARIO : le prompt généré doit contenir les
+  5 sections, avec leur intitulé COMPLET entre crochets (jamais la lettre
+  seule) — dans cet ordre exact : [M - MISE EN CONTEXTE], [A - ATTENTES],
+  [R - RÈGLES], [I - INFORMATIONS CLÉS], [O - OBJECTIF ULTIME]. Même si l'idée
+  de départ est vague, pose des hypothèses raisonnables et signale-les.
+- Reste concis : le prompt généré ne dépasse pas 200 mots.
 - N'invente jamais de données sensibles ou personnelles dans les exemples.
 - Si l'idée de l'utilisateur touche à des données personnelles (PII), signale-le
   avant de générer le prompt.
+- Si un ton est indiqué (professionnel, persuasif, créatif, technique,
+  pédagogique, direct), imprègne-en la section [R - RÈGLES] du prompt généré
+  (ex. "Adopte un ton direct et sans détour") et le style de rédaction
+  lui-même. Si aucun ton n'est indiqué, choisis le plus adapté au besoin.
 - Privilégie un français professionnel, clair, sans jargon technique inutile.
 - Ne propose jamais plus de 5 mots-clés — la bibliothèque doit rester
   cherchable, pas noyée sous les tags.
@@ -47,28 +46,6 @@ bibliothèque de prompts personnelle en portfolio. Métiers courants pour la
 classification : Marketing, Ventes, RH, Finance, Juridique, Produit, Support
 client, Opérations, Direction générale, Autre.
 
-Gabarit exact à suivre pour rédiger le champ "prompt" de version_1 et version_2
-(remplace chaque partie entre crochets par du contenu réel et précis, adapté à
-l'idée de l'utilisateur — ne laisse jamais un placeholder générique tel quel) :
-
-[M - MISE EN CONTEXTE] : Agis en tant qu'expert en [Métier/Domaine]. Le projet
-concerne [Description du projet].
-
-[A - ATTENTES] : Je veux que tu rédiges [Type de document : email, article,
-script, code] destiné à [Public cible].
-
-[R - RÈGLES] :
-- Utilise un ton [Professionnel / Amical / Persuasif].
-- Ne dépasse pas [Nombre] mots / lignes.
-- Ne mentionne pas [Élément interdit].
-- Structure la réponse avec des puces.
-
-[I - INFORMATIONS CLÉS] : Voici les données à intégrer : [Insérer vos données,
-faits ou textes ici].
-
-[O - OBJECTIF ULTIME] : Le but final de ce document est de [Convaincre le
-client / Expliquer un concept complexe simplement / Générer des ventes].
-
 [O] FORMAT DE SORTIE
 Réponds uniquement avec ce JSON (pas de texte avant/après) :
 {
@@ -76,8 +53,8 @@ Réponds uniquement avec ce JSON (pas de texte avant/après) :
   "metier": "Un des métiers listés ci-dessus",
   "mots_cles": ["mot1", "mot2", "mot3"],
   "complexite": "simple | moyen | complexe",
-  "version_1": { "prompt": "[M - MISE EN CONTEXTE] ... [A - ATTENTES] ... [R - RÈGLES] ... [I - INFORMATIONS CLÉS] ... [O - OBJECTIF ULTIME] ...", "note": "Ce que couvre cette première version" },
-  "version_2": { "prompt": "[M - MISE EN CONTEXTE] ... [A - ATTENTES] ... [R - RÈGLES] ... [I - INFORMATIONS CLÉS] ... [O - OBJECTIF ULTIME] ...", "amelioration": "Ce qui a été précisément amélioré par rapport à la V1" },
+  "prompt": "[M - MISE EN CONTEXTE] ... [A - ATTENTES] ... [R - RÈGLES] ... [I - INFORMATIONS CLÉS] ... [O - OBJECTIF ULTIME] ...",
+  "note": "Ce qui rend ce prompt efficace (2-3 phrases)",
   "etapes_lancement": ["Étape 1 : ...", "Étape 2 : ...", "Étape 3 : ..."],
   "alerte_pii": false
 }`;
@@ -119,6 +96,7 @@ export async function callAnthropicMario(input: {
   metier: string;
   modele: ModeleMario;
   typePrompt: string;
+  ton: string;
   image?: { mediaType: "image/png" | "image/jpeg"; base64: string } | undefined;
 }) {
   const apiKey = process.env["ANTHROPIC_API_KEY"];
@@ -129,12 +107,14 @@ export async function callAnthropicMario(input: {
   }
 
   const typeLabel = TYPES_PROMPT.find((t) => t.value === input.typePrompt)?.label;
+  const tonLabel = TONS.find((t) => t.value === input.ton)?.label;
 
   const userMessage = [
     `Idée brute : ${input.idee}`,
     input.motsCles ? `Mots-clés suggérés : ${input.motsCles}` : "Mots-clés suggérés : (aucun)",
     input.metier ? `Métier indiqué : ${input.metier}` : "Métier indiqué : (non précisé)",
     typeLabel ? `Type de tâche demandé : ${typeLabel}` : "Type de tâche demandé : (laisse Mario déduire)",
+    tonLabel ? `Ton souhaité : ${tonLabel}` : "Ton souhaité : (laisse Mario déduire le plus adapté)",
     input.image ? "Une image de référence est jointe : appuie-toi dessus si pertinent." : "",
   ]
     .filter(Boolean)
@@ -193,14 +173,8 @@ export async function callAnthropicMario(input: {
       metier: String(parsed.metier ?? "Autre"),
       mots_cles: Array.isArray(parsed.mots_cles) ? parsed.mots_cles.map(String).slice(0, 5) : [],
       complexite: String(parsed.complexite ?? "moyen"),
-      version_1: {
-        prompt: String(parsed.version_1?.prompt ?? ""),
-        note: String(parsed.version_1?.note ?? ""),
-      },
-      version_2: {
-        prompt: String(parsed.version_2?.prompt ?? ""),
-        amelioration: String(parsed.version_2?.amelioration ?? ""),
-      },
+      prompt: String(parsed.prompt ?? ""),
+      note: String(parsed.note ?? ""),
       etapes_lancement: Array.isArray(parsed.etapes_lancement)
         ? parsed.etapes_lancement.map(String)
         : [],

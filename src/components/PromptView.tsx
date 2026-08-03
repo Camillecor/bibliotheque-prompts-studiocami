@@ -1,4 +1,4 @@
-import { AlertTriangle, ListOrdered, Sparkles, Wand2 } from "lucide-react";
+import { AlertTriangle, ListOrdered, Sparkles } from "lucide-react";
 import { CopyButton } from "@/components/CopyButton";
 
 type PromptViewData = {
@@ -6,8 +6,8 @@ type PromptViewData = {
   metier: string;
   mots_cles: string[];
   complexite: string;
-  version_1: { prompt?: string; note?: string };
-  version_2: { prompt?: string; amelioration?: string };
+  prompt: string;
+  note?: string;
   etapes_lancement: string[];
   alerte_pii?: boolean;
 };
@@ -38,47 +38,31 @@ export function PromptView({ data }: { data: PromptViewData }) {
         </div>
       ) : null}
 
-      <div className="grid gap-5 lg:grid-cols-2">
-        <section className="cami-block-resume space-y-4">
-          <div className="flex items-center justify-between gap-3">
-            <h3 className="flex items-center gap-2 text-base font-bold">
-              <Sparkles className="h-4 w-4 text-[var(--info)]" />
-              Version 1
-            </h3>
-            <CopyButton value={data.version_1.prompt ?? ""} />
-          </div>
-          <pre className="whitespace-pre-wrap rounded-2xl bg-card/70 p-4 text-sm leading-relaxed text-primary">
-            {data.version_1.prompt}
-          </pre>
-          {data.version_1.note ? (
-            <p className="text-sm text-muted-foreground">
-              <span className="font-semibold text-primary">Ce que couvre cette V1 : </span>
-              {data.version_1.note}
-            </p>
-          ) : null}
-        </section>
+      <section className="cami-code-card">
+        <div className="glow-orb -right-10 -top-10 h-40 w-40 bg-[var(--info)] opacity-20" />
+        <div className="cami-code-chrome relative">
+          <span className="cami-code-dot bg-[#ff5f57]" />
+          <span className="cami-code-dot bg-[#febc2e]" />
+          <span className="cami-code-dot bg-[#28c840]" />
+          <span className="ml-2 font-mono text-xs text-white/50">prompt-mario.md</span>
+          <span className="ml-auto hidden items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.06] px-3 py-1 font-mono text-[10px] uppercase tracking-[0.1em] text-[var(--info)] sm:inline-flex">
+            <Sparkles className="h-3 w-3" />
+            MARIO
+          </span>
+        </div>
+        <pre className="cami-code-body relative">{data.prompt}</pre>
+      </section>
 
-        <section className="cami-block-amelioration space-y-4">
-          <div className="flex items-center justify-between gap-3">
-            <h3 className="flex items-center gap-2 text-base font-bold">
-              <Wand2 className="h-4 w-4 text-[var(--coral)]" />
-              Version 2 — améliorée
-            </h3>
-            <CopyButton value={data.version_2.prompt ?? ""} />
-          </div>
-          <pre className="whitespace-pre-wrap rounded-2xl bg-card/70 p-4 text-sm leading-relaxed text-primary">
-            {data.version_2.prompt}
-          </pre>
-          {data.version_2.amelioration ? (
-            <div className="rounded-2xl border border-[color-mix(in_srgb,var(--coral)_28%,transparent)] bg-card/80 p-4">
-              <p className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--coral)]">
-                Ce qui a changé
-              </p>
-              <p className="mt-1 text-sm text-muted-foreground">{data.version_2.amelioration}</p>
-            </div>
-          ) : null}
-        </section>
+      <div className="flex justify-center sm:justify-end">
+        <CopyButton value={data.prompt} label="Copier le prompt" className="cami-copy-btn" />
       </div>
+
+      {data.note ? (
+        <p className="text-sm text-muted-foreground">
+          <span className="font-semibold text-primary">Pourquoi ce prompt fonctionne : </span>
+          {data.note}
+        </p>
+      ) : null}
 
       {data.etapes_lancement.length > 0 ? (
         <section className="cami-block-positif space-y-3">

@@ -34,13 +34,24 @@ export const TYPES_PROMPT = [
 
 export type TypePromptValue = (typeof TYPES_PROMPT)[number]["value"];
 
+export const TONS = [
+  { value: "professionnel", label: "Professionnel" },
+  { value: "persuasif", label: "Persuasif" },
+  { value: "creatif", label: "Créatif" },
+  { value: "technique", label: "Technique" },
+  { value: "pedagogique", label: "Pédagogique" },
+  { value: "direct", label: "Direct" },
+] as const;
+
+export type TonValue = (typeof TONS)[number]["value"];
+
 export type MarioResult = {
   titre_prompt: string;
   metier: string;
   mots_cles: string[];
   complexite: string;
-  version_1: { prompt: string; note: string };
-  version_2: { prompt: string; amelioration: string };
+  prompt: string;
+  note: string;
   etapes_lancement: string[];
   alerte_pii: boolean;
 };
@@ -51,8 +62,8 @@ export type PromptRow = {
   metier: string;
   mots_cles: string[];
   complexite: string;
-  version_1: { prompt?: string; note?: string };
-  version_2: { prompt?: string; amelioration?: string };
+  prompt: string;
+  note?: string;
   etapes_lancement: string[];
   alerte_pii: boolean;
   date_ajout: string;

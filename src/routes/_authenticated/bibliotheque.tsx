@@ -111,8 +111,8 @@ function LibraryPage() {
                   metier: selection.metier,
                   mots_cles: selection.mots_cles ?? [],
                   complexite: selection.complexite,
-                  version_1: selection.version_1 ?? {},
-                  version_2: selection.version_2 ?? {},
+                  prompt: selection.prompt ?? "",
+                  note: selection.note,
                   etapes_lancement: selection.etapes_lancement ?? [],
                   alerte_pii: selection.alerte_pii,
                 }}
