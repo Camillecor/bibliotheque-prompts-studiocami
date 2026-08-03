@@ -27,9 +27,8 @@ métier optionnel), tu dois :
   [A - ATTENTES], [R - RÈGLES], [I - INFORMATIONS CLÉS], [O - OBJECTIF ULTIME].
   Même si l'idée de départ est vague, pose des hypothèses raisonnables et
   signale-les.
-- Dans le champ "prompt", sépare chaque section MARIO par un saut de ligne
-  vide (\n\n) : jamais tout sur une seule ligne ni un seul bloc compact.
-  Chaque section [X - ...] doit démarrer sur sa propre ligne.
+- Dans le champ "prompt", fais démarrer chaque section MARIO sur son propre
+  paragraphe (jamais tout sur une seule ligne ni un seul bloc compact).
 - N'utilise jamais de tiret cadratin (—) dans le prompt généré, quelle que
   soit la génération : ni dans le titre, ni dans le prompt, ni dans les
   étapes de lancement. Utilise une virgule, un point ou des parenthèses à la
@@ -66,7 +65,7 @@ Réponds uniquement avec ce JSON (pas de texte avant/après) :
   "metier": "Un des métiers listés ci-dessus",
   "mots_cles": ["mot1", "mot2", "mot3"],
   "complexite": "simple | moyen | complexe",
-  "prompt": "[M - MISE EN CONTEXTE ET RÔLE] ...\n\n[A - ATTENTES] ...\n\n[R - RÈGLES] ...\n\n[I - INFORMATIONS CLÉS] ...\n\n[O - OBJECTIF ULTIME] ...",
+  "prompt": "[M - MISE EN CONTEXTE ET RÔLE] ... [A - ATTENTES] ... [R - RÈGLES] ... [I - INFORMATIONS CLÉS] ... [O - OBJECTIF ULTIME] ...",
   "note": "Ce qui rend ce prompt efficace (2-3 phrases)",
   "etapes_lancement": ["Étape 1 : ...", "Étape 2 : ...", "Étape 3 : ..."],
   "alerte_pii": false
@@ -84,6 +83,66 @@ const IMAGE_SIGNATURES: { mediaType: "image/png" | "image/jpeg"; bytes: number[]
   { mediaType: "image/png", bytes: [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a] },
   { mediaType: "image/jpeg", bytes: [0xff, 0xd8, 0xff] },
 ];
+
+// Le modèle est invité à insérer des sauts de ligne à l'intérieur du champ JSON
+// "prompt" (pour aérer les sections MARIO), mais il lui arrive d'y écrire de
+// vrais caractères de contrôle (retour à la ligne brut) au lieu de la séquence
+// échappée \n : ça casse JSON.parse. On repasse donc sur le texte brut pour
+// échapper tout caractère de contrôle rencontré à l'intérieur d'une chaîne,
+// sans toucher au JSON structurel autour.
+function echapperSautsDeLigneDansLesChaines(raw: string): string {
+  let resultat = "";
+  let dansUneChaine = false;
+  let echappement = false;
+  for (const caractere of raw) {
+    if (dansUneChaine) {
+      if (echappement) {
+        resultat += caractere;
+        echappement = false;
+        continue;
+      }
+      if (caractere === "\\") {
+        resultat += caractere;
+        echappement = true;
+        continue;
+      }
+      if (caractere === '"') {
+        dansUneChaine = false;
+        resultat += caractere;
+        continue;
+      }
+      if (caractere === "\n") {
+        resultat += "\\n";
+        continue;
+      }
+      if (caractere === "\r") {
+        resultat += "\\r";
+        continue;
+      }
+      if (caractere === "\t") {
+        resultat += "\\t";
+        continue;
+      }
+      resultat += caractere;
+      continue;
+    }
+    if (caractere === '"') {
+      dansUneChaine = true;
+    }
+    resultat += caractere;
+  }
+  return resultat;
+}
+
+// Garantit une ligne vide avant chaque section MARIO ([M - ...], [A - ...], etc.),
+// quel que soit ce que le modèle a réellement produit (rien, un seul retour à la
+// ligne, ou déjà une ligne vide) : la lisibilité ne dépend plus de sa docilité.
+function formaterSautsDeSectionMario(prompt: string): string {
+  return prompt
+    .replace(/\s*(\[[A-ZÀ-Ý]\s*-\s*[^\]]+\])/g, "\n\n$1")
+    .replace(/^\n+/, "")
+    .trim();
+}
 
 // Sécurité : le client a déjà validé le fichier, mais un appel direct à cette fonction
 // (hors navigateur) pourrait contourner ce filtre. On ne fait donc jamais confiance à
@@ -184,13 +243,13 @@ export async function callAnthropicMario(input: {
     .trim();
 
   try {
-    const parsed = JSON.parse(cleaned);
+    const parsed = JSON.parse(echapperSautsDeLigneDansLesChaines(cleaned));
     return {
       titre_prompt: String(parsed.titre_prompt ?? "Prompt sans titre"),
       metier: String(parsed.metier ?? "Autre"),
       mots_cles: Array.isArray(parsed.mots_cles) ? parsed.mots_cles.map(String).slice(0, 5) : [],
       complexite: String(parsed.complexite ?? "moyen"),
-      prompt: String(parsed.prompt ?? ""),
+      prompt: formaterSautsDeSectionMario(String(parsed.prompt ?? "")),
       note: String(parsed.note ?? ""),
       etapes_lancement: Array.isArray(parsed.etapes_lancement)
         ? parsed.etapes_lancement.map(String)

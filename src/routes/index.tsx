@@ -327,7 +327,7 @@ function GeneratorPage() {
             </div>
           ) : null}
 
-          <div className="mt-4 flex flex-col gap-3 border-t border-border pt-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+          <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-border pt-4">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button
@@ -371,96 +371,92 @@ function GeneratorPage() {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <div className="flex flex-wrap items-center justify-between gap-2 sm:justify-end">
-              <div className="flex flex-wrap items-center gap-2">
-                <select
-                  id="ton"
-                  value={ton}
-                  onChange={(event) => setTon(event.target.value as TonValue)}
-                  className="cami-select-pill"
-                  aria-label="Ton du prompt"
-                >
-                  {TONS.map((item) => (
-                    <option key={item.value} value={item.value}>
-                      Ton : {item.label}
-                    </option>
-                  ))}
-                </select>
-                <select
-                  id="modele"
-                  value={modele}
-                  onChange={(event) => setModele(event.target.value as ModeleValue)}
-                  className="cami-select-pill"
-                  aria-label="Modèle Claude"
-                >
-                  {MODELES.map((item) => (
-                    <option key={item.value} value={item.value}>
-                      {item.label}
-                    </option>
-                  ))}
-                </select>
-                <button
-                  type="button"
-                  onClick={() => setMotsClesOuvert((v) => !v)}
-                  aria-pressed={motsClesOuvert}
-                  title="Ajouter des mots-clés"
-                  className={[
-                    "cami-icon-btn",
-                    motsClesOuvert ? "bg-secondary text-[var(--primary-dark)]" : "",
-                  ].join(" ")}
-                >
-                  <Hash className="h-4 w-4" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setAutresInstructionsOuvert((v) => !v)}
-                  aria-pressed={autresInstructionsOuvert}
-                  title="Ajouter d'autres instructions"
-                  className={[
-                    "cami-icon-btn",
-                    autresInstructionsOuvert ? "bg-secondary text-[var(--primary-dark)]" : "",
-                  ].join(" ")}
-                >
-                  <ListPlus className="h-4 w-4" />
-                </button>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/png,image/jpeg"
-                  onChange={handleImageChange}
-                  className="hidden"
-                />
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={imageEnCours}
-                  aria-pressed={!!image}
-                  title="Joindre une image (PNG ou JPG, 5 Mo max)"
-                  className={[
-                    "cami-icon-btn",
-                    image ? "bg-secondary text-[var(--primary-dark)]" : "",
-                  ].join(" ")}
-                >
-                  {imageEnCours ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <ImagePlus className="h-4 w-4" />
-                  )}
-                </button>
-              </div>
-              <button
-                type="submit"
-                disabled={!peutGenerer}
-                aria-label="Générer le prompt"
-                className="cami-submit-btn shrink-0"
-              >
-                {generation.isPending ? (
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                ) : (
-                  <ArrowUp className="h-5 w-5" />
-                )}
-              </button>
-            </div>
+            <select
+              id="ton"
+              value={ton}
+              onChange={(event) => setTon(event.target.value as TonValue)}
+              className="cami-select-pill"
+              aria-label="Ton du prompt"
+            >
+              {TONS.map((item) => (
+                <option key={item.value} value={item.value}>
+                  Ton : {item.label}
+                </option>
+              ))}
+            </select>
+            <select
+              id="modele"
+              value={modele}
+              onChange={(event) => setModele(event.target.value as ModeleValue)}
+              className="cami-select-pill"
+              aria-label="Modèle Claude"
+            >
+              {MODELES.map((item) => (
+                <option key={item.value} value={item.value}>
+                  {item.label}
+                </option>
+              ))}
+            </select>
+            <button
+              type="button"
+              onClick={() => setMotsClesOuvert((v) => !v)}
+              aria-pressed={motsClesOuvert}
+              title="Ajouter des mots-clés"
+              className={[
+                "cami-icon-btn",
+                motsClesOuvert ? "bg-secondary text-[var(--primary-dark)]" : "",
+              ].join(" ")}
+            >
+              <Hash className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              onClick={() => setAutresInstructionsOuvert((v) => !v)}
+              aria-pressed={autresInstructionsOuvert}
+              title="Ajouter d'autres instructions"
+              className={[
+                "cami-icon-btn",
+                autresInstructionsOuvert ? "bg-secondary text-[var(--primary-dark)]" : "",
+              ].join(" ")}
+            >
+              <ListPlus className="h-4 w-4" />
+            </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/png,image/jpeg"
+              onChange={handleImageChange}
+              className="hidden"
+            />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={imageEnCours}
+              aria-pressed={!!image}
+              title="Joindre une image (PNG ou JPG, 5 Mo max)"
+              className={[
+                "cami-icon-btn",
+                image ? "bg-secondary text-[var(--primary-dark)]" : "",
+              ].join(" ")}
+            >
+              {imageEnCours ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <ImagePlus className="h-4 w-4" />
+              )}
+            </button>
+            <button
+              type="submit"
+              disabled={!peutGenerer}
+              aria-label="Générer le prompt"
+              className="cami-submit-btn ml-auto shrink-0"
+            >
+              {generation.isPending ? (
+                <Loader2 className="h-5 w-5 animate-spin" />
+              ) : (
+                <ArrowUp className="h-5 w-5" />
+              )}
+            </button>
           </div>
         </form>
           </div>
