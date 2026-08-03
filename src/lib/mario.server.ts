@@ -98,7 +98,6 @@ export async function callAnthropicMario(input: {
     body: JSON.stringify({
       model: input.modele,
       max_tokens: 1500,
-      temperature: 0.7,
       system: MARIO_SYSTEM_PROMPT,
       messages: [{ role: "user", content: userMessage }],
     }),
