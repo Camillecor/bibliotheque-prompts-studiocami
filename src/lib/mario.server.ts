@@ -95,7 +95,7 @@ export async function callAnthropicMario(input: {
   metier: string;
   modele: ModeleMario;
   typePrompt: string;
-  image?: { mediaType: "image/png" | "image/jpeg"; base64: string };
+  image?: { mediaType: "image/png" | "image/jpeg"; base64: string } | undefined;
 }) {
   const apiKey = process.env["ANTHROPIC_API_KEY"];
   if (!apiKey) {
