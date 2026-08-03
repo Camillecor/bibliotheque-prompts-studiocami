@@ -65,20 +65,32 @@ export function PromptView({ data }: { data: PromptViewData }) {
       ) : null}
 
       {data.etapes_lancement.length > 0 ? (
-        <section className="cami-block-positif space-y-3">
+        <section className="space-y-4">
           <h3 className="flex items-center gap-2 text-base font-bold">
             <ListOrdered className="h-4 w-4 text-[var(--success)]" />
-            Étapes pour lancer ce prompt
+            Je suis ces étapes pour lancer mon prompt
           </h3>
-          <ol className="space-y-2">
-            {data.etapes_lancement.map((etape, index) => (
-              <li key={etape} className="flex gap-3 text-sm text-muted-foreground">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--success)_18%,white)] text-xs font-bold text-[var(--success)]">
-                  {index + 1}
-                </span>
-                <span>{etape}</span>
-              </li>
-            ))}
+          <ol>
+            {data.etapes_lancement.map((etape, index) => {
+              const estDerniere = index === data.etapes_lancement.length - 1;
+              return (
+                <li key={etape} className="flex gap-4 pb-4 last:pb-0">
+                  <div className="flex flex-col items-center">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 border-[var(--success)] bg-card text-xs font-bold text-[var(--success)]">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                    {!estDerniere ? (
+                      <span className="mt-1 w-px flex-1 bg-[color-mix(in_srgb,var(--success)_35%,transparent)]" />
+                    ) : null}
+                  </div>
+                  <div className="cami-block-positif flex-1">
+                    <p className="text-sm leading-relaxed text-muted-foreground">
+                      {etape.replace(/^Étape\s*\d+\s*:\s*/i, "")}
+                    </p>
+                  </div>
+                </li>
+              );
+            })}
           </ol>
         </section>
       ) : null}

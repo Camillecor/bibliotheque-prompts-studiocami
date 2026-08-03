@@ -535,7 +535,7 @@ function GeneratorPage() {
             />
 
             <div className="space-y-4 border-t border-border pt-6">
-              <h3 className="text-base font-bold">Classement dans la bibliothèque</h3>
+              <h3 className="text-base font-bold">Je range mon nouveau prompt dans ma bibliothèque</h3>
               <div className="flex flex-col gap-4">
                 <div>
                   <label htmlFor="titre-edit" className="mb-2 block text-sm font-semibold">
