@@ -47,7 +47,7 @@ export function PromptView({ data }: { data: PromptViewData }) {
             </h3>
             <CopyButton value={data.version_1.prompt ?? ""} />
           </div>
-          <pre className="whitespace-pre-wrap rounded-2xl bg-card/70 p-4 text-sm leading-relaxed text-primary">
+          <pre className="whitespace-pre-wrap rounded-2xl bg-card/70 p-4 text-sm leading-relaxed text-foreground">
             {data.version_1.prompt}
           </pre>
           {data.version_1.note ? (
@@ -89,7 +89,7 @@ export function PromptView({ data }: { data: PromptViewData }) {
           <ol className="space-y-2">
             {data.etapes_lancement.map((etape, index) => (
               <li key={etape} className="flex gap-3 text-sm text-muted-foreground">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--success)_18%,white)] text-xs font-bold text-[var(--success)]">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--success)_28%,transparent)] text-xs font-bold text-[var(--success)]">
                   {index + 1}
                 </span>
                 <span>{etape}</span>

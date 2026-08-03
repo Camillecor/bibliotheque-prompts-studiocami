@@ -205,7 +205,7 @@ function GeneratorPage() {
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="start"
-                className="w-80 rounded-3xl border border-white/60 bg-white/75 p-2 shadow-2xl backdrop-blur-xl"
+                className="glass-card w-80 p-2 text-white shadow-2xl"
               >
                 <button
                   type="button"
