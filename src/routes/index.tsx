@@ -141,7 +141,7 @@ function GeneratorPage() {
   const [motsCles, setMotsCles] = useState("");
   const [motsClesOuvert, setMotsClesOuvert] = useState(false);
   const [typePrompt, setTypePrompt] = useState<TypePromptValue | "">("");
-  const [modele, setModele] = useState<ModeleValue>("claude-opus-5");
+  const [modele, setModele] = useState<ModeleValue>("claude-sonnet-5");
   const [image, setImage] = useState<ImageAttachment | null>(null);
   const [imageEnCours, setImageEnCours] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);

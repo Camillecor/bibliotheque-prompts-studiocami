@@ -58,9 +58,9 @@ Réponds uniquement avec ce JSON (pas de texte avant/après) :
   "alerte_pii": false
 }`;
 
-export const ANTHROPIC_MODEL = "claude-opus-5";
+export const ANTHROPIC_MODEL = "claude-sonnet-5";
 
-export const MODELES_DISPONIBLES = ["claude-opus-5", "claude-sonnet-5", "claude-haiku-4-5"] as const;
+export const MODELES_DISPONIBLES = ["claude-sonnet-5", "claude-haiku-4-5"] as const;
 export type ModeleMario = (typeof MODELES_DISPONIBLES)[number];
 
 type AnthropicContentBlock = { type: string; text?: string };
