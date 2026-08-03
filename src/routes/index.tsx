@@ -217,7 +217,7 @@ function GeneratorPage() {
 
   return (
     <AppShell>
-      <div className="tech-grid-bg relative mx-auto w-full max-w-5xl overflow-hidden rounded-[2rem]">
+      <div className="tech-grid-bg relative mx-auto w-full max-w-5xl rounded-[2rem]">
         <div className="glow-orb -left-20 -top-16 h-72 w-72 bg-[var(--info)]" />
         <div className="glow-orb -right-16 top-24 h-64 w-64 bg-[var(--coral)]" />
 
@@ -245,9 +245,9 @@ function GeneratorPage() {
           </p>
         </div>
 
-        <div className="mx-auto mt-8 flex max-w-5xl items-center justify-center gap-6">
+        <div className="mx-auto mt-8 grid max-w-4xl grid-cols-1 items-center gap-6 xl:grid-cols-[minmax(0,1fr)_auto]">
         <form
-          className="cami-card-hero relative w-full max-w-3xl"
+          className="cami-card-hero relative mx-auto w-full max-w-2xl xl:mx-0"
           onSubmit={(event) => {
             event.preventDefault();
             if (peutGenerer) generation.mutate();
@@ -395,7 +395,7 @@ function GeneratorPage() {
           <img
             src="/mario-fox-point.png"
             alt="Mario le renard te montre le générateur"
-            className="hidden w-48 shrink-0 lg:block xl:w-56"
+            className="mx-auto hidden w-56 shrink-0 xl:mx-0 xl:block"
           />
         </div>
 
