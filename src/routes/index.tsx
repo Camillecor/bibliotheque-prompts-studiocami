@@ -472,7 +472,7 @@ function GeneratorPage() {
           </div>
         </form>
 
-        <div className="mx-auto mt-4 max-w-3xl text-center">
+        <div className="mx-auto mt-16 max-w-3xl text-center">
           <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-muted-foreground">
             Compatible avec toutes les IA
           </p>
