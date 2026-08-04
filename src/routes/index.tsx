@@ -272,7 +272,7 @@ function GeneratorPage() {
               en un prompt IA structuré
             </h1>
             <p className="mt-3 text-base text-muted-foreground">
-              Décris ton besoin.
+              Décris ton besoin. Affine en répondant à 3 questions.
               <br />
               Mario le renard, mon super agent, te génère un prompt structuré et optimisé.
             </p>
@@ -460,7 +460,7 @@ function GeneratorPage() {
           </div>
         </div>
 
-        <div className="mx-auto mt-12 max-w-3xl text-center">
+        <div className="mx-auto mt-4 max-w-3xl text-center">
           <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-muted-foreground">
             Compatible avec toutes les IA
           </p>
