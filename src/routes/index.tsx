@@ -6,7 +6,6 @@ import { toast } from "sonner";
 import {
   ArrowUp,
   Check,
-  ChevronDown,
   Hash,
   ImagePlus,
   ListPlus,
