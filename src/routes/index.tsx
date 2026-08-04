@@ -16,7 +16,7 @@ import {
 import { AppShell } from "@/components/AppShell";
 import { IaLogo, IA_LOGO_NAMES } from "@/components/IaLogos";
 import { PromptView } from "@/components/PromptView";
-import foxThumbsup from "@/assets/fox-thumbsup.png.asset.json";
+import foxWave from "@/assets/fox-wave.png.asset.json";
 import foxAi from "@/assets/fox-ai.png.asset.json";
 import foxBook from "@/assets/fox-book.png.asset.json";
 import {
@@ -283,7 +283,7 @@ function GeneratorPage() {
               <br />
               <span className="italic font-bold">en prompt IA structuré</span>
             </h1>
-            <p className="mt-3 text-sm text-muted-foreground md:text-base">
+            <p className="mt-3 text-xs text-muted-foreground md:text-base">
               Décris ton besoin. Affine en répondant à 3 questions.
               <br />
               Mario le renard, mon super agent, te génère un prompt structuré et optimisé.
@@ -461,12 +461,12 @@ function GeneratorPage() {
               type="submit"
               disabled={!peutGenerer}
               aria-label="Générer le prompt"
-              className="cami-submit-btn ml-auto shrink-0"
+              className="cami-submit-btn ml-auto shrink-0 h-8 w-8 md:h-10 md:w-10"
             >
               {generation.isPending ? (
-                <Loader2 className="h-5 w-5 animate-spin" />
+                <Loader2 className="h-4 w-4 animate-spin md:h-5 md:w-5" />
               ) : (
-                <ArrowUp className="h-5 w-5" />
+                <ArrowUp className="h-4 w-4 md:h-5 md:w-5" />
               )}
             </button>
           </div>
@@ -493,14 +493,14 @@ function GeneratorPage() {
 
         <section className="mx-auto mt-16 max-w-4xl">
           <p className="text-center text-xl font-bold text-primary md:text-[11px] md:uppercase md:tracking-[0.16em] md:text-muted-foreground">
-            En 3 étapes
+            Un générateur en 3 étapes
           </p>
           <div className="mt-8 grid gap-6 md:grid-cols-3">
             {[
               {
                 titre: "Décris ton besoin",
                 texte: "En français, comme tu le dirais à un collègue. Pas de jargon requis.",
-                image: foxThumbsup.url,
+                image: foxWave.url,
               },
               {
                 titre: "Affine en 3 questions",
@@ -521,7 +521,7 @@ function GeneratorPage() {
                   className="h-40 w-auto object-contain sm:h-48"
                   loading="lazy"
                 />
-                <h2 className="mt-4 text-base font-bold">{etape.titre}</h2>
+                <h2 className="mt-4 text-base font-bold md:text-sm">{etape.titre}</h2>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{etape.texte}</p>
               </div>
             ))}
