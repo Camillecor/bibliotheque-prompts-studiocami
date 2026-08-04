@@ -8,17 +8,17 @@ import {
   Check,
   Hash,
   ImagePlus,
-  Library,
   ListPlus,
   Loader2,
-  PenLine,
   Save,
-  Target,
   X,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { IaLogo, IA_LOGO_NAMES } from "@/components/IaLogos";
 import { PromptView } from "@/components/PromptView";
+import foxThumbsup from "@/assets/fox-thumbsup.png.asset.json";
+import foxAi from "@/assets/fox-ai.png.asset.json";
+import foxLibrary from "@/assets/fox-library.png.asset.json";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -500,23 +500,17 @@ function GeneratorPage() {
               {
                 titre: "Décris ton besoin",
                 texte: "En français, comme tu le dirais à un collègue. Pas de jargon requis.",
-                Icon: PenLine,
-                couleur: "var(--coral)",
-                image: "/mario-fox-point.png",
+                image: foxThumbsup.url,
               },
               {
                 titre: "Affine en 3 questions",
                 texte: "Mario cerne ton besoin exact avant de générer, pour un prompt qui tombe juste du premier coup.",
-                Icon: Target,
-                couleur: "var(--info)",
-                image: "/mario-fox.png",
+                image: foxAi.url,
               },
               {
                 titre: "Sauvegarde et retrouve-le",
                 texte: "Classé par métier, type et mots-clés, modifiable et exportable, disponible à tout moment dans ta bibliothèque.",
-                Icon: Library,
-                couleur: "var(--primary)",
-                image: "/mario-fox-head.png",
+                image: foxLibrary.url,
               },
             ].map((etape) => (
               <div key={etape.titre} className="cami-card flex flex-col items-center text-center">
@@ -527,16 +521,11 @@ function GeneratorPage() {
                   className="h-40 w-auto object-contain sm:h-48"
                   loading="lazy"
                 />
-                <span
-                  className="-mt-6 flex h-12 w-12 items-center justify-center rounded-full text-white shadow-md"
-                  style={{ backgroundColor: etape.couleur }}
-                >
-                  <etape.Icon className="h-5 w-5" strokeWidth={2.2} />
-                </span>
                 <h2 className="mt-4 text-base font-bold">{etape.titre}</h2>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{etape.texte}</p>
               </div>
             ))}
+
           </div>
 
         </section>
