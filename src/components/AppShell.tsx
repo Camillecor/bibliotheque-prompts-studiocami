@@ -48,7 +48,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen bg-background">
       <PrechargementBibliotheque />
-      <header className="fixed inset-x-0 top-0 z-40 flex h-14 items-center gap-4 bg-transparent px-4">
+      <header className="fixed inset-x-0 top-0 z-40 flex h-14 items-center gap-4 bg-transparent px-4 lg:h-20 lg:gap-6">
         {/* Flou progressif : maximal en haut de la navbar, nul sous celle-ci
             pour fondre doucement dans le contenu qui défile. Le calque dépasse
             la hauteur de la navbar (h-[120px]) et est masqué par un dégradé
@@ -65,9 +65,21 @@ export function AppShell({ children }: { children: ReactNode }) {
               "linear-gradient(to bottom, black 0%, black 47%, transparent 100%)",
           }}
         />
-        <Link to="/" aria-label="Studio Cami — accueil" className="flex shrink-0 items-center gap-2">
-          <img src="/mario-fox-head.png" alt="" className="h-8 w-8 rounded-full" />
-          <img src={logoAsset.url} alt="Studio Cami" className="h-8 w-auto" />
+        <Link
+          to="/"
+          aria-label="Studio Cami — accueil"
+          className="flex shrink-0 items-center gap-2 transition duration-200 hover:opacity-80 lg:gap-3"
+        >
+          <img
+            src="/mario-fox-head.png"
+            alt=""
+            className="h-8 w-8 object-contain lg:h-14 lg:w-14"
+          />
+          <img
+            src={logoAsset.url}
+            alt="Studio Cami"
+            className="h-8 w-auto lg:h-11"
+          />
         </Link>
 
         <nav className="ml-auto flex items-center gap-1">
@@ -81,7 +93,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </nav>
       </header>
 
-      <main className="pt-14">
+      <main className="pt-14 lg:pt-20">
         <div className="mx-auto max-w-[1200px] px-4 py-8 sm:px-8">{children}</div>
       </main>
     </div>
