@@ -272,7 +272,7 @@ function GeneratorPage() {
               </span>
               GÉNÉRATEUR DE PROMPT • BIBLIOTHÈQUE • GLOSSAIRE
             </span>
-            <h1 className="font-display mt-5 text-3xl leading-tight md:text-5xl">
+            <h1 className="font-display mt-5 text-4xl leading-tight md:text-5xl">
               Transforme ton idée
               <br />
               en un prompt IA structuré
