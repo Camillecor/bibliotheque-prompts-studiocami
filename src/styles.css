@@ -140,7 +140,7 @@
   position: absolute;
   border-radius: 9999px;
   filter: blur(70px);
-  opacity: 0.32;
+  opacity: 0.16;
   pointer-events: none;
 }
 
@@ -185,13 +185,15 @@
   0%,
   100% {
     box-shadow:
-      0 0 0 1px color-mix(in srgb, var(--info) 40%, transparent),
-      0 32px 64px -16px rgba(5, 12, 156, 0.12);
+      0 0 0 1px color-mix(in srgb, var(--info) 10%, transparent),
+      0 1px 2px rgba(17, 26, 61, 0.05),
+      0 16px 40px -18px rgba(17, 26, 61, 0.16);
   }
   50% {
     box-shadow:
-      0 0 0 1px color-mix(in srgb, var(--coral) 40%, transparent),
-      0 32px 64px -16px rgba(5, 12, 156, 0.12);
+      0 0 0 1px color-mix(in srgb, var(--coral) 10%, transparent),
+      0 1px 2px rgba(17, 26, 61, 0.05),
+      0 16px 40px -18px rgba(17, 26, 61, 0.16);
   }
 }
 
