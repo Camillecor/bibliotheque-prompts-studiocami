@@ -336,7 +336,6 @@ function GeneratorPage() {
                 >
                   Type :{" "}
                   {TYPES_PROMPT.find((t) => t.value === typePrompt)?.label ?? "Auto"}
-                  <ChevronDown className="h-3 w-3" />
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent
