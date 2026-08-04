@@ -67,6 +67,8 @@ export type PromptRow = {
   id: string;
   titre: string;
   metier: string;
+  type_prompt?: string;
+
   mots_cles: string[];
   complexite: string;
   prompt: string;
