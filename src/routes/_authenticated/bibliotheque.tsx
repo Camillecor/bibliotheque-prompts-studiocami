@@ -4,10 +4,16 @@ import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
-import { ArrowLeft, Loader2, Search, Trash2 } from "lucide-react";
+import { ArrowLeft, Loader2, Search, SlidersHorizontal, Trash2 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { PromptView } from "@/components/PromptView";
-import { METIERS, formatDateFr, labelTypePrompt, type PromptRow } from "@/lib/mario";
+import {
+  METIERS,
+  TYPES_PROMPT,
+  formatDateFr,
+  labelTypePrompt,
+  type PromptRow,
+} from "@/lib/mario";
 import { deletePrompt, listPrompts } from "@/lib/mario.functions";
 
 export const Route = createFileRoute("/_authenticated/bibliotheque")({
@@ -30,7 +36,9 @@ export const Route = createFileRoute("/_authenticated/bibliotheque")({
   component: LibraryPage,
 });
 
-type Tri = "recent" | "ancien";
+type Tri = "recent" | "ancien" | "alpha" | "complexite";
+
+const ORDRE_COMPLEXITE: Record<string, number> = { simple: 0, moyen: 1, complexe: 2 };
 
 function LibraryPage() {
   const { id: idDeepLink } = Route.useSearch();
@@ -39,8 +47,12 @@ function LibraryPage() {
   const queryClient = useQueryClient();
 
   const [recherche, setRecherche] = useState("");
-  const [metierFiltre, setMetierFiltre] = useState("");
+  const [metierFiltre, setMetierFiltre] = useState<string[]>([]);
+  const [typeFiltre, setTypeFiltre] = useState<string[]>([]);
+  const [complexiteFiltre, setComplexiteFiltre] = useState("");
   const [tri, setTri] = useState<Tri>("recent");
+  const [typeListeOuverte, setTypeListeOuverte] = useState(false);
+  const [filtresOuverts, setFiltresOuverts] = useState(false);
   const [selection, setSelection] = useState<PromptRow | null>(null);
 
   const { data, isLoading } = useQuery({
@@ -72,14 +84,41 @@ function LibraryPage() {
           !terme ||
           prompt.titre.toLowerCase().includes(terme) ||
           (prompt.mots_cles ?? []).some((mot) => mot.toLowerCase().includes(terme));
-        const matchMetier = !metierFiltre || prompt.metier === metierFiltre;
-        return matchTerme && matchMetier;
+        const matchMetier = metierFiltre.length === 0 || metierFiltre.includes(prompt.metier);
+        const matchType =
+          typeFiltre.length === 0 || (prompt.type_prompt ? typeFiltre.includes(prompt.type_prompt) : false);
+        const matchComplexite = !complexiteFiltre || prompt.complexite === complexiteFiltre;
+        return matchTerme && matchMetier && matchType && matchComplexite;
       })
       .sort((a, b) => {
+        if (tri === "alpha") return a.titre.localeCompare(b.titre, "fr");
+        if (tri === "complexite")
+          return (ORDRE_COMPLEXITE[a.complexite] ?? 1) - (ORDRE_COMPLEXITE[b.complexite] ?? 1);
         const diff = new Date(b.date_ajout).getTime() - new Date(a.date_ajout).getTime();
         return tri === "recent" ? diff : -diff;
       });
-  }, [data, recherche, metierFiltre, tri]);
+  }, [data, recherche, metierFiltre, typeFiltre, complexiteFiltre, tri]);
+
+  function toggleMetier(metier: string) {
+    setMetierFiltre((p) => (p.includes(metier) ? p.filter((m) => m !== metier) : [...p, metier]));
+  }
+
+  function toggleType(type: string) {
+    setTypeFiltre((p) => (p.includes(type) ? p.filter((t) => t !== type) : [...p, type]));
+  }
+
+  const filtresActifs =
+    recherche.trim().length > 0 ||
+    metierFiltre.length > 0 ||
+    typeFiltre.length > 0 ||
+    complexiteFiltre.length > 0;
+
+  function reinitialiserFiltres() {
+    setRecherche("");
+    setMetierFiltre([]);
+    setTypeFiltre([]);
+    setComplexiteFiltre("");
+  }
 
   return (
     <AppShell>
@@ -127,83 +166,187 @@ function LibraryPage() {
               <div>
                 <h1 className="text-3xl font-extrabold md:text-4xl">Ma bibliothèque</h1>
                 <p className="mt-2 text-sm text-muted-foreground">
-                  {(data ?? []).length} prompt{(data ?? []).length > 1 ? "s" : ""} dans ta
-                  bibliothèque
+                  {prompts.length} résultat{prompts.length > 1 ? "s" : ""} sur{" "}
+                  {(data ?? []).length} prompt{(data ?? []).length > 1 ? "s" : ""}
                 </p>
               </div>
+              <button
+                type="button"
+                className="cami-btn lg:hidden"
+                onClick={() => setFiltresOuverts((v) => !v)}
+              >
+                <SlidersHorizontal className="h-4 w-4" />
+                Filtres
+              </button>
             </div>
 
-            <div className="cami-card mt-6 grid gap-4 md:grid-cols-[2fr_1fr_1fr]">
-              <div className="relative">
-                <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <input
-                  value={recherche}
-                  onChange={(event) => setRecherche(event.target.value)}
-                  placeholder="Rechercher un titre ou un mot-clé"
-                  className="cami-input pl-11"
-                />
-              </div>
-              <select
-                value={metierFiltre}
-                onChange={(event) => setMetierFiltre(event.target.value)}
-                className="cami-input"
+            <div className="mt-6 grid gap-6 lg:grid-cols-[280px_1fr] lg:items-start">
+              <aside
+                className={`cami-card space-y-6 lg:sticky lg:top-20 ${
+                  filtresOuverts ? "block" : "hidden lg:block"
+                }`}
               >
-                <option value="">Tous les métiers</option>
-                {METIERS.map((item) => (
-                  <option key={item} value={item}>
-                    {item}
-                  </option>
-                ))}
-              </select>
-              <select
-                value={tri}
-                onChange={(event) => setTri(event.target.value as Tri)}
-                className="cami-input"
-              >
-                <option value="recent">Plus récents d'abord</option>
-                <option value="ancien">Plus anciens d'abord</option>
-              </select>
-            </div>
+                <div className="relative">
+                  <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <input
+                    value={recherche}
+                    onChange={(event) => setRecherche(event.target.value)}
+                    placeholder="Rechercher un titre ou un mot-clé"
+                    className="cami-input pl-11"
+                  />
+                </div>
 
-            {isLoading ? (
-              <div className="mt-10 flex justify-center">
-                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-              </div>
-            ) : prompts.length === 0 ? (
-              <div className="cami-block-resume mt-6 text-center text-sm text-muted-foreground">
-                Aucun prompt pour l'instant. Génère ton premier prompt depuis le générateur.
-              </div>
-            ) : (
-              <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {prompts.map((prompt) => (
+                <select
+                  value={tri}
+                  onChange={(event) => setTri(event.target.value as Tri)}
+                  className="cami-input"
+                >
+                  <option value="recent">Plus récents d'abord</option>
+                  <option value="ancien">Plus anciens d'abord</option>
+                  <option value="alpha">Alphabétique (A → Z)</option>
+                  <option value="complexite">Complexité (simple → complexe)</option>
+                </select>
+
+                {filtresActifs ? (
                   <button
-                    key={prompt.id}
                     type="button"
-                    onClick={() => setSelection(prompt)}
-                    className="cami-card text-left transition hover:-translate-y-0.5 hover:shadow-md"
+                    onClick={reinitialiserFiltres}
+                    className="text-xs font-semibold text-[var(--coral)] hover:underline"
                   >
-                    <p className="text-xs font-medium uppercase tracking-[0.08em] text-muted-foreground">
-                      {formatDateFr(prompt.date_ajout)}
-                    </p>
-                    <h2 className="mt-2 text-lg font-bold leading-snug">{prompt.titre}</h2>
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      <span className="cami-pill">{prompt.metier}</span>
-                      {prompt.type_prompt ? (
-                        <span className="cami-pill">{labelTypePrompt(prompt.type_prompt)}</span>
-                      ) : null}
-                      <span className="cami-pill text-muted-foreground">{prompt.complexite}</span>
-
-                    </div>
-                    {(prompt.mots_cles ?? []).length > 0 ? (
-                      <p className="mt-3 text-xs text-muted-foreground">
-                        Mots-clés : {(prompt.mots_cles ?? []).join(", ")}
-                      </p>
-                    ) : null}
+                    Réinitialiser les filtres
                   </button>
-                ))}
+                ) : null}
+
+                <div className="border-t border-border pt-5">
+                  <p className="text-xs font-bold uppercase tracking-[0.08em] text-muted-foreground">
+                    Métier
+                  </p>
+                  <div className="mt-3 space-y-2">
+                    {METIERS.map((item) => (
+                      <label
+                        key={item}
+                        className="flex cursor-pointer items-center gap-2 text-sm"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={metierFiltre.includes(item)}
+                          onChange={() => toggleMetier(item)}
+                          className="h-4 w-4 rounded border-border accent-[var(--coral)]"
+                        />
+                        <span>{item}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="border-t border-border pt-5">
+                  <p className="text-xs font-bold uppercase tracking-[0.08em] text-muted-foreground">
+                    Type
+                  </p>
+                  <div className="mt-3 space-y-2">
+                    {(typeListeOuverte ? TYPES_PROMPT : TYPES_PROMPT.slice(0, 6)).map((item) => (
+                      <label
+                        key={item.value}
+                        className="flex cursor-pointer items-center gap-2 text-sm"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={typeFiltre.includes(item.value)}
+                          onChange={() => toggleType(item.value)}
+                          className="h-4 w-4 rounded border-border accent-[var(--coral)]"
+                        />
+                        <span>{item.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                  {TYPES_PROMPT.length > 6 ? (
+                    <button
+                      type="button"
+                      onClick={() => setTypeListeOuverte((v) => !v)}
+                      className="mt-3 text-xs font-semibold text-[var(--coral)] hover:underline"
+                    >
+                      {typeListeOuverte ? "Réduire" : "Tout afficher"}
+                    </button>
+                  ) : null}
+                </div>
+
+                <div className="border-t border-border pt-5">
+                  <p className="text-xs font-bold uppercase tracking-[0.08em] text-muted-foreground">
+                    Complexité
+                  </p>
+                  <div className="mt-3 space-y-2">
+                    {["simple", "moyen", "complexe"].map((niveau) => (
+                      <label
+                        key={niveau}
+                        className="flex cursor-pointer items-center gap-2 text-sm capitalize"
+                      >
+                        <input
+                          type="radio"
+                          name="complexite-filtre"
+                          checked={complexiteFiltre === niveau}
+                          onChange={() => setComplexiteFiltre(niveau)}
+                          className="h-4 w-4 border-border accent-[var(--coral)]"
+                        />
+                        <span>{niveau}</span>
+                      </label>
+                    ))}
+                  </div>
+                  {complexiteFiltre ? (
+                    <button
+                      type="button"
+                      onClick={() => setComplexiteFiltre("")}
+                      className="mt-3 text-xs font-semibold text-[var(--coral)] hover:underline"
+                    >
+                      Effacer
+                    </button>
+                  ) : null}
+                </div>
+              </aside>
+
+              <div>
+                {isLoading ? (
+                  <div className="mt-4 flex justify-center">
+                    <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                  </div>
+                ) : prompts.length === 0 ? (
+                  <div className="cami-block-resume text-center text-sm text-muted-foreground">
+                    Aucun prompt pour l'instant. Génère ton premier prompt depuis le générateur.
+                  </div>
+                ) : (
+                  <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                    {prompts.map((prompt) => (
+                      <button
+                        key={prompt.id}
+                        type="button"
+                        onClick={() => setSelection(prompt)}
+                        className="cami-card text-left transition hover:-translate-y-0.5 hover:shadow-md"
+                      >
+                        <p className="text-xs font-medium uppercase tracking-[0.08em] text-muted-foreground">
+                          {formatDateFr(prompt.date_ajout)}
+                        </p>
+                        <h2 className="mt-2 text-lg font-bold leading-snug">{prompt.titre}</h2>
+                        <div className="mt-4 flex flex-wrap gap-2">
+                          <span className="cami-pill">{prompt.metier}</span>
+                          {prompt.type_prompt ? (
+                            <span className="cami-pill">{labelTypePrompt(prompt.type_prompt)}</span>
+                          ) : null}
+                          <span className="cami-pill text-muted-foreground">
+                            {prompt.complexite}
+                          </span>
+                        </div>
+                        {(prompt.mots_cles ?? []).length > 0 ? (
+                          <p className="mt-3 text-xs text-muted-foreground">
+                            Mots-clés : {(prompt.mots_cles ?? []).join(", ")}
+                          </p>
+                        ) : null}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
-            )}
+            </div>
           </>
+
         )}
       </div>
     </AppShell>
