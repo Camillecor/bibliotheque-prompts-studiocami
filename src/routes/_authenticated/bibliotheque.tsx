@@ -7,7 +7,7 @@ import { z } from "zod";
 import { ArrowLeft, Loader2, Search, Trash2 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { PromptView } from "@/components/PromptView";
-import { METIERS, formatDateFr, type PromptRow } from "@/lib/mario";
+import { METIERS, formatDateFr, labelTypePrompt, type PromptRow } from "@/lib/mario";
 import { deletePrompt, listPrompts } from "@/lib/mario.functions";
 
 export const Route = createFileRoute("/_authenticated/bibliotheque")({
