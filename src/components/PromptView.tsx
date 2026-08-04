@@ -46,17 +46,18 @@ export function decouperSections(prompt: string): Section[] {
   const preambule: string[] = [];
 
   for (const ligne of lignes) {
-    const estHeader = /^\s*\[[^\]]+\]\s*$/.test(ligne);
-    if (estHeader) {
+    const correspondance = /^\s*(\[[^\]]+\])\s*(.*)$/.exec(ligne);
+    if (correspondance) {
       if (courante) sections.push(courante);
-      const header = ligne.trim();
-      courante = { header, body: "", couleur: couleurPourHeader(header) };
+      const header = correspondance[1] as string;
+      courante = { header, body: correspondance[2] ?? "", couleur: couleurPourHeader(header) };
     } else if (courante) {
       courante.body += (courante.body ? "\n" : "") + ligne;
     } else {
       preambule.push(ligne);
     }
   }
+
   if (courante) sections.push(courante);
 
   const texteIntro = preambule.join("\n").trim();
