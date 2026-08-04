@@ -37,6 +37,7 @@ export const generateMarioPrompt = createServerFn({ method: "POST" })
 const SaveInput = z.object({
   titre: z.string().min(1),
   metier: z.string().min(1),
+  type_prompt: z.string().default("standard"),
   mots_cles: z.array(z.string()).default([]),
   complexite: z.string().min(1),
   prompt: z.string(),
@@ -46,6 +47,7 @@ const SaveInput = z.object({
   idee_source: z.string().default(""),
   date_ajout: z.string().datetime().optional(),
 });
+
 
 export const savePrompt = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => SaveInput.parse(input))
