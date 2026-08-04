@@ -36,7 +36,9 @@ export const Route = createFileRoute("/_authenticated/bibliotheque")({
   component: LibraryPage,
 });
 
-type Tri = "recent" | "ancien";
+type Tri = "recent" | "ancien" | "alpha" | "complexite";
+
+const ORDRE_COMPLEXITE: Record<string, number> = { simple: 0, moyen: 1, complexe: 2 };
 
 function LibraryPage() {
   const { id: idDeepLink } = Route.useSearch();
@@ -45,8 +47,12 @@ function LibraryPage() {
   const queryClient = useQueryClient();
 
   const [recherche, setRecherche] = useState("");
-  const [metierFiltre, setMetierFiltre] = useState("");
+  const [metierFiltre, setMetierFiltre] = useState<string[]>([]);
+  const [typeFiltre, setTypeFiltre] = useState<string[]>([]);
+  const [complexiteFiltre, setComplexiteFiltre] = useState("");
   const [tri, setTri] = useState<Tri>("recent");
+  const [typeListeOuverte, setTypeListeOuverte] = useState(false);
+  const [filtresOuverts, setFiltresOuverts] = useState(false);
   const [selection, setSelection] = useState<PromptRow | null>(null);
 
   const { data, isLoading } = useQuery({
