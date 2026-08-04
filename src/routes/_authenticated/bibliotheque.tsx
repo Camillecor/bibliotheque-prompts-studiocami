@@ -84,14 +84,41 @@ function LibraryPage() {
           !terme ||
           prompt.titre.toLowerCase().includes(terme) ||
           (prompt.mots_cles ?? []).some((mot) => mot.toLowerCase().includes(terme));
-        const matchMetier = !metierFiltre || prompt.metier === metierFiltre;
-        return matchTerme && matchMetier;
+        const matchMetier = metierFiltre.length === 0 || metierFiltre.includes(prompt.metier);
+        const matchType =
+          typeFiltre.length === 0 || (prompt.type_prompt ? typeFiltre.includes(prompt.type_prompt) : false);
+        const matchComplexite = !complexiteFiltre || prompt.complexite === complexiteFiltre;
+        return matchTerme && matchMetier && matchType && matchComplexite;
       })
       .sort((a, b) => {
+        if (tri === "alpha") return a.titre.localeCompare(b.titre, "fr");
+        if (tri === "complexite")
+          return (ORDRE_COMPLEXITE[a.complexite] ?? 1) - (ORDRE_COMPLEXITE[b.complexite] ?? 1);
         const diff = new Date(b.date_ajout).getTime() - new Date(a.date_ajout).getTime();
         return tri === "recent" ? diff : -diff;
       });
-  }, [data, recherche, metierFiltre, tri]);
+  }, [data, recherche, metierFiltre, typeFiltre, complexiteFiltre, tri]);
+
+  function toggleMetier(metier: string) {
+    setMetierFiltre((p) => (p.includes(metier) ? p.filter((m) => m !== metier) : [...p, metier]));
+  }
+
+  function toggleType(type: string) {
+    setTypeFiltre((p) => (p.includes(type) ? p.filter((t) => t !== type) : [...p, type]));
+  }
+
+  const filtresActifs =
+    recherche.trim().length > 0 ||
+    metierFiltre.length > 0 ||
+    typeFiltre.length > 0 ||
+    complexiteFiltre.length > 0;
+
+  function reinitialiserFiltres() {
+    setRecherche("");
+    setMetierFiltre([]);
+    setTypeFiltre([]);
+    setComplexiteFiltre("");
+  }
 
   return (
     <AppShell>
