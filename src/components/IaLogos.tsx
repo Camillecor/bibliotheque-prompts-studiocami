@@ -122,7 +122,7 @@ function LogoPerplexity() {
   );
 }
 
-const LOGO_COMPONENTS: Record<IaLogoName, () => JSX.Element> = {
+const LOGO_COMPONENTS: Record<IaLogoName, () => React.ReactElement> = {
   ChatGPT: LogoOpenAI,
   Claude: LogoClaude,
   Gemini: LogoGemini,
