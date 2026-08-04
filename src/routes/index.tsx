@@ -288,9 +288,11 @@ function GeneratorPage() {
               <br />
               Mario le renard, mon super agent, te génère un prompt structuré et optimisé.
             </p>
+          </div>
+        </div>
 
-            <form
-              className="cami-card-hero relative mx-auto mt-8 w-full max-w-2xl"
+        <form
+          className="cami-card-hero relative mx-auto mt-8 w-full"
               onSubmit={(event) => {
                 event.preventDefault();
                 if (peutGenerer) generation.mutate();
