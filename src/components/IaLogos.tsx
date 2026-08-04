@@ -1,3 +1,5 @@
+import type { ReactElement } from "react";
+
 export const IA_LOGO_NAMES = [
   "ChatGPT",
   "Claude",
