@@ -158,10 +158,10 @@ export function PromptView({
   return (
     <div className="space-y-6">
       <div className="space-y-4">
-        <div className="flex items-center gap-3">
+        <h2 className="flex items-center gap-3 text-lg font-bold">
           <span className="cami-step-badge">1</span>
-          <h2 className="text-2xl font-extrabold md:text-3xl">{data.titre}</h2>
-        </div>
+          J'obtiens mon prompt avec la méthode MARIO
+        </h2>
         <div className="flex flex-wrap gap-2">
           <span className="cami-pill">{data.metier}</span>
           {data.type_prompt ? (
@@ -188,9 +188,6 @@ export function PromptView({
 
       {editable ? (
         <section className="space-y-3 rounded-2xl border border-border bg-card p-4 md:p-6">
-          <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
-            Prompt modifiable — chaque section MARIO a sa couleur
-          </p>
           {sections.map((section, index) => (
             <div
               key={`${section.header ?? "intro"}-${index}`}
