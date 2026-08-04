@@ -169,8 +169,10 @@ function GeneratorPage() {
 
   const [titreEdit, setTitreEdit] = useState("");
   const [metierEdit, setMetierEdit] = useState("Autre");
+  const [typeEdit, setTypeEdit] = useState<TypePromptValue>("standard");
   const [motsClesEdit, setMotsClesEdit] = useState("");
   const [dateEdit, setDateEdit] = useState(() => new Date().toISOString().slice(0, 10));
+
 
   useEffect(() => {
     if (result) {
@@ -208,9 +210,11 @@ function GeneratorPage() {
       setResult(data);
       setTitreEdit(data.titre_prompt);
       setMetierEdit(data.metier);
+      setTypeEdit(typePrompt === "" ? "standard" : typePrompt);
       setMotsClesEdit(data.mots_cles.join(", "));
       setDateEdit(new Date().toISOString().slice(0, 10));
     },
+
     onError: (error: Error) => toast.error(error.message),
   });
 
@@ -221,6 +225,8 @@ function GeneratorPage() {
         data: {
           titre: titreEdit.trim() || result.titre_prompt,
           metier: metierEdit,
+          type_prompt: typeEdit,
+
           mots_cles: motsClesEdit
             .split(",")
             .map((m) => m.trim())
@@ -516,9 +522,14 @@ function GeneratorPage() {
             className="cami-card mx-auto mt-16 max-w-5xl scroll-mt-20 space-y-8"
           >
             <PromptView
+              editable
+              onPromptChange={(prompt) =>
+                setResult((precedent) => (precedent ? { ...precedent, prompt } : precedent))
+              }
               data={{
-                titre: result.titre_prompt,
-                metier: result.metier,
+                titre: titreEdit || result.titre_prompt,
+                metier: metierEdit,
+                type_prompt: typeEdit,
                 mots_cles: result.mots_cles,
                 complexite: result.complexite,
                 prompt: result.prompt,
@@ -527,6 +538,7 @@ function GeneratorPage() {
                 alerte_pii: result.alerte_pii,
               }}
             />
+
 
             <div className="space-y-4 border-t border-border pt-6">
               <h3 className="flex items-center gap-3 text-lg font-bold">
@@ -563,11 +575,29 @@ function GeneratorPage() {
                   </select>
                 </div>
                 <div>
+                  <label htmlFor="type-edit" className="mb-2 block text-sm font-semibold">
+                    Type
+                  </label>
+                  <select
+                    id="type-edit"
+                    value={typeEdit}
+                    onChange={(event) => setTypeEdit(event.target.value as TypePromptValue)}
+                    className="cami-input"
+                  >
+                    {TYPES_PROMPT.map((item) => (
+                      <option key={item.value} value={item.value}>
+                        {item.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
                   <label htmlFor="mots-edit" className="mb-2 block text-sm font-semibold">
                     Mots-clés
                   </label>
                   <input
                     id="mots-edit"
+
                     value={motsClesEdit}
                     onChange={(event) => setMotsClesEdit(event.target.value)}
                     className="cami-input"

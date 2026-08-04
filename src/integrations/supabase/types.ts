@@ -28,6 +28,7 @@ export type Database = {
           note: string
           prompt: string
           titre: string
+          type_prompt: string
           user_id: string
         }
         Insert: {
@@ -43,6 +44,7 @@ export type Database = {
           note?: string
           prompt?: string
           titre: string
+          type_prompt?: string
           user_id: string
         }
         Update: {
@@ -58,6 +60,7 @@ export type Database = {
           note?: string
           prompt?: string
           titre?: string
+          type_prompt?: string
           user_id?: string
         }
         Relationships: []

@@ -7,7 +7,7 @@ import { z } from "zod";
 import { ArrowLeft, Loader2, Search, Trash2 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { PromptView } from "@/components/PromptView";
-import { METIERS, formatDateFr, type PromptRow } from "@/lib/mario";
+import { METIERS, formatDateFr, labelTypePrompt, type PromptRow } from "@/lib/mario";
 import { deletePrompt, listPrompts } from "@/lib/mario.functions";
 
 export const Route = createFileRoute("/_authenticated/bibliotheque")({
@@ -109,7 +109,9 @@ function LibraryPage() {
                 data={{
                   titre: selection.titre,
                   metier: selection.metier,
+                  type_prompt: selection.type_prompt,
                   mots_cles: selection.mots_cles ?? [],
+
                   complexite: selection.complexite,
                   prompt: selection.prompt ?? "",
                   note: selection.note,
@@ -186,7 +188,11 @@ function LibraryPage() {
                     <h2 className="mt-2 text-lg font-bold leading-snug">{prompt.titre}</h2>
                     <div className="mt-4 flex flex-wrap gap-2">
                       <span className="cami-pill">{prompt.metier}</span>
+                      {prompt.type_prompt ? (
+                        <span className="cami-pill">{labelTypePrompt(prompt.type_prompt)}</span>
+                      ) : null}
                       <span className="cami-pill text-muted-foreground">{prompt.complexite}</span>
+
                     </div>
                     {(prompt.mots_cles ?? []).length > 0 ? (
                       <p className="mt-3 text-xs text-muted-foreground">
