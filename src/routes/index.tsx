@@ -471,8 +471,6 @@ function GeneratorPage() {
             </button>
           </div>
         </form>
-          </div>
-        </div>
 
         <div className="mx-auto mt-4 max-w-3xl text-center">
           <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-muted-foreground">
