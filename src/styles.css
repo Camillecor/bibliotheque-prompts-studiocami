@@ -215,11 +215,14 @@
   }
 
   .cami-input {
-    @apply w-full rounded-2xl border-2 border-transparent bg-muted px-5 py-4 text-[15px] text-foreground outline-none transition placeholder:text-muted-foreground focus:border-[var(--info)] focus:bg-card;
+    @apply w-full rounded-[14px] border-2 border-transparent bg-muted px-5 py-4 text-[15px] text-foreground outline-none transition placeholder:text-muted-foreground focus:border-[var(--info)] focus:bg-card;
   }
 
   .cami-cta {
-    @apply inline-flex items-center justify-center gap-2 rounded-2xl bg-[var(--coral)] px-8 py-5 text-lg font-bold text-white shadow-lg shadow-[rgba(255,107,53,0.28)] transition duration-200 hover:-translate-y-0.5 hover:bg-[var(--coral-dark)] active:scale-95 disabled:pointer-events-none disabled:opacity-60;
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-[var(--coral)] px-8 py-5 text-lg font-bold text-white transition duration-200 hover:-translate-y-0.5 hover:bg-[var(--coral-dark)] active:scale-95 disabled:pointer-events-none disabled:opacity-60;
+    box-shadow:
+      0 1px 2px rgba(17, 26, 61, 0.06),
+      0 12px 32px rgba(17, 26, 61, 0.12);
   }
 
   .cami-btn {
@@ -231,15 +234,15 @@
   }
 
   .cami-block-resume {
-    @apply rounded-3xl border border-[color-mix(in_srgb,var(--info)_35%,transparent)] bg-[color-mix(in_srgb,var(--info)_12%,white)] p-6;
+    @apply rounded-2xl border border-[color-mix(in_srgb,var(--info)_35%,transparent)] bg-[color-mix(in_srgb,var(--info)_12%,white)] p-6;
   }
 
   .cami-block-positif {
-    @apply rounded-3xl border border-[color-mix(in_srgb,var(--success)_28%,transparent)] bg-[color-mix(in_srgb,var(--success)_10%,white)] p-6;
+    @apply rounded-2xl border border-[color-mix(in_srgb,var(--success)_28%,transparent)] bg-[color-mix(in_srgb,var(--success)_10%,white)] p-6;
   }
 
   .cami-block-alerte {
-    @apply rounded-3xl border border-[color-mix(in_srgb,var(--warning)_40%,transparent)] bg-[color-mix(in_srgb,var(--warning)_14%,white)] p-5;
+    @apply rounded-2xl border border-[color-mix(in_srgb,var(--warning)_40%,transparent)] bg-[color-mix(in_srgb,var(--warning)_14%,white)] p-5;
   }
 
   .cami-select-pill {
@@ -252,7 +255,10 @@
   }
 
   .cami-submit-btn {
-    @apply inline-flex h-10 w-10 items-center justify-center rounded-full bg-[var(--coral)] text-white shadow-md shadow-[rgba(255,107,53,0.28)] transition duration-200 hover:-translate-y-0.5 hover:bg-[var(--coral-dark)] hover:shadow-[0_0_24px_rgba(255,107,53,0.55)] active:scale-95 disabled:pointer-events-none disabled:opacity-40;
+    @apply inline-flex h-10 w-10 items-center justify-center rounded-full bg-[var(--coral)] text-white transition duration-200 hover:-translate-y-0.5 hover:bg-[var(--coral-dark)] active:scale-95 disabled:pointer-events-none disabled:opacity-40;
+    box-shadow:
+      0 1px 2px rgba(17, 26, 61, 0.06),
+      0 8px 20px rgba(17, 26, 61, 0.12);
   }
 
   .cami-side-item {
@@ -265,11 +271,14 @@
 
   /* Style "tech / code" pour l'affichage du prompt généré */
   .cami-code-card {
-    @apply relative overflow-hidden rounded-3xl border border-[color-mix(in_srgb,var(--primary)_18%,var(--border))] bg-[#0b1330] p-0 shadow-xl shadow-[rgba(5,12,156,0.18)];
+    @apply relative overflow-hidden rounded-2xl border border-border bg-card p-0;
+    box-shadow:
+      0 1px 2px rgba(17, 26, 61, 0.05),
+      0 12px 32px -18px rgba(17, 26, 61, 0.16);
   }
 
   .cami-code-chrome {
-    @apply flex items-center gap-2 border-b border-white/10 bg-white/[0.03] px-4 py-3;
+    @apply flex items-center gap-2 border-b border-border bg-muted px-4 py-3;
   }
 
   .cami-code-dot {
@@ -277,15 +286,21 @@
   }
 
   .cami-code-body {
-    @apply whitespace-pre-wrap break-words px-5 py-6 font-mono text-[13px] leading-relaxed text-[#dce6ff] sm:px-6 sm:text-sm;
+    @apply whitespace-pre-wrap break-words px-5 py-6 font-mono text-[13px] leading-relaxed text-foreground sm:px-6 sm:text-sm;
   }
 
   .cami-copy-btn {
-    @apply inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[var(--coral)] px-6 py-4 text-base font-bold text-white shadow-lg shadow-[rgba(255,107,53,0.3)] transition duration-200 hover:-translate-y-0.5 hover:bg-[var(--coral-dark)] active:scale-95 sm:w-auto;
+    @apply inline-flex w-full items-center justify-center gap-2 rounded-full bg-[var(--coral)] px-6 py-4 text-base font-bold text-white transition duration-200 hover:-translate-y-0.5 hover:bg-[var(--coral-dark)] active:scale-95 sm:w-auto;
+    box-shadow:
+      0 1px 2px rgba(17, 26, 61, 0.06),
+      0 12px 32px rgba(17, 26, 61, 0.12);
   }
 
   .cami-save-btn {
-    @apply inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[var(--info)] px-6 py-4 text-base font-bold text-white shadow-lg shadow-[rgba(58,190,249,0.32)] transition duration-200 hover:-translate-y-0.5 hover:bg-[#2aa8e0] active:scale-95 disabled:pointer-events-none disabled:opacity-60 sm:w-auto;
+    @apply inline-flex w-full items-center justify-center gap-2 rounded-full bg-[var(--info)] px-6 py-4 text-base font-bold text-white transition duration-200 hover:-translate-y-0.5 hover:bg-[#2aa8e0] active:scale-95 disabled:pointer-events-none disabled:opacity-60 sm:w-auto;
+    box-shadow:
+      0 1px 2px rgba(17, 26, 61, 0.06),
+      0 12px 32px rgba(17, 26, 61, 0.12);
   }
 
   .cami-marquee-mask {
