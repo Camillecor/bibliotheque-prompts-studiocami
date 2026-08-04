@@ -48,7 +48,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen bg-background">
       <PrechargementBibliotheque />
-      <header className="fixed inset-x-0 top-0 z-40 flex h-14 items-center gap-4 bg-transparent px-4 lg:h-20 lg:gap-6">
+      <header className="fixed inset-x-0 top-0 z-40 flex h-14 items-center gap-4 bg-transparent px-4 lg:h-16 lg:gap-6">
         {/* Flou progressif : maximal en haut de la navbar, nul sous celle-ci
             pour fondre doucement dans le contenu qui défile. Le calque dépasse
             la hauteur de la navbar (h-[120px]) et est masqué par un dégradé
@@ -73,12 +73,12 @@ export function AppShell({ children }: { children: ReactNode }) {
           <img
             src="/mario-fox-head.png"
             alt=""
-            className="h-8 w-8 object-contain lg:h-14 lg:w-14"
+            className="h-8 w-8 object-contain lg:h-12 lg:w-12"
           />
           <img
             src={logoAsset.url}
             alt="Studio Cami"
-            className="h-8 w-auto lg:h-11"
+            className="h-8 w-auto lg:h-9"
           />
         </Link>
 
@@ -93,7 +93,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </nav>
       </header>
 
-      <main className="pt-14 lg:pt-20">
+      <main className="pt-14 lg:pt-16">
         <div className="mx-auto max-w-[1200px] px-4 py-8 sm:px-8">{children}</div>
       </main>
     </div>
