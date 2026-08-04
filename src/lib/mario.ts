@@ -22,8 +22,12 @@ export type ModeleValue = (typeof MODELES)[number]["value"];
 
 export const TYPES_PROMPT = [
   { value: "standard", label: "Standard", description: "Passe-partout pour toute tâche" },
+  { value: "article", label: "Article", description: "Articles, billets de blog, posts longs" },
+  { value: "redaction", label: "Rédaction", description: "Emails, posts courts, textes divers" },
+  { value: "email", label: "Email", description: "Relances, séquences, réponses clients" },
+  { value: "interface", label: "Interface", description: "Maquettes, UI, UX, design produit" },
+  { value: "presentation", label: "Présentation", description: "Slides, pitch, storytelling" },
   { value: "recherche", label: "Recherche", description: "Analyser, enquêter, résumer" },
-  { value: "redaction", label: "Rédaction", description: "Articles, emails, posts et plus" },
   { value: "planification", label: "Planification", description: "Explorer, structurer, cadrer" },
   { value: "agent", label: "Agent", description: "Persona, assistant sur-mesure" },
   { value: "image", label: "Image", description: "Visuels, illustrations, graphismes" },
@@ -33,6 +37,11 @@ export const TYPES_PROMPT = [
 ] as const;
 
 export type TypePromptValue = (typeof TYPES_PROMPT)[number]["value"];
+
+export function labelTypePrompt(value: string) {
+  return TYPES_PROMPT.find((item) => item.value === value)?.label ?? "Standard";
+}
+
 
 export const TONS = [
   { value: "professionnel", label: "Professionnel" },
