@@ -591,8 +591,13 @@ function GeneratorPage() {
                     ))}
                   </select>
                 </div>
-
+                <div>
+                  <label htmlFor="mots-edit" className="mb-2 block text-sm font-semibold">
+                    Mots-clés
+                  </label>
+                  <input
                     id="mots-edit"
+
                     value={motsClesEdit}
                     onChange={(event) => setMotsClesEdit(event.target.value)}
                     className="cami-input"
