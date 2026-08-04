@@ -257,11 +257,11 @@ function GeneratorPage() {
         <div className="glow-orb -left-20 -top-16 h-72 w-72 bg-[var(--info)]" />
         <div className="glow-orb -right-16 top-24 h-64 w-64 bg-[var(--coral)]" />
 
-        <div className="grid items-center gap-8 py-6 md:py-12 lg:grid-cols-[minmax(0,320px)_1fr] lg:gap-10">
+        <div className="grid items-center gap-8 py-6 md:py-12 lg:grid-cols-[220px_1fr] lg:items-start lg:gap-10">
           <img
             src="/mario-fox-point.png"
             alt="Mario, la mascotte de Studio Cami IA"
-            className="mx-auto w-48 sm:w-56 lg:mx-0 lg:w-full"
+            className="mx-auto w-48 sm:w-56 lg:mx-0 lg:mt-10 lg:w-full"
           />
 
           <div className="text-center lg:text-left">
@@ -287,7 +287,7 @@ function GeneratorPage() {
             </p>
 
             <form
-              className="cami-card-hero relative mx-auto mt-8 w-full max-w-2xl lg:mx-0"
+              className="cami-card-hero relative mx-auto mt-8 w-full max-w-2xl lg:mx-0 lg:max-w-none"
               onSubmit={(event) => {
                 event.preventDefault();
                 if (peutGenerer) generation.mutate();
