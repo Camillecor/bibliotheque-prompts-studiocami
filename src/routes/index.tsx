@@ -8,17 +8,17 @@ import {
   Check,
   Hash,
   ImagePlus,
-  Library,
   ListPlus,
   Loader2,
-  PenLine,
   Save,
-  Target,
   X,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { IaLogo, IA_LOGO_NAMES } from "@/components/IaLogos";
 import { PromptView } from "@/components/PromptView";
+import foxThumbsup from "@/assets/fox-thumbsup.png.asset.json";
+import foxAi from "@/assets/fox-ai.png.asset.json";
+import foxLibrary from "@/assets/fox-library.png.asset.json";
 import {
   DropdownMenu,
   DropdownMenuContent,
