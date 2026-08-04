@@ -219,7 +219,7 @@ export async function callAnthropicMario(input: {
     },
     body: JSON.stringify({
       model: input.modele,
-      max_tokens: 1500,
+      max_tokens: 4096,
       system: MARIO_SYSTEM_PROMPT,
       messages: [{ role: "user", content }],
     }),
@@ -234,17 +234,36 @@ export async function callAnthropicMario(input: {
     throw new Error(`L'appel à l'IA a échoué (${response.status}).`);
   }
 
-  const payload = (await response.json()) as { content?: AnthropicContentBlock[] };
+  const payload = (await response.json()) as {
+    content?: AnthropicContentBlock[];
+    stop_reason?: string;
+  };
+
+  if (payload.stop_reason === "max_tokens") {
+    console.error("[mario] Anthropic response truncated (stop_reason=max_tokens)");
+    throw Object.assign(
+      new Error("La réponse de l'IA a été coupée car trop longue, réessaie."),
+      { statusCode: 502 },
+    );
+  }
+
   const raw = (payload.content ?? [])
     .filter((block) => block.type === "text")
     .map((block) => block.text ?? "")
     .join("")
     .trim();
 
-  const cleaned = raw
-    .replace(/^```(?:json)?/i, "")
-    .replace(/```$/, "")
-    .trim();
+  // Le modèle peut ajouter du texte ou des balises ``` autour du JSON : on isole
+  // la sous-chaîne entre la première { et la dernière } avant de parser.
+  const debut = raw.indexOf("{");
+  const fin = raw.lastIndexOf("}");
+  const cleaned =
+    debut !== -1 && fin > debut
+      ? raw.slice(debut, fin + 1)
+      : raw
+          .replace(/^```(?:json)?/i, "")
+          .replace(/```$/, "")
+          .trim();
 
   try {
     const parsed = JSON.parse(echapperSautsDeLigneDansLesChaines(cleaned));
