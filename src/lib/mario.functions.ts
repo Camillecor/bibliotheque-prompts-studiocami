@@ -70,7 +70,7 @@ export const listPrompts = createServerFn({ method: "GET" }).handler(
     const { data, error } = await supabaseAdmin
       .from("prompts")
       .select(
-        "id, titre, metier, mots_cles, complexite, prompt, note, etapes_lancement, alerte_pii, date_ajout",
+        "id, titre, metier, type_prompt, mots_cles, complexite, prompt, note, etapes_lancement, alerte_pii, date_ajout",
       )
       .eq("user_id", TEST_USER_ID)
       .order("date_ajout", { ascending: false });
