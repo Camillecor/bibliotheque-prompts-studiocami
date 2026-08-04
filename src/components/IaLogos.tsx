@@ -1,3 +1,5 @@
+import type { ReactElement } from "react";
+
 export const IA_LOGO_NAMES = [
   "ChatGPT",
   "Claude",
@@ -122,7 +124,7 @@ function LogoPerplexity() {
   );
 }
 
-const LOGO_COMPONENTS: Record<IaLogoName, () => JSX.Element> = {
+const LOGO_COMPONENTS: Record<IaLogoName, () => ReactElement> = {
   ChatGPT: LogoOpenAI,
   Claude: LogoClaude,
   Gemini: LogoGemini,
