@@ -268,7 +268,7 @@ function GeneratorPage() {
           />
 
           <div className="w-full lg:max-w-2xl">
-            <span className="cami-pill">
+            <span className="cami-pill text-[9px] md:text-[11px]">
               <span className="live-dot">
                 <span className="live-dot-ping" />
                 <span className="live-dot-core" />
@@ -276,14 +276,14 @@ function GeneratorPage() {
               GÉNÉRATEUR DE PROMPT • BIBLIOTHÈQUE • GLOSSAIRE
             </span>
             <h1
-              className="mt-5 text-4xl leading-tight md:text-5xl"
+              className="mt-5 text-2xl leading-tight md:text-5xl"
               style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
             >
               Transforme ton idée
               <br />
               <span className="italic font-bold">en prompt IA structuré</span>
             </h1>
-            <p className="mt-3 text-base text-muted-foreground">
+            <p className="mt-3 text-sm text-muted-foreground md:text-base">
               Décris ton besoin. Affine en répondant à 3 questions.
               <br />
               Mario le renard, mon super agent, te génère un prompt structuré et optimisé.
@@ -292,7 +292,7 @@ function GeneratorPage() {
         </div>
 
         <form
-          className="cami-card-hero relative mx-auto mt-8 w-[calc(100%-100px)]"
+          className="cami-card-hero relative mx-auto mt-8 w-[calc(100%-32px)] md:w-[calc(100%-100px)]"
               onSubmit={(event) => {
                 event.preventDefault();
                 if (peutGenerer) generation.mutate();
@@ -473,7 +473,7 @@ function GeneratorPage() {
         </form>
 
         <div className="mx-auto mt-16 max-w-3xl text-center">
-          <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-muted-foreground">
+          <p className="text-xl font-bold text-primary md:text-[11px] md:uppercase md:tracking-[0.16em] md:text-muted-foreground">
             Compatible avec toutes les IA
           </p>
           <div className="cami-marquee-mask relative mt-5 overflow-hidden">
@@ -492,7 +492,7 @@ function GeneratorPage() {
         </div>
 
         <section className="mx-auto mt-16 max-w-4xl">
-          <p className="text-center text-[11px] font-bold uppercase tracking-[0.16em] text-muted-foreground">
+          <p className="text-center text-xl font-bold text-primary md:text-[11px] md:uppercase md:tracking-[0.16em] md:text-muted-foreground">
             En 3 étapes
           </p>
           <div className="mt-8 grid gap-6 md:grid-cols-3">
