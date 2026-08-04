@@ -4,10 +4,16 @@ import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
-import { ArrowLeft, Loader2, Search, Trash2 } from "lucide-react";
+import { ArrowLeft, Loader2, Search, SlidersHorizontal, Trash2 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { PromptView } from "@/components/PromptView";
-import { METIERS, formatDateFr, labelTypePrompt, type PromptRow } from "@/lib/mario";
+import {
+  METIERS,
+  TYPES_PROMPT,
+  formatDateFr,
+  labelTypePrompt,
+  type PromptRow,
+} from "@/lib/mario";
 import { deletePrompt, listPrompts } from "@/lib/mario.functions";
 
 export const Route = createFileRoute("/_authenticated/bibliotheque")({
