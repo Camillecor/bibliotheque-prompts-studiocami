@@ -18,7 +18,7 @@ import { IaLogo, IA_LOGO_NAMES } from "@/components/IaLogos";
 import { PromptView } from "@/components/PromptView";
 import foxThumbsup from "@/assets/fox-thumbsup.png.asset.json";
 import foxAi from "@/assets/fox-ai.png.asset.json";
-import foxLibrary from "@/assets/fox-library.png.asset.json";
+import foxBook from "@/assets/fox-book.png.asset.json";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -510,7 +510,7 @@ function GeneratorPage() {
               {
                 titre: "Sauvegarde et retrouve-le",
                 texte: "Classé par métier, type et mots-clés, modifiable et exportable, disponible à tout moment dans ta bibliothèque.",
-                image: foxLibrary.url,
+                image: foxBook.url,
               },
             ].map((etape) => (
               <div key={etape.titre} className="cami-card flex flex-col items-center text-center">
