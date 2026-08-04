@@ -260,14 +260,14 @@ function GeneratorPage() {
         <div className="glow-orb -left-20 -top-16 h-72 w-72 bg-[var(--info)]" />
         <div className="glow-orb -right-16 top-24 h-64 w-64 bg-[var(--coral)]" />
 
-        <div className="flex flex-col items-center gap-6 py-6 text-center md:py-12 lg:gap-4">
+        <div className="flex flex-col items-center gap-6 py-6 text-center md:py-12 lg:flex-row lg:items-center lg:justify-center lg:gap-10 lg:py-6">
           <img
             src="/mario-fox-point.png"
             alt="Mario, la mascotte de Studio Cami IA"
-            className="w-48 sm:w-56 lg:-mt-6 lg:w-60"
+            className="w-48 sm:w-56 lg:w-64 lg:shrink-0"
           />
 
-          <div className="w-full">
+          <div className="w-full lg:max-w-2xl">
             <span className="cami-pill">
               <span className="live-dot">
                 <span className="live-dot-ping" />
