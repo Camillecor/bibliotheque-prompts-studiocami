@@ -274,11 +274,11 @@ function GeneratorPage() {
             </span>
             <h1
               className="mt-5 text-4xl leading-tight md:text-5xl"
-              style={{ fontFamily: "'Inter', sans-serif" }}
+              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
             >
-              <span className="italic">Transforme ton idée</span>
+              Transforme ton idée
               <br />
-              en un prompt IA structuré
+              <span className="italic">en un prompt IA structuré</span>
             </h1>
             <p className="mt-3 text-base text-muted-foreground">
               Décris ton besoin. Affine en répondant à 3 questions.
