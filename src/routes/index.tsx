@@ -495,41 +495,50 @@ function GeneratorPage() {
           <p className="text-center text-[11px] font-bold uppercase tracking-[0.16em] text-muted-foreground">
             En 3 étapes
           </p>
-          <div className="relative mt-8 grid gap-8 md:grid-cols-3 md:gap-6">
-            {/* Ligne de connexion horizontale (desktop uniquement) */}
-            <div className="absolute left-0 right-0 top-7 hidden h-px bg-border md:block" />
+          <div className="mt-8 grid gap-6 md:grid-cols-3">
             {[
               {
                 titre: "Décris ton besoin",
                 texte: "En français, comme tu le dirais à un collègue. Pas de jargon requis.",
                 Icon: PenLine,
                 couleur: "var(--coral)",
+                image: "/mario-fox-point.png",
               },
               {
                 titre: "Affine en 3 questions",
                 texte: "Mario cerne ton besoin exact avant de générer, pour un prompt qui tombe juste du premier coup.",
                 Icon: Target,
                 couleur: "var(--info)",
+                image: "/mario-fox.png",
               },
               {
                 titre: "Sauvegarde et retrouve-le",
                 texte: "Classé par métier, type et mots-clés, modifiable et exportable, disponible à tout moment dans ta bibliothèque.",
                 Icon: Library,
                 couleur: "var(--primary)",
+                image: "/mario-fox-head.png",
               },
             ].map((etape) => (
-              <div key={etape.titre} className="relative z-10 flex flex-col items-center text-center">
+              <div key={etape.titre} className="cami-card flex flex-col items-center text-center">
+                <img
+                  src={etape.image}
+                  alt=""
+                  aria-hidden="true"
+                  className="h-40 w-auto object-contain sm:h-48"
+                  loading="lazy"
+                />
                 <span
-                  className="flex h-14 w-14 items-center justify-center rounded-full text-white shadow-md"
+                  className="-mt-6 flex h-12 w-12 items-center justify-center rounded-full text-white shadow-md"
                   style={{ backgroundColor: etape.couleur }}
                 >
-                  <etape.Icon className="h-6 w-6" strokeWidth={2.2} />
+                  <etape.Icon className="h-5 w-5" strokeWidth={2.2} />
                 </span>
                 <h2 className="mt-4 text-base font-bold">{etape.titre}</h2>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{etape.texte}</p>
               </div>
             ))}
           </div>
+
         </section>
 
         {result ? (
