@@ -1,0 +1,1 @@
+ALTER TABLE public.prompts DROP CONSTRAINT IF EXISTS prompts_user_id_fkey;
