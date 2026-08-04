@@ -260,14 +260,14 @@ function GeneratorPage() {
         <div className="glow-orb -left-20 -top-16 h-72 w-72 bg-[var(--info)]" />
         <div className="glow-orb -right-16 top-24 h-64 w-64 bg-[var(--coral)]" />
 
-        <div className="grid items-center gap-8 py-6 md:py-12 lg:grid-cols-[220px_1fr] lg:items-start lg:gap-10">
+        <div className="flex flex-col items-center gap-6 py-6 text-center md:py-12 lg:gap-4">
           <img
             src="/mario-fox-point.png"
             alt="Mario, la mascotte de Studio Cami IA"
-            className="mx-auto w-48 sm:w-56 lg:mx-0 lg:mt-10 lg:w-full"
+            className="w-48 sm:w-56 lg:-mt-6 lg:w-60"
           />
 
-          <div className="text-center lg:text-left">
+          <div className="w-full">
             <span className="cami-pill">
               <span className="live-dot">
                 <span className="live-dot-ping" />
@@ -281,7 +281,7 @@ function GeneratorPage() {
             >
               Transforme ton idée
               <br />
-              <span className="italic">en un prompt IA structuré</span>
+              <span className="italic font-bold">en prompt IA structuré</span>
             </h1>
             <p className="mt-3 text-base text-muted-foreground">
               Décris ton besoin. Affine en répondant à 3 questions.
@@ -290,7 +290,7 @@ function GeneratorPage() {
             </p>
 
             <form
-              className="cami-card-hero relative mx-auto mt-8 w-full max-w-2xl lg:mx-0 lg:max-w-none"
+              className="cami-card-hero relative mx-auto mt-8 w-full max-w-2xl"
               onSubmit={(event) => {
                 event.preventDefault();
                 if (peutGenerer) generation.mutate();

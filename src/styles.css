@@ -93,12 +93,13 @@
 
   body {
     background-color: var(--background);
-    background-image: linear-gradient(
-      160deg,
-      #ffffff 0%,
-      var(--background) 45%,
-      var(--secondary) 100%
-    );
+    background-image:
+      radial-gradient(1100px 550px at 12% -8%, color-mix(in srgb, var(--info) 14%, transparent), transparent 60%),
+      radial-gradient(900px 650px at 100% 8%, color-mix(in srgb, var(--coral) 10%, transparent), transparent 55%),
+      radial-gradient(1000px 750px at 50% 115%, color-mix(in srgb, var(--primary) 9%, transparent), transparent 60%),
+      linear-gradient(160deg, #ffffff 0%, var(--background) 45%, var(--secondary) 100%),
+      radial-gradient(color-mix(in srgb, var(--primary) 7%, transparent) 1px, transparent 1px);
+    background-size: auto, auto, auto, auto, 26px 26px;
     background-attachment: fixed;
     color: var(--foreground);
     font-family: var(--font-sans);
