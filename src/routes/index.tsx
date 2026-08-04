@@ -461,7 +461,7 @@ function GeneratorPage() {
               type="submit"
               disabled={!peutGenerer}
               aria-label="Générer le prompt"
-              className="cami-submit-btn ml-auto shrink-0 h-8 w-8 md:h-10 md:w-10"
+              className="cami-submit-btn ml-auto shrink-0 h-8 w-8 md:ml-0 md:h-10 md:w-10 lg:ml-auto"
             >
               {generation.isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin md:h-5 md:w-5" />
@@ -522,7 +522,7 @@ function GeneratorPage() {
                   loading="lazy"
                 />
                 <h2 className="mt-4 text-base font-bold md:text-sm">{etape.titre}</h2>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{etape.texte}</p>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground md:text-xs lg:text-sm">{etape.texte}</p>
               </div>
             ))}
 
