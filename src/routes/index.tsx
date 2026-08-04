@@ -560,7 +560,7 @@ function GeneratorPage() {
                 <span className="cami-step-badge bg-[var(--coral)]">3</span>
                 Je range mon nouveau prompt dans ma bibliothèque
               </h3>
-              <div className="flex flex-col gap-4">
+              <div className="grid gap-4 sm:grid-cols-2">
                 <div>
                   <label htmlFor="titre-edit" className="mb-2 block text-sm font-semibold">
                     Titre
@@ -618,7 +618,7 @@ function GeneratorPage() {
                     className="cami-input"
                   />
                 </div>
-                <div>
+                <div className="sm:col-span-2">
                   <label htmlFor="date-edit" className="mb-2 block text-sm font-semibold">
                     Date
                   </label>

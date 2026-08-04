@@ -279,27 +279,17 @@ export function PromptView({
             <span className="cami-step-badge bg-[var(--success)]">2</span>
             Je suis ces étapes pour lancer mon prompt
           </h3>
-          <ol>
-            {data.etapes_lancement.map((etape, index) => {
-              const estDerniere = index === data.etapes_lancement.length - 1;
-              return (
-                <li key={etape} className="flex gap-4 pb-4 last:pb-0">
-                  <div className="flex flex-col items-center">
-                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 border-[var(--success)] bg-card text-xs font-bold text-[var(--success)]">
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
-                    {!estDerniere ? (
-                      <span className="mt-1 w-px flex-1 bg-[color-mix(in_srgb,var(--success)_35%,transparent)]" />
-                    ) : null}
-                  </div>
-                  <div className="cami-block-positif flex-1">
-                    <p className="text-sm leading-relaxed text-muted-foreground">
-                      {etape.replace(/^Étape\s*\d+\s*:\s*/i, "")}
-                    </p>
-                  </div>
-                </li>
-              );
-            })}
+          <ol className="space-y-2.5">
+            {data.etapes_lancement.map((etape, index) => (
+              <li key={etape} className="flex items-start gap-3">
+                <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--success)_14%,transparent)] text-xs font-bold text-[var(--success)]">
+                  {index + 1}
+                </span>
+                <p className="text-sm leading-relaxed text-foreground">
+                  {etape.replace(/^Étape\s*\d+\s*:\s*/i, "")}
+                </p>
+              </li>
+            ))}
           </ol>
         </section>
       ) : null}
