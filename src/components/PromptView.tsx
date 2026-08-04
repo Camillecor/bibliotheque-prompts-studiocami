@@ -187,7 +187,7 @@ export function PromptView({
       ) : null}
 
       {editable ? (
-        <section className="space-y-3 rounded-3xl border border-border bg-card p-4 md:p-6">
+        <section className="space-y-3 rounded-2xl border border-border bg-card p-4 md:p-6">
           <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
             Prompt modifiable — chaque section MARIO a sa couleur
           </p>
@@ -226,8 +226,8 @@ export function PromptView({
             <span className="cami-code-dot bg-[#ff5f57]" />
             <span className="cami-code-dot bg-[#febc2e]" />
             <span className="cami-code-dot bg-[#28c840]" />
-            <span className="ml-2 font-mono text-xs text-white/50">prompt-mario.md</span>
-            <span className="ml-auto hidden items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.06] px-3 py-1 font-mono text-[10px] uppercase tracking-[0.1em] text-[var(--info)] sm:inline-flex">
+            <span className="ml-2 font-mono text-xs text-muted-foreground">prompt-mario.md</span>
+            <span className="ml-auto hidden items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1 font-mono text-[10px] uppercase tracking-[0.1em] text-[var(--primary)] sm:inline-flex">
               <Sparkles className="h-3 w-3" />
               MARIO
             </span>
