@@ -48,7 +48,23 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen bg-background">
       <PrechargementBibliotheque />
-      <header className="fixed inset-x-0 top-0 z-40 flex h-14 items-center gap-4 bg-transparent px-4 backdrop-blur-sm">
+      <header className="fixed inset-x-0 top-0 z-40 flex h-14 items-center gap-4 bg-transparent px-4">
+        {/* Flou progressif : maximal en haut de la navbar, nul sous celle-ci
+            pour fondre doucement dans le contenu qui défile. Le calque dépasse
+            la hauteur de la navbar (h-[120px]) et est masqué par un dégradé
+            vertical : opaque jusqu'à ~47% (bas de la navbar), puis transparent. */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none fixed inset-x-0 top-0 -z-10 h-[120px]"
+          style={{
+            backdropFilter: "blur(14px)",
+            WebkitBackdropFilter: "blur(14px)",
+            maskImage:
+              "linear-gradient(to bottom, black 0%, black 47%, transparent 100%)",
+            WebkitMaskImage:
+              "linear-gradient(to bottom, black 0%, black 47%, transparent 100%)",
+          }}
+        />
         <Link to="/" aria-label="Studio Cami — accueil" className="flex shrink-0 items-center gap-2">
           <img src="/mario-fox-head.png" alt="" className="h-8 w-8 rounded-full" />
           <img src={logoAsset.url} alt="Studio Cami" className="h-8 w-auto" />
