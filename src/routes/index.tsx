@@ -210,9 +210,11 @@ function GeneratorPage() {
       setResult(data);
       setTitreEdit(data.titre_prompt);
       setMetierEdit(data.metier);
+      setTypeEdit(typePrompt === "" ? "standard" : typePrompt);
       setMotsClesEdit(data.mots_cles.join(", "));
       setDateEdit(new Date().toISOString().slice(0, 10));
     },
+
     onError: (error: Error) => toast.error(error.message),
   });
 
