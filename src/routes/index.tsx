@@ -473,7 +473,7 @@ function GeneratorPage() {
         </form>
 
         <div className="mx-auto mt-16 max-w-3xl text-center">
-          <p className="text-xl font-bold text-primary md:text-[11px] md:uppercase md:tracking-[0.16em] md:text-muted-foreground">
+          <p className="text-xl font-bold text-primary">
             Compatible avec toutes les IA
           </p>
           <div className="cami-marquee-mask relative mt-5 overflow-hidden">
@@ -492,7 +492,7 @@ function GeneratorPage() {
         </div>
 
         <section className="mx-auto mt-16 max-w-4xl">
-          <p className="text-center text-xl font-bold text-primary md:text-[11px] md:uppercase md:tracking-[0.16em] md:text-muted-foreground">
+          <p className="text-center text-xl font-bold text-primary">
             Un générateur en 3 étapes
           </p>
           <div className="mt-8 grid gap-6 md:grid-cols-3">
