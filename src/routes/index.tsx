@@ -284,7 +284,7 @@ function GeneratorPage() {
               <span className="italic font-bold">en prompt IA structuré</span>
             </h1>
             <p className="mt-3 text-xs text-muted-foreground md:text-base">
-              Décris ton besoin. Affine en répondant à 3 questions.
+              Décris ton besoin. <br className="md:hidden" />Affine en répondant à 3 questions.
               <br />
               Mario le renard, mon super agent, te génère un prompt structuré et optimisé.
             </p>
