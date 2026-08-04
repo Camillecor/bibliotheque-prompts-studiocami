@@ -280,36 +280,40 @@ function LibraryPage() {
                     Aucun prompt pour l'instant. Génère ton premier prompt depuis le générateur.
                   </div>
                 ) : (
-              <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {prompts.map((prompt) => (
-                  <button
-                    key={prompt.id}
-                    type="button"
-                    onClick={() => setSelection(prompt)}
-                    className="cami-card text-left transition hover:-translate-y-0.5 hover:shadow-md"
-                  >
-                    <p className="text-xs font-medium uppercase tracking-[0.08em] text-muted-foreground">
-                      {formatDateFr(prompt.date_ajout)}
-                    </p>
-                    <h2 className="mt-2 text-lg font-bold leading-snug">{prompt.titre}</h2>
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      <span className="cami-pill">{prompt.metier}</span>
-                      {prompt.type_prompt ? (
-                        <span className="cami-pill">{labelTypePrompt(prompt.type_prompt)}</span>
-                      ) : null}
-                      <span className="cami-pill text-muted-foreground">{prompt.complexite}</span>
-
-                    </div>
-                    {(prompt.mots_cles ?? []).length > 0 ? (
-                      <p className="mt-3 text-xs text-muted-foreground">
-                        Mots-clés : {(prompt.mots_cles ?? []).join(", ")}
-                      </p>
-                    ) : null}
-                  </button>
-                ))}
+                  <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                    {prompts.map((prompt) => (
+                      <button
+                        key={prompt.id}
+                        type="button"
+                        onClick={() => setSelection(prompt)}
+                        className="cami-card text-left transition hover:-translate-y-0.5 hover:shadow-md"
+                      >
+                        <p className="text-xs font-medium uppercase tracking-[0.08em] text-muted-foreground">
+                          {formatDateFr(prompt.date_ajout)}
+                        </p>
+                        <h2 className="mt-2 text-lg font-bold leading-snug">{prompt.titre}</h2>
+                        <div className="mt-4 flex flex-wrap gap-2">
+                          <span className="cami-pill">{prompt.metier}</span>
+                          {prompt.type_prompt ? (
+                            <span className="cami-pill">{labelTypePrompt(prompt.type_prompt)}</span>
+                          ) : null}
+                          <span className="cami-pill text-muted-foreground">
+                            {prompt.complexite}
+                          </span>
+                        </div>
+                        {(prompt.mots_cles ?? []).length > 0 ? (
+                          <p className="mt-3 text-xs text-muted-foreground">
+                            Mots-clés : {(prompt.mots_cles ?? []).join(", ")}
+                          </p>
+                        ) : null}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
-            )}
+            </div>
           </>
+
         )}
       </div>
     </AppShell>
