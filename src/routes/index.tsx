@@ -8,9 +8,12 @@ import {
   Check,
   Hash,
   ImagePlus,
+  Library,
   ListPlus,
   Loader2,
+  PenLine,
   Save,
+  Target,
   X,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
@@ -492,24 +495,35 @@ function GeneratorPage() {
           <p className="text-center text-[11px] font-bold uppercase tracking-[0.16em] text-muted-foreground">
             En 3 étapes
           </p>
-          <div className="mt-6 grid gap-4 md:grid-cols-3">
+          <div className="relative mt-8 grid gap-8 md:grid-cols-3 md:gap-6">
+            {/* Ligne de connexion horizontale (desktop uniquement) */}
+            <div className="absolute left-0 right-0 top-7 hidden h-px bg-border md:block" />
             {[
               {
                 titre: "Décris ton besoin",
                 texte: "En français, comme tu le dirais à un collègue. Pas de jargon requis.",
+                Icon: PenLine,
+                couleur: "var(--coral)",
               },
               {
                 titre: "Affine en 3 questions",
                 texte: "Mario cerne ton besoin exact avant de générer, pour un prompt qui tombe juste du premier coup.",
+                Icon: Target,
+                couleur: "var(--info)",
               },
               {
                 titre: "Sauvegarde et retrouve-le",
                 texte: "Classé par métier, type et mots-clés, modifiable et exportable, disponible à tout moment dans ta bibliothèque.",
+                Icon: Library,
+                couleur: "var(--primary)",
               },
-            ].map((etape, index) => (
-              <div key={etape.titre} className="cami-card">
-                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-secondary font-chic text-sm text-[var(--primary-dark)]">
-                  {index + 1}
+            ].map((etape) => (
+              <div key={etape.titre} className="relative z-10 flex flex-col items-center text-center">
+                <span
+                  className="flex h-14 w-14 items-center justify-center rounded-full text-white shadow-md"
+                  style={{ backgroundColor: etape.couleur }}
+                >
+                  <etape.Icon className="h-6 w-6" strokeWidth={2.2} />
                 </span>
                 <h2 className="mt-4 text-base font-bold">{etape.titre}</h2>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{etape.texte}</p>
