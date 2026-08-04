@@ -1,0 +1,1 @@
+ALTER TABLE public.prompts ADD COLUMN IF NOT EXISTS type_prompt text NOT NULL DEFAULT 'standard';
