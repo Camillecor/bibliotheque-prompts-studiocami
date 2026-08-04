@@ -109,7 +109,9 @@ function LibraryPage() {
                 data={{
                   titre: selection.titre,
                   metier: selection.metier,
+                  type_prompt: selection.type_prompt,
                   mots_cles: selection.mots_cles ?? [],
+
                   complexite: selection.complexite,
                   prompt: selection.prompt ?? "",
                   note: selection.note,
