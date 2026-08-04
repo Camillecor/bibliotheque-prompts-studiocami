@@ -522,9 +522,14 @@ function GeneratorPage() {
             className="cami-card mx-auto mt-16 max-w-5xl scroll-mt-20 space-y-8"
           >
             <PromptView
+              editable
+              onPromptChange={(prompt) =>
+                setResult((precedent) => (precedent ? { ...precedent, prompt } : precedent))
+              }
               data={{
-                titre: result.titre_prompt,
-                metier: result.metier,
+                titre: titreEdit || result.titre_prompt,
+                metier: metierEdit,
+                type_prompt: typeEdit,
                 mots_cles: result.mots_cles,
                 complexite: result.complexite,
                 prompt: result.prompt,
@@ -533,6 +538,7 @@ function GeneratorPage() {
                 alerte_pii: result.alerte_pii,
               }}
             />
+
 
             <div className="space-y-4 border-t border-border pt-6">
               <h3 className="flex items-center gap-3 text-lg font-bold">
