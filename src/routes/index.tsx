@@ -169,8 +169,10 @@ function GeneratorPage() {
 
   const [titreEdit, setTitreEdit] = useState("");
   const [metierEdit, setMetierEdit] = useState("Autre");
+  const [typeEdit, setTypeEdit] = useState<TypePromptValue>("standard");
   const [motsClesEdit, setMotsClesEdit] = useState("");
   const [dateEdit, setDateEdit] = useState(() => new Date().toISOString().slice(0, 10));
+
 
   useEffect(() => {
     if (result) {
