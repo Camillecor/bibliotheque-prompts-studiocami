@@ -292,7 +292,7 @@ function GeneratorPage() {
         </div>
 
         <form
-          className="cami-card-hero relative mx-auto mt-8 w-full"
+          className="cami-card-hero relative mx-auto mt-8 w-[calc(100%-100px)]"
               onSubmit={(event) => {
                 event.preventDefault();
                 if (peutGenerer) generation.mutate();
