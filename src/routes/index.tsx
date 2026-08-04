@@ -575,10 +575,23 @@ function GeneratorPage() {
                   </select>
                 </div>
                 <div>
-                  <label htmlFor="mots-edit" className="mb-2 block text-sm font-semibold">
-                    Mots-clés
+                  <label htmlFor="type-edit" className="mb-2 block text-sm font-semibold">
+                    Type
                   </label>
-                  <input
+                  <select
+                    id="type-edit"
+                    value={typeEdit}
+                    onChange={(event) => setTypeEdit(event.target.value as TypePromptValue)}
+                    className="cami-input"
+                  >
+                    {TYPES_PROMPT.map((item) => (
+                      <option key={item.value} value={item.value}>
+                        {item.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
                     id="mots-edit"
                     value={motsClesEdit}
                     onChange={(event) => setMotsClesEdit(event.target.value)}
