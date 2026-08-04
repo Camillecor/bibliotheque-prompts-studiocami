@@ -188,7 +188,11 @@ function LibraryPage() {
                     <h2 className="mt-2 text-lg font-bold leading-snug">{prompt.titre}</h2>
                     <div className="mt-4 flex flex-wrap gap-2">
                       <span className="cami-pill">{prompt.metier}</span>
+                      {prompt.type_prompt ? (
+                        <span className="cami-pill">{labelTypePrompt(prompt.type_prompt)}</span>
+                      ) : null}
                       <span className="cami-pill text-muted-foreground">{prompt.complexite}</span>
+
                     </div>
                     {(prompt.mots_cles ?? []).length > 0 ? (
                       <p className="mt-3 text-xs text-muted-foreground">
