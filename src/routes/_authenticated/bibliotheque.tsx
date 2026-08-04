@@ -133,53 +133,153 @@ function LibraryPage() {
               <div>
                 <h1 className="text-3xl font-extrabold md:text-4xl">Ma bibliothèque</h1>
                 <p className="mt-2 text-sm text-muted-foreground">
-                  {(data ?? []).length} prompt{(data ?? []).length > 1 ? "s" : ""} dans ta
-                  bibliothèque
+                  {prompts.length} résultat{prompts.length > 1 ? "s" : ""} sur{" "}
+                  {(data ?? []).length} prompt{(data ?? []).length > 1 ? "s" : ""}
                 </p>
               </div>
+              <button
+                type="button"
+                className="cami-btn lg:hidden"
+                onClick={() => setFiltresOuverts((v) => !v)}
+              >
+                <SlidersHorizontal className="h-4 w-4" />
+                Filtres
+              </button>
             </div>
 
-            <div className="cami-card mt-6 grid gap-4 md:grid-cols-[2fr_1fr_1fr]">
-              <div className="relative">
-                <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <input
-                  value={recherche}
-                  onChange={(event) => setRecherche(event.target.value)}
-                  placeholder="Rechercher un titre ou un mot-clé"
-                  className="cami-input pl-11"
-                />
-              </div>
-              <select
-                value={metierFiltre}
-                onChange={(event) => setMetierFiltre(event.target.value)}
-                className="cami-input"
+            <div className="mt-6 grid gap-6 lg:grid-cols-[280px_1fr] lg:items-start">
+              <aside
+                className={`cami-card space-y-6 lg:sticky lg:top-20 ${
+                  filtresOuverts ? "block" : "hidden lg:block"
+                }`}
               >
-                <option value="">Tous les métiers</option>
-                {METIERS.map((item) => (
-                  <option key={item} value={item}>
-                    {item}
-                  </option>
-                ))}
-              </select>
-              <select
-                value={tri}
-                onChange={(event) => setTri(event.target.value as Tri)}
-                className="cami-input"
-              >
-                <option value="recent">Plus récents d'abord</option>
-                <option value="ancien">Plus anciens d'abord</option>
-              </select>
-            </div>
+                <div className="relative">
+                  <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <input
+                    value={recherche}
+                    onChange={(event) => setRecherche(event.target.value)}
+                    placeholder="Rechercher un titre ou un mot-clé"
+                    className="cami-input pl-11"
+                  />
+                </div>
 
-            {isLoading ? (
-              <div className="mt-10 flex justify-center">
-                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-              </div>
-            ) : prompts.length === 0 ? (
-              <div className="cami-block-resume mt-6 text-center text-sm text-muted-foreground">
-                Aucun prompt pour l'instant. Génère ton premier prompt depuis le générateur.
-              </div>
-            ) : (
+                <select
+                  value={tri}
+                  onChange={(event) => setTri(event.target.value as Tri)}
+                  className="cami-input"
+                >
+                  <option value="recent">Plus récents d'abord</option>
+                  <option value="ancien">Plus anciens d'abord</option>
+                  <option value="alpha">Alphabétique (A → Z)</option>
+                  <option value="complexite">Complexité (simple → complexe)</option>
+                </select>
+
+                {filtresActifs ? (
+                  <button
+                    type="button"
+                    onClick={reinitialiserFiltres}
+                    className="text-xs font-semibold text-[var(--coral)] hover:underline"
+                  >
+                    Réinitialiser les filtres
+                  </button>
+                ) : null}
+
+                <div className="border-t border-border pt-5">
+                  <p className="text-xs font-bold uppercase tracking-[0.08em] text-muted-foreground">
+                    Métier
+                  </p>
+                  <div className="mt-3 space-y-2">
+                    {METIERS.map((item) => (
+                      <label
+                        key={item}
+                        className="flex cursor-pointer items-center gap-2 text-sm"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={metierFiltre.includes(item)}
+                          onChange={() => toggleMetier(item)}
+                          className="h-4 w-4 rounded border-border accent-[var(--coral)]"
+                        />
+                        <span>{item}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="border-t border-border pt-5">
+                  <p className="text-xs font-bold uppercase tracking-[0.08em] text-muted-foreground">
+                    Type
+                  </p>
+                  <div className="mt-3 space-y-2">
+                    {(typeListeOuverte ? TYPES_PROMPT : TYPES_PROMPT.slice(0, 6)).map((item) => (
+                      <label
+                        key={item.value}
+                        className="flex cursor-pointer items-center gap-2 text-sm"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={typeFiltre.includes(item.value)}
+                          onChange={() => toggleType(item.value)}
+                          className="h-4 w-4 rounded border-border accent-[var(--coral)]"
+                        />
+                        <span>{item.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                  {TYPES_PROMPT.length > 6 ? (
+                    <button
+                      type="button"
+                      onClick={() => setTypeListeOuverte((v) => !v)}
+                      className="mt-3 text-xs font-semibold text-[var(--coral)] hover:underline"
+                    >
+                      {typeListeOuverte ? "Réduire" : "Tout afficher"}
+                    </button>
+                  ) : null}
+                </div>
+
+                <div className="border-t border-border pt-5">
+                  <p className="text-xs font-bold uppercase tracking-[0.08em] text-muted-foreground">
+                    Complexité
+                  </p>
+                  <div className="mt-3 space-y-2">
+                    {["simple", "moyen", "complexe"].map((niveau) => (
+                      <label
+                        key={niveau}
+                        className="flex cursor-pointer items-center gap-2 text-sm capitalize"
+                      >
+                        <input
+                          type="radio"
+                          name="complexite-filtre"
+                          checked={complexiteFiltre === niveau}
+                          onChange={() => setComplexiteFiltre(niveau)}
+                          className="h-4 w-4 border-border accent-[var(--coral)]"
+                        />
+                        <span>{niveau}</span>
+                      </label>
+                    ))}
+                  </div>
+                  {complexiteFiltre ? (
+                    <button
+                      type="button"
+                      onClick={() => setComplexiteFiltre("")}
+                      className="mt-3 text-xs font-semibold text-[var(--coral)] hover:underline"
+                    >
+                      Effacer
+                    </button>
+                  ) : null}
+                </div>
+              </aside>
+
+              <div>
+                {isLoading ? (
+                  <div className="mt-4 flex justify-center">
+                    <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                  </div>
+                ) : prompts.length === 0 ? (
+                  <div className="cami-block-resume text-center text-sm text-muted-foreground">
+                    Aucun prompt pour l'instant. Génère ton premier prompt depuis le générateur.
+                  </div>
+                ) : (
               <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {prompts.map((prompt) => (
                   <button
