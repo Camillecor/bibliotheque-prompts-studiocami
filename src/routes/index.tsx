@@ -496,12 +496,12 @@ function GeneratorPage() {
                 texte: "En français, comme tu le dirais à un collègue. Pas de jargon requis.",
               },
               {
-                titre: "Mario génère ton prompt",
-                texte: "Un prompt MARIO complet, déjà optimisé, avec les étapes pour le lancer.",
+                titre: "Affine en 3 questions",
+                texte: "Mario cerne ton besoin exact avant de générer, pour un prompt qui tombe juste du premier coup.",
               },
               {
                 titre: "Sauvegarde et retrouve-le",
-                texte: "Classé par métier et mots-clés, disponible à tout moment dans ta bibliothèque.",
+                texte: "Classé par métier, type et mots-clés, modifiable et exportable, disponible à tout moment dans ta bibliothèque.",
               },
             ].map((etape, index) => (
               <div key={etape.titre} className="cami-card">
