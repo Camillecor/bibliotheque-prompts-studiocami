@@ -225,6 +225,8 @@ function GeneratorPage() {
         data: {
           titre: titreEdit.trim() || result.titre_prompt,
           metier: metierEdit,
+          type_prompt: typeEdit,
+
           mots_cles: motsClesEdit
             .split(",")
             .map((m) => m.trim())
