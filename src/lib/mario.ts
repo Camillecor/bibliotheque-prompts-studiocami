@@ -75,6 +75,7 @@ export type PromptRow = {
   note?: string;
   etapes_lancement: string[];
   alerte_pii: boolean;
+  favori: boolean;
   date_ajout: string;
 };
 

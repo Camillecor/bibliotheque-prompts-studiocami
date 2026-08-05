@@ -70,7 +70,7 @@ export const listPrompts = createServerFn({ method: "GET" }).handler(
     const { data, error } = await supabaseAdmin
       .from("prompts")
       .select(
-        "id, titre, metier, type_prompt, mots_cles, complexite, prompt, note, etapes_lancement, alerte_pii, date_ajout",
+        "id, titre, metier, type_prompt, mots_cles, complexite, prompt, note, etapes_lancement, alerte_pii, favori, date_ajout",
       )
       .eq("user_id", TEST_USER_ID)
       .order("date_ajout", { ascending: false });
@@ -87,6 +87,21 @@ export const deletePrompt = createServerFn({ method: "POST" })
     const { error } = await supabaseAdmin
       .from("prompts")
       .delete()
+      .eq("id", data.id)
+      .eq("user_id", TEST_USER_ID);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const toggleFavori = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) =>
+    z.object({ id: z.string().uuid(), favori: z.boolean() }).parse(input),
+  )
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin
+      .from("prompts")
+      .update({ favori: data.favori })
       .eq("id", data.id)
       .eq("user_id", TEST_USER_ID);
     if (error) throw new Error(error.message);
