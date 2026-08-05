@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import {
   ArrowUp,
@@ -10,15 +10,14 @@ import {
   ImagePlus,
   ListPlus,
   Loader2,
+  Plus,
   Save,
+  Search,
   X,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
-import { IaLogo, IA_LOGO_NAMES } from "@/components/IaLogos";
 import { PromptView } from "@/components/PromptView";
-import foxWave from "@/assets/fox-wave.png.asset.json";
 import foxAi from "@/assets/fox-ai.png.asset.json";
-import foxBook from "@/assets/fox-book.png.asset.json";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -337,7 +336,7 @@ function GeneratorPage() {
             value={idee}
             onChange={(event) => setIdee(event.target.value)}
             placeholder={placeholderAnime}
-            className="w-full resize-none border-0 bg-transparent text-lg text-primary outline-none placeholder:text-sm placeholder:text-muted-foreground"
+            className="min-h-[85px] w-full resize-none border-0 bg-transparent text-lg text-primary outline-none placeholder:text-sm placeholder:text-muted-foreground"
           />
 
           {motsClesOuvert ? (
@@ -650,7 +649,6 @@ function GeneratorPage() {
             </div>
           </div>
         ) : null}
-      </div>
     </AppShell>
   );
 }
