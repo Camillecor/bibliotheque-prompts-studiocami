@@ -391,7 +391,7 @@ function GeneratorPage() {
           result ? "" : "flex min-h-[calc(100vh-61px)] items-center justify-center",
         ].join(" ")}
       >
-        <div className="mx-auto w-full max-w-[640px]">
+        <div className="mx-auto w-full max-w-[820px]">
           <form
             className="cami-card-hero relative w-full"
             onSubmit={(event) => {

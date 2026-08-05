@@ -325,8 +325,11 @@ function LibraryPage() {
                 onChange={(event) => setRecherche(event.target.value)}
                 placeholder="Recherche"
                 aria-label="Rechercher un prompt"
-                className="w-56 rounded-full border border-border bg-muted py-2 pl-9 pr-3 text-xs text-primary outline-none transition focus:border-[var(--info)] focus:bg-card"
+                className="w-56 rounded-full border border-border bg-muted py-2 pl-9 pr-12 text-xs text-primary outline-none transition focus:border-[var(--info)] focus:bg-card"
               />
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-muted-foreground bg-card border border-border rounded px-1.5 py-0.5">
+                ⌘K
+              </span>
             </div>
           </div>
 
