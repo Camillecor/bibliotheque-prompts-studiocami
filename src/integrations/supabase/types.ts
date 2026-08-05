@@ -21,6 +21,7 @@ export type Database = {
           created_at: string
           date_ajout: string
           etapes_lancement: Json
+          favori: boolean
           id: string
           idee_source: string | null
           metier: string
@@ -37,6 +38,7 @@ export type Database = {
           created_at?: string
           date_ajout?: string
           etapes_lancement?: Json
+          favori?: boolean
           id?: string
           idee_source?: string | null
           metier?: string
@@ -53,6 +55,7 @@ export type Database = {
           created_at?: string
           date_ajout?: string
           etapes_lancement?: Json
+          favori?: boolean
           id?: string
           idee_source?: string | null
           metier?: string

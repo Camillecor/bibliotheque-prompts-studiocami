@@ -29,7 +29,7 @@ import {
   labelTypePrompt,
   type PromptRow,
 } from "@/lib/mario";
-import { deletePrompt, listPrompts } from "@/lib/mario.functions";
+import { deletePrompt, listPrompts, toggleFavori } from "@/lib/mario.functions";
 
 export const Route = createFileRoute("/_authenticated/bibliotheque")({
   validateSearch: z.object({ id: z.string().uuid().optional() }),
@@ -51,7 +51,7 @@ export const Route = createFileRoute("/_authenticated/bibliotheque")({
   component: LibraryPage,
 });
 
-type Tri = "recent" | "ancien" | "alpha" | "complexite";
+type Tri = "recent" | "ancien" | "alpha" | "complexite" | "favoris";
 
 const ORDRE_COMPLEXITE: Record<string, number> = { simple: 0, moyen: 1, complexe: 2 };
 
@@ -84,12 +84,14 @@ function LibraryPage() {
   const { id: idDeepLink } = Route.useSearch();
   const fetchPrompts = useServerFn(listPrompts);
   const removePrompt = useServerFn(deletePrompt);
+  const changeFavori = useServerFn(toggleFavori);
   const queryClient = useQueryClient();
 
   const [recherche, setRecherche] = useState("");
   const [metierFiltre, setMetierFiltre] = useState<string[]>([]);
   const [typeFiltre, setTypeFiltre] = useState<string[]>([]);
   const [complexiteFiltre, setComplexiteFiltre] = useState("");
+  const [favorisUniquement, setFavorisUniquement] = useState(false);
   const [tri, setTri] = useState<Tri>("recent");
   const [typeListeOuverte, setTypeListeOuverte] = useState(false);
   const [selection, setSelection] = useState<PromptRow | null>(null);
@@ -115,6 +117,12 @@ function LibraryPage() {
     onError: (error: Error) => toast.error(error.message),
   });
 
+  const favori = useMutation({
+    mutationFn: (vars: { id: string; favori: boolean }) => changeFavori({ data: vars }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["prompts"] }),
+    onError: (error: Error) => toast.error(error.message),
+  });
+
   const prompts = useMemo(() => {
     const terme = recherche.trim().toLowerCase();
     return (data ?? [])
@@ -127,16 +135,21 @@ function LibraryPage() {
         const matchType =
           typeFiltre.length === 0 || (prompt.type_prompt ? typeFiltre.includes(prompt.type_prompt) : false);
         const matchComplexite = !complexiteFiltre || prompt.complexite === complexiteFiltre;
-        return matchTerme && matchMetier && matchType && matchComplexite;
+        const matchFavori = !favorisUniquement || Boolean(prompt.favori);
+        return matchTerme && matchMetier && matchType && matchComplexite && matchFavori;
       })
       .sort((a, b) => {
         if (tri === "alpha") return a.titre.localeCompare(b.titre, "fr");
         if (tri === "complexite")
           return (ORDRE_COMPLEXITE[a.complexite] ?? 1) - (ORDRE_COMPLEXITE[b.complexite] ?? 1);
         const diff = new Date(b.date_ajout).getTime() - new Date(a.date_ajout).getTime();
+        if (tri === "favoris") {
+          if (Boolean(a.favori) !== Boolean(b.favori)) return a.favori ? -1 : 1;
+          return diff;
+        }
         return tri === "recent" ? diff : -diff;
       });
-  }, [data, recherche, metierFiltre, typeFiltre, complexiteFiltre, tri]);
+  }, [data, recherche, metierFiltre, typeFiltre, complexiteFiltre, favorisUniquement, tri]);
 
   function toggleMetier(metier: string) {
     setMetierFiltre((p) => (p.includes(metier) ? p.filter((m) => m !== metier) : [...p, metier]));
@@ -150,13 +163,15 @@ function LibraryPage() {
     recherche.trim().length > 0 ||
     metierFiltre.length > 0 ||
     typeFiltre.length > 0 ||
-    complexiteFiltre.length > 0;
+    complexiteFiltre.length > 0 ||
+    favorisUniquement;
 
   function reinitialiserFiltres() {
     setRecherche("");
     setMetierFiltre([]);
     setTypeFiltre([]);
     setComplexiteFiltre("");
+    setFavorisUniquement(false);
   }
 
   const panneauFiltres = (
@@ -182,7 +197,19 @@ function LibraryPage() {
         <option value="ancien">Plus anciens d'abord</option>
         <option value="alpha">Alphabétique (A → Z)</option>
         <option value="complexite">Complexité (simple → complexe)</option>
+        <option value="favoris">Favoris d'abord</option>
       </select>
+
+      <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold">
+        <input
+          type="checkbox"
+          checked={favorisUniquement}
+          onChange={(event) => setFavorisUniquement(event.target.checked)}
+          className="h-4 w-4 rounded border-border accent-[var(--coral)]"
+        />
+        <span>Favoris uniquement</span>
+      </label>
+
 
       {filtresActifs ? (
         <button
@@ -356,9 +383,37 @@ function LibraryPage() {
                     onClick={() => setSelection(prompt)}
                     className="cami-card text-left transition hover:-translate-y-0.5 hover:shadow-md"
                   >
-                    <p className="text-xs font-medium uppercase tracking-[0.08em] text-muted-foreground">
-                      {formatDateFr(prompt.date_ajout)}
-                    </p>
+                    <div className="flex items-start justify-between gap-3">
+                      <p className="text-xs font-medium uppercase tracking-[0.08em] text-muted-foreground">
+                        {formatDateFr(prompt.date_ajout)}
+                      </p>
+                      <span
+                        role="switch"
+                        tabIndex={0}
+                        aria-checked={prompt.favori}
+                        aria-label="Marquer comme favori"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          favori.mutate({ id: prompt.id, favori: !prompt.favori });
+                        }}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter" || event.key === " ") {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            favori.mutate({ id: prompt.id, favori: !prompt.favori });
+                          }
+                        }}
+                        className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full transition ${
+                          prompt.favori ? "bg-[var(--coral)]" : "bg-muted"
+                        }`}
+                      >
+                        <span
+                          className={`absolute h-4 w-4 rounded-full bg-white shadow-sm transition-all ${
+                            prompt.favori ? "left-[18px]" : "left-0.5"
+                          }`}
+                        />
+                      </span>
+                    </div>
                     <div className="mt-2 flex items-start gap-3">
                       <IconeMetier metier={prompt.metier} />
                       <h2 className="text-lg font-bold leading-snug">{prompt.titre}</h2>
