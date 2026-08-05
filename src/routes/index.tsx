@@ -109,13 +109,6 @@ const SUGGESTIONS_METIER = [
     prefill:
       "Un prompt pour écrire un communiqué de presse clair, factuel et prêt à diffuser.",
   },
-  {
-    titre: "Construire un calendrier éditorial",
-    description: "pour organiser mes contenus du mois…",
-    tags: ["Planning", "Contenu"],
-    prefill:
-      "Un prompt pour construire un calendrier éditorial afin d'organiser mes contenus du mois.",
-  },
 ] as const;
 
 function useTypewriterPlaceholder(phrases: readonly string[], active: boolean) {
@@ -376,13 +369,12 @@ function GeneratorPage() {
         </div>
       }
     >
-      <div className="grid grid-cols-[1fr_auto_1fr] items-center border-b border-border px-6 py-3">
+      <div className="flex items-center justify-between border-b border-border px-6 py-3">
         <h2 className="text-lg font-semibold">Générateur de prompt</h2>
         <button type="button" onClick={nouveauPrompt} className="cami-btn">
           <Plus className="h-4 w-4" />
           Nouveau prompt
         </button>
-        <span />
       </div>
 
       <div
@@ -574,7 +566,7 @@ function GeneratorPage() {
           </div>
         </form>
 
-            <div className="mt-6 grid grid-cols-2 gap-2.5">
+            <div className="mt-6 grid grid-cols-3 gap-2.5">
               {SUGGESTIONS_METIER.map((s) => (
                 <button
                   key={s.titre}

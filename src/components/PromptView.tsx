@@ -1,4 +1,3 @@
-import { useEffect, useRef } from "react";
 import { AlertTriangle, Download, Sparkles } from "lucide-react";
 import { CopyButton } from "@/components/CopyButton";
 import {
@@ -67,12 +66,6 @@ export function decouperSections(prompt: string): Section[] {
   return sections;
 }
 
-function recomposer(sections: Section[]) {
-  return sections
-    .map((s) => (s.header ? `${s.header}\n${s.body.replace(/^\n+/, "")}` : s.body))
-    .join("\n\n")
-    .trim();
-}
 
 function titreLisible(header: string) {
   const nu = header.replace(/^\[|\]$/g, "").trim();
@@ -114,34 +107,6 @@ function telecharger(nom: string, contenu: string, mime: string) {
   URL.revokeObjectURL(url);
 }
 
-function AutoTextarea({
-  value,
-  onChange,
-  ariaLabel,
-}: {
-  value: string;
-  onChange: (value: string) => void;
-  ariaLabel: string;
-}) {
-  const ref = useRef<HTMLTextAreaElement>(null);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    el.style.height = "auto";
-    el.style.height = `${el.scrollHeight}px`;
-  }, [value]);
-
-  return (
-    <textarea
-      ref={ref}
-      aria-label={ariaLabel}
-      value={value}
-      onChange={(event) => onChange(event.target.value)}
-      className="w-full resize-none border-0 bg-transparent text-sm leading-relaxed text-foreground outline-none"
-    />
-  );
-}
 
 export function PromptView({
   data,
@@ -187,34 +152,14 @@ export function PromptView({
       ) : null}
 
       {editable ? (
-        <section className="space-y-3 rounded-2xl border border-border bg-card p-4 md:p-6">
-          {sections.map((section, index) => (
-            <div
-              key={`${section.header ?? "intro"}-${index}`}
-              className="rounded-2xl border-l-4 p-4"
-              style={{
-                borderLeftColor: section.couleur,
-                backgroundColor: `color-mix(in srgb, ${section.couleur} 8%, transparent)`,
-              }}
-            >
-              {section.header ? (
-                <p
-                  className="mb-2 text-[11px] font-bold uppercase tracking-[0.1em]"
-                  style={{ color: section.couleur }}
-                >
-                  {section.header}
-                </p>
-              ) : null}
-              <AutoTextarea
-                ariaLabel={section.header ?? "Introduction du prompt"}
-                value={section.body}
-                onChange={(valeur) => {
-                  const copie = sections.map((s, i) => (i === index ? { ...s, body: valeur } : s));
-                  onPromptChange?.(recomposer(copie));
-                }}
-              />
-            </div>
-          ))}
+        <section className="rounded-2xl bg-[var(--primary)] p-5 md:p-6">
+          <textarea
+            value={data.prompt}
+            onChange={(event) => onPromptChange?.(event.target.value)}
+            aria-label="Prompt généré"
+            rows={Math.max(8, data.prompt.split("\n").length)}
+            className="w-full resize-none border-0 bg-transparent text-sm leading-relaxed text-white outline-none placeholder:text-white/60"
+          />
         </section>
       ) : (
         <section className="cami-code-card">
