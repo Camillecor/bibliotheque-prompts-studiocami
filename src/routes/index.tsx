@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { PromptView } from "@/components/PromptView";
-import foxAi from "@/assets/fox-ai.png.asset.json";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
