@@ -403,7 +403,7 @@ function GeneratorPage() {
       panel={
         <div className="flex h-full flex-col gap-4 p-4">
           <div className="flex flex-col items-center gap-2">
-            <img src={foxAi.url} alt="" aria-hidden="true" className="w-14" />
+            <img src="/mario-fox-head.png" alt="" aria-hidden="true" className="w-24" />
             <p className="text-center text-xs text-muted-foreground">
               Mario le renard génère des prompts IA performants.
             </p>
@@ -498,7 +498,7 @@ function GeneratorPage() {
               {questions.slice(0, reponses.length + 1).map((question, index) => (
                 <div key={question} className="space-y-2">
                   <div className="flex items-start gap-2">
-                    <img src={foxAi.url} alt="" aria-hidden="true" className="h-6 w-6 shrink-0" />
+                    <img src="/mario-fox-head.png" alt="" aria-hidden="true" className="h-10 w-10 shrink-0" />
                     <p
                       className={[
                         "max-w-[85%] rounded-2xl px-3.5 py-2 text-sm",
