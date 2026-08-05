@@ -408,7 +408,7 @@ function LibraryPage() {
                             favori.mutate({ id: prompt.id, favori: !prompt.favori });
                           }
                         }}
-                        className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition sm:h-5 sm:w-9 ${
+                        className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition before:absolute before:-inset-2.5 before:content-[''] sm:h-5 sm:w-9 sm:before:hidden ${
                           prompt.favori ? "bg-[var(--coral)]" : "bg-muted"
                         }`}
                       >

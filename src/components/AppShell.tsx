@@ -164,7 +164,7 @@ export function AppShell({ children, panel }: { children: ReactNode; panel?: Rea
             </SheetContent>
           </Sheet>
 
-          <Link to="/" aria-label="Studio Cami — accueil" className="shrink-0">
+          <Link to="/" aria-label="Studio Cami — accueil" className="flex h-11 shrink-0 items-center">
             <img src={logoAsset.url} alt="Studio Cami" className="w-9" />
           </Link>
 
