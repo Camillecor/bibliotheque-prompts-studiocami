@@ -33,7 +33,7 @@ import {
   type TonValue,
   type TypePromptValue,
 } from "@/lib/mario";
-import { generateMarioPrompt, savePrompt } from "@/lib/mario.functions";
+import { generateMarioPrompt, listPrompts, savePrompt } from "@/lib/mario.functions";
 
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024; // 5 Mo
 const IMAGE_SIGNATURES: { mediaType: "image/png" | "image/jpeg"; bytes: number[] }[] = [
@@ -85,6 +85,37 @@ const SUGGESTIONS_IDEE = [
   "Un prompt pour rédiger des posts LinkedIn qui convertissent…",
   "Un prompt pour préparer un entretien de recrutement structuré…",
   "Un prompt pour analyser un contrat et repérer les clauses à risque…",
+] as const;
+
+const SUGGESTIONS_METIER = [
+  {
+    titre: "Rédiger un post Instagram",
+    description: "qui capte l'attention et donne envie de réagir…",
+    tags: ["Instagram", "Post"],
+    prefill:
+      "Un prompt pour rédiger un post Instagram qui capte l'attention et donne envie de réagir.",
+  },
+  {
+    titre: "Préparer ma candidature",
+    description: "lettre de motivation adaptée à une offre d'emploi…",
+    tags: ["Emploi", "Lettre"],
+    prefill:
+      "Un prompt pour préparer ma candidature avec une lettre de motivation adaptée à une offre d'emploi.",
+  },
+  {
+    titre: "Écrire un communiqué de presse",
+    description: "clair, factuel et prêt à diffuser…",
+    tags: ["Presse", "Communiqué"],
+    prefill:
+      "Un prompt pour écrire un communiqué de presse clair, factuel et prêt à diffuser.",
+  },
+  {
+    titre: "Construire un calendrier éditorial",
+    description: "pour organiser mes contenus du mois…",
+    tags: ["Planning", "Contenu"],
+    prefill:
+      "Un prompt pour construire un calendrier éditorial afin d'organiser mes contenus du mois.",
+  },
 ] as const;
 
 function useTypewriterPlaceholder(phrases: readonly string[], active: boolean) {
