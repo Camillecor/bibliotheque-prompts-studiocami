@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import {
   ArrowUp,
@@ -10,15 +10,14 @@ import {
   ImagePlus,
   ListPlus,
   Loader2,
+  Plus,
   Save,
+  Search,
   X,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
-import { IaLogo, IA_LOGO_NAMES } from "@/components/IaLogos";
 import { PromptView } from "@/components/PromptView";
-import foxWave from "@/assets/fox-wave.png.asset.json";
 import foxAi from "@/assets/fox-ai.png.asset.json";
-import foxBook from "@/assets/fox-book.png.asset.json";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,7 +33,7 @@ import {
   type TonValue,
   type TypePromptValue,
 } from "@/lib/mario";
-import { generateMarioPrompt, savePrompt } from "@/lib/mario.functions";
+import { generateMarioPrompt, listPrompts, savePrompt } from "@/lib/mario.functions";
 
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024; // 5 Mo
 const IMAGE_SIGNATURES: { mediaType: "image/png" | "image/jpeg"; bytes: number[] }[] = [
@@ -86,6 +85,37 @@ const SUGGESTIONS_IDEE = [
   "Un prompt pour rédiger des posts LinkedIn qui convertissent…",
   "Un prompt pour préparer un entretien de recrutement structuré…",
   "Un prompt pour analyser un contrat et repérer les clauses à risque…",
+] as const;
+
+const SUGGESTIONS_METIER = [
+  {
+    titre: "Rédiger un post Instagram",
+    description: "qui capte l'attention et donne envie de réagir…",
+    tags: ["Instagram", "Post"],
+    prefill:
+      "Un prompt pour rédiger un post Instagram qui capte l'attention et donne envie de réagir.",
+  },
+  {
+    titre: "Préparer ma candidature",
+    description: "lettre de motivation adaptée à une offre d'emploi…",
+    tags: ["Emploi", "Lettre"],
+    prefill:
+      "Un prompt pour préparer ma candidature avec une lettre de motivation adaptée à une offre d'emploi.",
+  },
+  {
+    titre: "Écrire un communiqué de presse",
+    description: "clair, factuel et prêt à diffuser…",
+    tags: ["Presse", "Communiqué"],
+    prefill:
+      "Un prompt pour écrire un communiqué de presse clair, factuel et prêt à diffuser.",
+  },
+  {
+    titre: "Construire un calendrier éditorial",
+    description: "pour organiser mes contenus du mois…",
+    tags: ["Planning", "Contenu"],
+    prefill:
+      "Un prompt pour construire un calendrier éditorial afin d'organiser mes contenus du mois.",
+  },
 ] as const;
 
 function useTypewriterPlaceholder(phrases: readonly string[], active: boolean) {
@@ -254,56 +284,128 @@ function GeneratorPage() {
 
   const peutGenerer = idee.trim().length >= 5 && !generation.isPending;
 
+  // Panneau contextuel : historique récent, lu depuis le cache React Query déjà préchargé.
+  const fetchPrompts = useServerFn(listPrompts);
+  const { data: prompts } = useQuery({ queryKey: ["prompts"], queryFn: () => fetchPrompts() });
+  const [recherche, setRecherche] = useState("");
+
+  const groupesHistorique = useMemo(() => {
+    const aujourdhui = new Date().toISOString().slice(0, 10);
+    const limite = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    const filtres = (prompts ?? [])
+      .filter((p) => p.titre.toLowerCase().includes(recherche.trim().toLowerCase()))
+      .slice(0, 6);
+
+    const jour = filtres.filter((p) => String(p.date_ajout).slice(0, 10) === aujourdhui);
+    const semaine = filtres.filter(
+      (p) =>
+        String(p.date_ajout).slice(0, 10) !== aujourdhui &&
+        new Date(p.date_ajout).getTime() >= limite,
+    );
+
+    return [
+      { titre: "Aujourd'hui", items: jour },
+      { titre: "7 derniers jours", items: semaine },
+    ].filter((g) => g.items.length > 0);
+  }, [prompts, recherche]);
+
+  function nouveauPrompt() {
+    setIdee("");
+    setMotsCles("");
+    setMotsClesOuvert(false);
+    setAutresInstructions("");
+    setAutresInstructionsOuvert(false);
+    setTypePrompt("");
+    setImage(null);
+    setResult(null);
+    setTitreEdit("");
+    setMotsClesEdit("");
+  }
+
   return (
-    <AppShell>
-      <div className="tech-grid-bg relative mx-auto w-full max-w-5xl rounded-[2rem]">
-        <div className="glow-orb -left-20 -top-16 h-72 w-72 bg-[var(--info)]" />
-        <div className="glow-orb -right-16 top-24 h-64 w-64 bg-[var(--coral)]" />
-
-        <div className="flex flex-col items-center gap-6 py-6 text-center md:py-12 lg:flex-row lg:items-start lg:justify-center lg:gap-10 lg:py-6">
-          <img
-            src="/mario-fox-point.png"
-            alt="Mario, la mascotte de Studio Cami IA"
-            className="w-48 sm:w-56 lg:w-64 lg:shrink-0"
-          />
-
-          <div className="w-full lg:max-w-2xl">
-            <span className="cami-pill text-[9px] md:text-[11px]">
-              <span className="live-dot">
-                <span className="live-dot-ping" />
-                <span className="live-dot-core" />
-              </span>
-              GÉNÉRATEUR DE PROMPT • BIBLIOTHÈQUE • GLOSSAIRE
-            </span>
-            <h1
-              className="mt-5 text-2xl leading-tight md:text-5xl"
-              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
-            >
-              Transforme ton idée
-              <br />
-              <span className="italic font-bold">en prompt IA structuré</span>
-            </h1>
-            <p className="mt-3 text-xs text-muted-foreground md:text-base">
-              Décris ton besoin. <br className="md:hidden" />Affine en répondant à 3 questions.
-              <br />
-              Mario le renard, mon super agent, te génère un prompt structuré et optimisé.
+    <AppShell
+      panel={
+        <div className="flex h-full flex-col gap-4 p-4">
+          <div className="flex flex-col items-center gap-2">
+            <img src={foxAi.url} alt="" aria-hidden="true" className="w-14" />
+            <p className="text-center text-xs text-muted-foreground">
+              Mario le renard génère des prompts IA performants.
             </p>
           </div>
-        </div>
 
-        <form
-          className="cami-card-hero relative mx-auto mt-8 w-[calc(100%-32px)] md:w-[calc(100%-100px)]"
-              onSubmit={(event) => {
-                event.preventDefault();
-                if (peutGenerer) generation.mutate();
-              }}
-            >
+          <button type="button" onClick={nouveauPrompt} className="cami-btn w-full">
+            <Plus className="h-4 w-4" />
+            Nouveau prompt
+          </button>
+
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+            <input
+              value={recherche}
+              onChange={(event) => setRecherche(event.target.value)}
+              placeholder="Rechercher dans l'historique…"
+              aria-label="Rechercher dans l'historique"
+              className="w-full rounded-full border border-border bg-muted py-2 pl-9 pr-3 text-xs text-primary outline-none transition focus:border-[var(--info)] focus:bg-card"
+            />
+          </div>
+
+          <div className="space-y-4 overflow-y-auto">
+            {groupesHistorique.map((groupe) => (
+              <div key={groupe.titre}>
+                <p className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-muted-foreground">
+                  {groupe.titre}
+                </p>
+                <ul className="space-y-0.5">
+                  {groupe.items.map((item) => (
+                    <li key={item.id}>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          navigate({ to: "/bibliotheque", search: { id: item.id } })
+                        }
+                        className="w-full truncate rounded-lg px-2 py-1.5 text-left text-xs text-primary transition hover:bg-muted"
+                      >
+                        {item.titre}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      }
+    >
+      <div className="grid grid-cols-[1fr_auto_1fr] items-center border-b border-border px-6 py-3">
+        <h2 className="text-lg font-semibold">Générateur de prompt</h2>
+        <button type="button" onClick={nouveauPrompt} className="cami-btn">
+          <Plus className="h-4 w-4" />
+          Nouveau prompt
+        </button>
+        <span />
+      </div>
+
+      <div
+        className={[
+          "px-6 py-8",
+          result ? "" : "flex min-h-[calc(100vh-61px)] items-center justify-center",
+        ].join(" ")}
+      >
+        <div className="mx-auto w-full max-w-[640px]">
+          <form
+            className="cami-card-hero relative w-full"
+            onSubmit={(event) => {
+              event.preventDefault();
+              if (peutGenerer) generation.mutate();
+            }}
+          >
+
           <textarea
             rows={2}
             value={idee}
             onChange={(event) => setIdee(event.target.value)}
             placeholder={placeholderAnime}
-            className="w-full resize-none border-0 bg-transparent text-lg text-primary outline-none placeholder:text-sm placeholder:text-muted-foreground"
+            className="min-h-[85px] w-full resize-none border-0 bg-transparent text-lg text-primary outline-none placeholder:text-sm placeholder:text-muted-foreground"
           />
 
           {motsClesOuvert ? (
@@ -472,63 +574,31 @@ function GeneratorPage() {
           </div>
         </form>
 
-        <div className="mx-auto mt-16 max-w-3xl text-center">
-          <p className="text-xl font-bold text-primary">
-            Compatible avec toutes les IA
-          </p>
-          <div className="cami-marquee-mask relative mt-5 overflow-hidden">
-            <div className="cami-marquee-track flex w-max items-center gap-3">
-              {[...IA_LOGO_NAMES, ...IA_LOGO_NAMES].map((nom, index) => (
-                <span
-                  key={`${nom}-${index}`}
-                  className="inline-flex shrink-0 items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm font-semibold text-primary"
+            <div className="mt-6 grid grid-cols-2 gap-2.5">
+              {SUGGESTIONS_METIER.map((s) => (
+                <button
+                  key={s.titre}
+                  type="button"
+                  onClick={() => setIdee(s.prefill)}
+                  className="rounded-2xl border border-border bg-card p-3.5 text-left transition hover:-translate-y-0.5 hover:border-[var(--coral)]"
                 >
-                  <IaLogo nom={nom} />
-                  {nom}
-                </span>
+                  <p className="text-sm font-bold text-primary">{s.titre}</p>
+                  <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                    {s.description}
+                  </p>
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {s.tags.map((tag) => (
+                      <span key={tag} className="cami-pill">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </button>
               ))}
             </div>
           </div>
         </div>
 
-        <section className="mx-auto mt-16 max-w-4xl">
-          <p className="text-center text-xl font-bold text-primary">
-            Un générateur en 3 étapes
-          </p>
-          <div className="mt-8 grid gap-6 md:grid-cols-3">
-            {[
-              {
-                titre: "Décris ton besoin",
-                texte: "En français, comme tu le dirais à un collègue. Pas de jargon requis.",
-                image: foxWave.url,
-              },
-              {
-                titre: "Affine en 3 questions",
-                texte: "Mario cerne ton besoin exact avant de générer, pour un prompt qui tombe juste du premier coup.",
-                image: foxAi.url,
-              },
-              {
-                titre: "Sauvegarde et retrouve-le",
-                texte: "Classé par métier, type et mots-clés, modifiable et exportable, disponible à tout moment dans ta bibliothèque.",
-                image: foxBook.url,
-              },
-            ].map((etape) => (
-              <div key={etape.titre} className="cami-card flex flex-col items-center text-center">
-                <img
-                  src={etape.image}
-                  alt=""
-                  aria-hidden="true"
-                  className="h-40 w-auto object-contain sm:h-48"
-                  loading="lazy"
-                />
-                <h2 className="mt-4 text-base font-bold md:text-sm">{etape.titre}</h2>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground md:text-xs lg:text-sm">{etape.texte}</p>
-              </div>
-            ))}
-
-          </div>
-
-        </section>
 
         {result ? (
           <div
@@ -648,7 +718,6 @@ function GeneratorPage() {
             </div>
           </div>
         ) : null}
-      </div>
     </AppShell>
   );
 }
