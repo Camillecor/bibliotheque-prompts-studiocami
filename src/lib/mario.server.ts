@@ -287,3 +287,89 @@ export async function callAnthropicMario(input: {
     );
   }
 }
+
+export const MARIO_QUESTIONS_SYSTEM_PROMPT = `Tu es Mario le renard, l'agent IA de Studio Cami. Un utilisateur vient de décrire une idée de prompt IA. Avant de générer le prompt final structuré (méthode MARIO), pose-lui exactement 3 questions courtes et concrètes pour affiner sa demande (ex : précision sur le ton, la longueur, le public cible, un exemple concret, une contrainte spécifique à respecter). Les questions doivent être adaptées à l'idée donnée, jamais génériques ni interchangeables d'une idée à l'autre.
+
+Réponds UNIQUEMENT avec ce JSON (aucun texte avant/après, aucun markdown) :
+{ "questions": ["Question 1 ?", "Question 2 ?", "Question 3 ?"] }`;
+
+// Tâche légère (reformulation courte, pas de génération créative) : on reste sur
+// Haiku, conformément à la règle RSE du projet (Haiku pour le tagging/classification,
+// Sonnet/Opus réservés à la génération).
+export async function callAnthropicQuestions(input: {
+  idee: string;
+  motsCles: string;
+  metier: string;
+  typePrompt: string;
+  ton: string;
+}): Promise<{ questions: string[] }> {
+  const apiKey = process.env["ANTHROPIC_API_KEY"];
+  if (!apiKey) {
+    throw new Error(
+      "ANTHROPIC_API_KEY n'est pas configurée. Ajoute la clé dans Project Settings → Secrets.",
+    );
+  }
+
+  const typeLabel = TYPES_PROMPT.find((t) => t.value === input.typePrompt)?.label;
+  const tonLabel = TONS.find((t) => t.value === input.ton)?.label;
+
+  const userMessage = [
+    `Idée brute : ${input.idee}`,
+    input.motsCles ? `Mots-clés suggérés : ${input.motsCles}` : "",
+    input.metier ? `Métier indiqué : ${input.metier}` : "",
+    typeLabel ? `Type de tâche demandé : ${typeLabel}` : "",
+    tonLabel ? `Ton souhaité : ${tonLabel}` : "",
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+  const response = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      "x-api-key": apiKey,
+      "anthropic-version": "2023-06-01",
+    },
+    body: JSON.stringify({
+      model: "claude-haiku-4-5",
+      max_tokens: 512,
+      system: MARIO_QUESTIONS_SYSTEM_PROMPT,
+      messages: [{ role: "user", content: [{ type: "text", text: userMessage }] }],
+    }),
+  });
+
+  if (!response.ok) {
+    const detail = await response.text();
+    console.error("[mario] Anthropic questions error", response.status, detail);
+    if (response.status === 429) {
+      throw new Error("Trop de requêtes vers l'IA. Réessaie dans quelques instants.");
+    }
+    throw new Error(`L'appel à l'IA a échoué (${response.status}).`);
+  }
+
+  const payload = (await response.json()) as { content?: AnthropicContentBlock[] };
+  const raw = (payload.content ?? [])
+    .filter((block) => block.type === "text")
+    .map((block) => block.text ?? "")
+    .join("")
+    .trim();
+
+  const debut = raw.indexOf("{");
+  const fin = raw.lastIndexOf("}");
+  const cleaned = debut !== -1 && fin > debut ? raw.slice(debut, fin + 1) : raw;
+
+  try {
+    const parsed = JSON.parse(echapperSautsDeLigneDansLesChaines(cleaned));
+    const questions = Array.isArray(parsed.questions)
+      ? parsed.questions.map(String).slice(0, 3)
+      : [];
+    if (questions.length === 0) throw new Error("Aucune question générée.");
+    return { questions };
+  } catch (error) {
+    console.error("[mario] JSON parse failed (questions)", error, raw.slice(0, 500));
+    throw Object.assign(
+      new Error("Mario n'a pas réussi à formuler ses questions. Réessaie."),
+      { statusCode: 502 },
+    );
+  }
+}
