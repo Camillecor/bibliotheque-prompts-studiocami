@@ -305,15 +305,19 @@ function LibraryPage() {
   return (
     <AppShell panel={selection ? undefined : panneauFiltres}>
       {selection ? (
-        <div className="mx-auto w-full max-w-5xl space-y-6 px-6 py-8">
+        <div className="mx-auto w-full max-w-5xl space-y-6 px-4 py-6 md:px-6 md:py-8">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <button type="button" className="cami-btn" onClick={() => setSelection(null)}>
+            <button
+              type="button"
+              className="cami-btn min-h-11 flex-1 sm:flex-none"
+              onClick={() => setSelection(null)}
+            >
               <ArrowLeft className="h-4 w-4" />
               Retour à la bibliothèque
             </button>
             <button
               type="button"
-              className="cami-btn"
+              className="cami-btn min-h-11 flex-1 sm:flex-none"
               disabled={suppression.isPending}
               onClick={() => suppression.mutate(selection.id)}
             >
@@ -343,28 +347,29 @@ function LibraryPage() {
         </div>
       ) : (
         <>
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-6 py-3">
-            <h2 className="text-lg font-semibold">Bibliothèque de prompts</h2>
-            <div className="relative">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-3 md:px-6">
+            <h2 className="text-base font-semibold sm:text-lg">Bibliothèque de prompts</h2>
+            <div className="relative w-full sm:w-auto">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
               <input
                 value={recherche}
                 onChange={(event) => setRecherche(event.target.value)}
                 placeholder="Recherche"
                 aria-label="Rechercher un prompt"
-                className="w-56 rounded-full border border-border bg-muted py-2 pl-9 pr-12 text-xs text-primary outline-none transition focus:border-[var(--info)] focus:bg-card"
+                className="h-11 w-full rounded-full border border-border bg-muted pl-9 pr-4 text-sm text-primary outline-none transition focus:border-[var(--info)] focus:bg-card sm:h-auto sm:w-56 sm:py-2 sm:pr-12 sm:text-xs"
               />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-muted-foreground bg-card border border-border rounded px-1.5 py-0.5">
+              <span className="absolute right-3 top-1/2 hidden -translate-y-1/2 rounded border border-border bg-card px-1.5 py-0.5 text-[10px] font-bold text-muted-foreground sm:inline">
                 ⌘K
               </span>
             </div>
           </div>
 
-          <div className="px-6 py-8">
+          <div className="px-4 py-6 md:px-6 md:py-8">
             <p className="mb-4 text-sm text-muted-foreground">
               {prompts.length} résultat{prompts.length > 1 ? "s" : ""} sur{" "}
               {(data ?? []).length} prompt{(data ?? []).length > 1 ? "s" : ""}
             </p>
+
 
             {isLoading ? (
               <div className="mt-4 flex justify-center">
