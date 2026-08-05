@@ -531,7 +531,7 @@ function GeneratorPage() {
                 : setIdee(event.target.value)
             }
             placeholder={phase === "questions" ? "Ta réponse…" : placeholderAnime}
-            className="min-h-[85px] w-full resize-none border-0 bg-transparent text-lg text-primary outline-none placeholder:text-sm placeholder:text-muted-foreground"
+            className="min-h-[70px] w-full resize-none border-0 bg-transparent text-lg text-primary outline-none placeholder:text-sm placeholder:text-muted-foreground"
           />
 
 
