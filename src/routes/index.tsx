@@ -28,6 +28,7 @@ import {
   MODELES,
   TONS,
   TYPES_PROMPT,
+  formatDateFr,
   type MarioResult,
   type ModeleValue,
   type TonValue,
