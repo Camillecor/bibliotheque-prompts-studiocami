@@ -15,7 +15,7 @@ function PrechargementBibliotheque() {
   return null;
 }
 
-function NavLink({
+function RailButton({
   to,
   icon: Icon,
   label,
@@ -29,73 +29,86 @@ function NavLink({
   return (
     <Link
       to={to}
+      aria-label={label}
+      title={label}
       className={[
-        "flex items-center gap-2 rounded-full px-3.5 py-1.5 text-sm font-semibold transition",
+        "flex h-11 w-11 items-center justify-center rounded-full transition duration-200 hover:-translate-y-0.5",
         active
-          ? "bg-secondary text-[var(--primary-dark)]"
-          : "text-muted-foreground hover:bg-muted hover:text-primary",
+          ? "bg-primary text-primary-foreground shadow-[0_8px_20px_-8px_rgba(17,26,61,0.45)]"
+          : "border border-border bg-card text-primary shadow-[0_1px_2px_rgba(17,26,61,0.06),0_8px_18px_-14px_rgba(17,26,61,0.35)]",
       ].join(" ")}
     >
-      <Icon className="h-4 w-4" />
-      <span className="hidden sm:inline">{label}</span>
+      <Icon className="h-5 w-5" />
     </Link>
   );
 }
 
-export function AppShell({ children }: { children: ReactNode }) {
+/** Décor très subtil : quelques traits courbés en arrière-plan de la colonne centrale. */
+function DecorLignes() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-0 -z-10 h-full w-full"
+      preserveAspectRatio="none"
+      viewBox="0 0 1200 800"
+      fill="none"
+    >
+      <path
+        d="M-50 180 C 250 60, 600 300, 1250 120"
+        stroke="var(--info)"
+        strokeOpacity="0.25"
+        strokeWidth="1.5"
+      />
+      <path
+        d="M-50 460 C 300 340, 700 620, 1250 420"
+        stroke="var(--info)"
+        strokeOpacity="0.2"
+        strokeWidth="1.5"
+      />
+      <path
+        d="M-50 700 C 350 620, 750 820, 1250 660"
+        stroke="var(--info)"
+        strokeOpacity="0.22"
+        strokeWidth="1.5"
+      />
+    </svg>
+  );
+}
+
+export function AppShell({ children, panel }: { children: ReactNode; panel?: ReactNode }) {
   const pathname = useRouterState({ select: (router) => router.location.pathname });
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="relative flex h-screen w-full overflow-hidden bg-background">
       <PrechargementBibliotheque />
-      <header className="fixed inset-x-0 top-0 z-40 flex h-14 items-center gap-4 bg-transparent px-4 lg:h-16 lg:gap-6">
-        {/* Flou progressif : maximal en haut de la navbar, nul sous celle-ci
-            pour fondre doucement dans le contenu qui défile. Le calque dépasse
-            la hauteur de la navbar (h-[120px]) et est masqué par un dégradé
-            vertical : opaque jusqu'à ~47% (bas de la navbar), puis transparent. */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none fixed inset-x-0 top-0 -z-10 h-[120px]"
-          style={{
-            backdropFilter: "blur(14px)",
-            WebkitBackdropFilter: "blur(14px)",
-            maskImage:
-              "linear-gradient(to bottom, black 0%, black 47%, transparent 100%)",
-            WebkitMaskImage:
-              "linear-gradient(to bottom, black 0%, black 47%, transparent 100%)",
-          }}
-        />
-        <Link
-          to="/"
-          aria-label="Studio Cami — accueil"
-          className="flex shrink-0 items-center gap-2 transition duration-200 hover:opacity-80 lg:gap-3"
-        >
-          <img
-            src="/mario-fox-head.png"
-            alt=""
-            className="h-8 w-8 object-contain lg:h-12 lg:w-12"
-          />
-          <img
-            src={logoAsset.url}
-            alt="Studio Cami"
-            className="h-8 w-auto lg:h-9"
-          />
+      <DecorLignes />
+
+      {/* Rail de navigation */}
+      <aside className="z-10 flex w-[76px] shrink-0 flex-col items-center gap-6 border-r border-border bg-card py-5">
+        <Link to="/" aria-label="Studio Cami — accueil" className="transition hover:opacity-80">
+          <img src={logoAsset.url} alt="Studio Cami" className="w-12" />
         </Link>
 
-        <nav className="ml-auto flex items-center gap-1">
-          <NavLink to="/" icon={Plus} label="Nouveau prompt" active={pathname === "/"} />
-          <NavLink
+        <nav className="flex flex-col items-center gap-3">
+          <RailButton to="/" icon={Plus} label="Générateur" active={pathname === "/"} />
+          <RailButton
             to="/bibliotheque"
             icon={Library}
             label="Bibliothèque"
             active={pathname.startsWith("/bibliotheque")}
           />
         </nav>
-      </header>
+      </aside>
 
-      <main className="pt-14 lg:pt-16">
-        <div className="mx-auto max-w-[1200px] px-4 py-8 sm:px-8">{children}</div>
-      </main>
+      {/* Contenu principal */}
+      <main className="flex-1 overflow-y-auto">{children}</main>
+
+      {/* Panneau contextuel */}
+      {panel ? (
+        <aside className="z-10 hidden w-72 shrink-0 overflow-y-auto border-l border-border bg-card lg:block">
+          {panel}
+        </aside>
+      ) : null}
     </div>
   );
 }
