@@ -566,7 +566,7 @@ function GeneratorPage() {
           </div>
         </form>
 
-            <div className="mt-6 grid grid-cols-2 gap-2.5">
+            <div className="mt-6 grid grid-cols-3 gap-2.5">
               {SUGGESTIONS_METIER.map((s) => (
                 <button
                   key={s.titre}
