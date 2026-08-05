@@ -226,8 +226,14 @@ function GeneratorPage() {
     }
   }
 
+  // Flux conversationnel : Mario pose 3 questions avant la génération finale.
+  const [phase, setPhase] = useState<"idee" | "questions">("idee");
+  const [questions, setQuestions] = useState<string[]>([]);
+  const [reponses, setReponses] = useState<string[]>([]);
+  const [reponseCourante, setReponseCourante] = useState("");
+
   const generation = useMutation({
-    mutationFn: () =>
+    mutationFn: (instructionsOverride?: string) =>
       generate({
         data: {
           idee,
@@ -235,7 +241,7 @@ function GeneratorPage() {
           modele,
           typePrompt,
           ton,
-          autresInstructions,
+          autresInstructions: instructionsOverride ?? autresInstructions,
           image: image ? { mediaType: image.mediaType, base64: image.base64 } : undefined,
         },
       }),
@@ -250,6 +256,40 @@ function GeneratorPage() {
 
     onError: (error: Error) => toast.error(error.message),
   });
+
+  const poserQuestions = useServerFn(poserQuestionsMario);
+  const demandeQuestions = useMutation({
+    mutationFn: () =>
+      poserQuestions({ data: { idee, motsCles, metier: metierEdit, typePrompt, ton } }),
+    onSuccess: (data) => {
+      setQuestions(data.questions);
+      setReponses([]);
+      setReponseCourante("");
+      setPhase("questions");
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+
+  function envoyerReponse() {
+    const reponse = reponseCourante.trim();
+    if (!reponse || generation.isPending) return;
+    const nouvellesReponses = [...reponses, reponse];
+    setReponses(nouvellesReponses);
+    setReponseCourante("");
+
+    if (nouvellesReponses.length >= questions.length) {
+      const echange = questions
+        .map((q, i) => `Q${i + 1}: ${q}\nR${i + 1}: ${nouvellesReponses[i] ?? ""}`)
+        .join("\n");
+      const bloc = `Précisions apportées en échangeant avec Mario :\n${echange}`;
+      const combine = autresInstructions.trim()
+        ? `${autresInstructions.trim()}\n\n${bloc}`
+        : bloc;
+      setAutresInstructions(combine);
+      generation.mutate(combine);
+    }
+  }
+
 
   const sauvegarde = useMutation({
     mutationFn: async () => {
