@@ -120,6 +120,14 @@ export function PromptView({
 }) {
   const sections = decouperSections(data.prompt);
   const slug = slugifier(data.titre);
+  const promptRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    const el = promptRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${el.scrollHeight}px`;
+  }, [data.prompt]);
 
   return (
     <div className="space-y-6">
@@ -153,13 +161,13 @@ export function PromptView({
       ) : null}
 
       {editable ? (
-        <section className="rounded-2xl bg-[var(--primary)] p-5 md:p-6">
+        <section className="rounded-2xl bg-[var(--primary-dark)] p-5 md:p-6">
           <textarea
+            ref={promptRef}
             value={data.prompt}
             onChange={(event) => onPromptChange?.(event.target.value)}
             aria-label="Prompt généré"
-            rows={Math.max(8, data.prompt.split("\n").length)}
-            className="w-full resize-none border-0 bg-transparent text-sm leading-relaxed text-white outline-none placeholder:text-white/60"
+            className="w-full resize-none overflow-hidden border-0 bg-transparent text-sm leading-relaxed text-white outline-none placeholder:text-white/60"
           />
         </section>
       ) : (
@@ -178,6 +186,15 @@ export function PromptView({
           <pre className="cami-code-body relative">{data.prompt}</pre>
         </section>
       )}
+
+      {data.note ? (
+        <div className="cami-block-resume">
+          <p className="text-sm font-bold uppercase tracking-[0.06em] text-primary">
+            Pourquoi ce prompt fonctionne
+          </p>
+          <p className="mt-2 text-sm leading-relaxed text-foreground">{data.note}</p>
+        </div>
+      ) : null}
 
       <div className="flex flex-wrap items-center justify-center gap-3">
         <CopyButton value={data.prompt} label="Copier le prompt" className="cami-copy-btn" />
@@ -211,13 +228,6 @@ export function PromptView({
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-
-      {data.note ? (
-        <p className="text-sm text-muted-foreground">
-          <span className="font-semibold text-primary">Pourquoi ce prompt fonctionne : </span>
-          {data.note}
-        </p>
-      ) : null}
 
       {data.etapes_lancement.length > 0 ? (
         <section className="space-y-4">
