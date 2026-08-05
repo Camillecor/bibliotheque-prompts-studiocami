@@ -586,7 +586,7 @@ function GeneratorPage() {
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="start"
-                className="w-80 rounded-3xl border border-white/60 bg-white/75 p-2 shadow-2xl backdrop-blur-xl"
+                className="w-[min(20rem,calc(100vw-2rem))] rounded-3xl border border-white/60 bg-white/75 p-2 shadow-2xl backdrop-blur-xl"
               >
                 <button
                   type="button"
@@ -710,7 +710,7 @@ function GeneratorPage() {
           </div>
         </form>
 
-            <div className="mt-6 grid grid-cols-3 gap-2.5">
+            <div className="mt-6 grid grid-cols-1 gap-2.5 sm:grid-cols-3">
               {SUGGESTIONS_METIER.map((s) => (
                 <button
                   key={s.titre}
@@ -740,8 +740,9 @@ function GeneratorPage() {
           <div
             ref={resultRef}
             id="prompt-genere"
-            className="mx-auto mt-16 max-w-5xl scroll-mt-20 space-y-8"
+            className="mx-auto mt-10 max-w-5xl scroll-mt-20 space-y-8 px-4 md:mt-16 md:px-6"
           >
+
             <PromptView
               editable
               onPromptChange={(prompt) =>
