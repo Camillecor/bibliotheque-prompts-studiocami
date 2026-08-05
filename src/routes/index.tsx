@@ -688,11 +688,16 @@ function GeneratorPage() {
             </button>
             <button
               type="submit"
-              disabled={!peutGenerer}
-              aria-label="Générer le prompt"
+              disabled={
+                phase === "questions"
+                  ? reponseCourante.trim().length === 0 || generation.isPending
+                  : !peutGenerer || demandeQuestions.isPending
+              }
+              aria-label={phase === "questions" ? "Envoyer ma réponse" : "Générer le prompt"}
               className="cami-submit-btn ml-auto shrink-0 h-8 w-8 md:ml-0 md:h-10 md:w-10 lg:ml-auto"
             >
-              {generation.isPending ? (
+              {generation.isPending || demandeQuestions.isPending ? (
+
                 <Loader2 className="h-4 w-4 animate-spin md:h-5 md:w-5" />
               ) : (
                 <ArrowUp className="h-4 w-4 md:h-5 md:w-5" />
