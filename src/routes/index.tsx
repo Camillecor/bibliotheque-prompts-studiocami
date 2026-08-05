@@ -34,7 +34,13 @@ import {
   type TonValue,
   type TypePromptValue,
 } from "@/lib/mario";
-import { generateMarioPrompt, listPrompts, savePrompt } from "@/lib/mario.functions";
+import {
+  generateMarioPrompt,
+  listPrompts,
+  poserQuestionsMario,
+  savePrompt,
+} from "@/lib/mario.functions";
+
 
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024; // 5 Mo
 const IMAGE_SIGNATURES: { mediaType: "image/png" | "image/jpeg"; bytes: number[] }[] = [
