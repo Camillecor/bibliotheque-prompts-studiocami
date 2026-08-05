@@ -84,7 +84,7 @@ export function AppShell({ children, panel }: { children: ReactNode; panel?: Rea
       <DecorLignes />
 
       {/* Rail de navigation */}
-      <aside className="z-10 flex w-[76px] shrink-0 flex-col items-center gap-6 border-r border-border bg-card py-5">
+      <aside className="z-10 flex w-[92px] shrink-0 flex-col items-center gap-6 border-r border-border bg-card py-5">
         <Link to="/" aria-label="Studio Cami — accueil" className="transition hover:opacity-80">
           <img src={logoAsset.url} alt="Studio Cami" className="w-12" />
         </Link>
