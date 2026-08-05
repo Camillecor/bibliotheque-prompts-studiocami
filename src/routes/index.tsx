@@ -28,6 +28,7 @@ import {
   MODELES,
   TONS,
   TYPES_PROMPT,
+  formatDateFr,
   type MarioResult,
   type ModeleValue,
   type TonValue,
@@ -302,6 +303,36 @@ function GeneratorPage() {
     ].filter((g) => g.items.length > 0);
   }, [prompts, recherche]);
 
+  const stats = useMemo(() => {
+    const liste = prompts ?? [];
+    const total = liste.length;
+    const limite7j = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    const cetteSemaine = liste.filter(
+      (p) => new Date(p.date_ajout).getTime() >= limite7j,
+    ).length;
+    const metierComptes = new Map<string, number>();
+    for (const p of liste) {
+      metierComptes.set(p.metier, (metierComptes.get(p.metier) ?? 0) + 1);
+    }
+    let metierActif = "—";
+    let max = 0;
+    for (const [metier, count] of metierComptes) {
+      if (count > max) {
+        max = count;
+        metierActif = metier;
+      }
+    }
+    const dernier = liste
+      .slice()
+      .sort((a, b) => new Date(b.date_ajout).getTime() - new Date(a.date_ajout).getTime())[0];
+    return {
+      total,
+      cetteSemaine,
+      metierActif,
+      dernier: dernier ? formatDateFr(dernier.date_ajout) : "Aucun",
+    };
+  }, [prompts]);
+
   function nouveauPrompt() {
     setIdee("");
     setMotsCles("");
@@ -370,6 +401,20 @@ function GeneratorPage() {
           <Plus className="h-4 w-4" />
           Nouveau prompt
         </button>
+      </div>
+
+      <div className="grid grid-cols-2 gap-6 px-6 pt-6 sm:grid-cols-4 md:px-10">
+        {[
+          { label: "Prompts dans ma bibliothèque", valeur: stats.total },
+          { label: "Ajoutés cette semaine", valeur: stats.cetteSemaine },
+          { label: "Métier le plus actif", valeur: stats.metierActif },
+          { label: "Dernier ajout", valeur: stats.dernier },
+        ].map((item) => (
+          <div key={item.label} className="flex flex-col gap-1">
+            <p className="text-xs text-muted-foreground">{item.label}</p>
+            <p className="font-chic text-lg font-semibold text-primary">{item.valeur}</p>
+          </div>
+        ))}
       </div>
 
       <div
