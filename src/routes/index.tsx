@@ -284,6 +284,44 @@ function GeneratorPage() {
 
   const peutGenerer = idee.trim().length >= 5 && !generation.isPending;
 
+  // Panneau contextuel : historique récent, lu depuis le cache React Query déjà préchargé.
+  const fetchPrompts = useServerFn(listPrompts);
+  const { data: prompts } = useQuery({ queryKey: ["prompts"], queryFn: () => fetchPrompts() });
+  const [recherche, setRecherche] = useState("");
+
+  const groupesHistorique = useMemo(() => {
+    const aujourdhui = new Date().toISOString().slice(0, 10);
+    const limite = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    const filtres = (prompts ?? [])
+      .filter((p) => p.titre.toLowerCase().includes(recherche.trim().toLowerCase()))
+      .slice(0, 6);
+
+    const jour = filtres.filter((p) => String(p.date_ajout).slice(0, 10) === aujourdhui);
+    const semaine = filtres.filter(
+      (p) =>
+        String(p.date_ajout).slice(0, 10) !== aujourdhui &&
+        new Date(p.date_ajout).getTime() >= limite,
+    );
+
+    return [
+      { titre: "Aujourd'hui", items: jour },
+      { titre: "7 derniers jours", items: semaine },
+    ].filter((g) => g.items.length > 0);
+  }, [prompts, recherche]);
+
+  function nouveauPrompt() {
+    setIdee("");
+    setMotsCles("");
+    setMotsClesOuvert(false);
+    setAutresInstructions("");
+    setAutresInstructionsOuvert(false);
+    setTypePrompt("");
+    setImage(null);
+    setResult(null);
+    setTitreEdit("");
+    setMotsClesEdit("");
+  }
+
   return (
     <AppShell
       panel={
