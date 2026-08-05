@@ -255,49 +255,83 @@ function GeneratorPage() {
   const peutGenerer = idee.trim().length >= 5 && !generation.isPending;
 
   return (
-    <AppShell>
-      <div className="tech-grid-bg relative mx-auto w-full max-w-5xl rounded-[2rem]">
-        <div className="glow-orb -left-20 -top-16 h-72 w-72 bg-[var(--info)]" />
-        <div className="glow-orb -right-16 top-24 h-64 w-64 bg-[var(--coral)]" />
-
-        <div className="flex flex-col items-center gap-6 py-6 text-center md:py-12 lg:flex-row lg:items-start lg:justify-center lg:gap-10 lg:py-6">
-          <img
-            src="/mario-fox-point.png"
-            alt="Mario, la mascotte de Studio Cami IA"
-            className="w-48 sm:w-56 lg:w-64 lg:shrink-0"
-          />
-
-          <div className="w-full lg:max-w-2xl">
-            <span className="cami-pill text-[9px] md:text-[11px]">
-              <span className="live-dot">
-                <span className="live-dot-ping" />
-                <span className="live-dot-core" />
-              </span>
-              GÉNÉRATEUR DE PROMPT • BIBLIOTHÈQUE • GLOSSAIRE
-            </span>
-            <h1
-              className="mt-5 text-2xl leading-tight md:text-5xl"
-              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
-            >
-              Transforme ton idée
-              <br />
-              <span className="italic font-bold">en prompt IA structuré</span>
-            </h1>
-            <p className="mt-3 text-xs text-muted-foreground md:text-base">
-              Décris ton besoin. <br className="md:hidden" />Affine en répondant à 3 questions.
-              <br />
-              Mario le renard, mon super agent, te génère un prompt structuré et optimisé.
+    <AppShell
+      panel={
+        <div className="flex h-full flex-col gap-4 p-4">
+          <div className="flex flex-col items-center gap-2">
+            <img src={foxAi.url} alt="" aria-hidden="true" className="w-14" />
+            <p className="text-center text-xs text-muted-foreground">
+              Mario le renard génère des prompts IA performants.
             </p>
           </div>
-        </div>
 
-        <form
-          className="cami-card-hero relative mx-auto mt-8 w-[calc(100%-32px)] md:w-[calc(100%-100px)]"
-              onSubmit={(event) => {
-                event.preventDefault();
-                if (peutGenerer) generation.mutate();
-              }}
-            >
+          <button type="button" onClick={nouveauPrompt} className="cami-btn w-full">
+            <Plus className="h-4 w-4" />
+            Nouveau prompt
+          </button>
+
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+            <input
+              value={recherche}
+              onChange={(event) => setRecherche(event.target.value)}
+              placeholder="Rechercher dans l'historique…"
+              aria-label="Rechercher dans l'historique"
+              className="w-full rounded-full border border-border bg-muted py-2 pl-9 pr-3 text-xs text-primary outline-none transition focus:border-[var(--info)] focus:bg-card"
+            />
+          </div>
+
+          <div className="space-y-4 overflow-y-auto">
+            {groupesHistorique.map((groupe) => (
+              <div key={groupe.titre}>
+                <p className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-muted-foreground">
+                  {groupe.titre}
+                </p>
+                <ul className="space-y-0.5">
+                  {groupe.items.map((item) => (
+                    <li key={item.id}>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          navigate({ to: "/bibliotheque", search: { id: item.id } })
+                        }
+                        className="w-full truncate rounded-lg px-2 py-1.5 text-left text-xs text-primary transition hover:bg-muted"
+                      >
+                        {item.titre}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      }
+    >
+      <div className="grid grid-cols-[1fr_auto_1fr] items-center border-b border-border px-6 py-3">
+        <h2 className="text-lg font-semibold">Générateur de prompt</h2>
+        <button type="button" onClick={nouveauPrompt} className="cami-btn">
+          <Plus className="h-4 w-4" />
+          Nouveau prompt
+        </button>
+        <span />
+      </div>
+
+      <div
+        className={[
+          "px-6 py-8",
+          result ? "" : "flex min-h-[calc(100vh-61px)] items-center justify-center",
+        ].join(" ")}
+      >
+        <div className="mx-auto w-full max-w-[640px]">
+          <form
+            className="cami-card-hero relative w-full"
+            onSubmit={(event) => {
+              event.preventDefault();
+              if (peutGenerer) generation.mutate();
+            }}
+          >
+
           <textarea
             rows={2}
             value={idee}
