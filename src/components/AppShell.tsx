@@ -101,7 +101,15 @@ export function AppShell({ children, panel }: { children: ReactNode; panel?: Rea
       </aside>
 
       {/* Contenu principal */}
-      <main className="flex-1 overflow-y-auto">{children}</main>
+      <main
+        className="flex-1 overflow-y-auto"
+        style={{
+          backgroundImage:
+            "radial-gradient(1100px 700px at 12% 0%, color-mix(in srgb, var(--info) 12%, transparent), transparent 60%), radial-gradient(900px 650px at 90% 15%, color-mix(in srgb, var(--primary) 8%, transparent), transparent 55%), radial-gradient(900px 700px at 50% 105%, color-mix(in srgb, var(--coral) 7%, transparent), transparent 60%)",
+        }}
+      >
+        {children}
+      </main>
 
       {/* Panneau contextuel */}
       {panel ? (
