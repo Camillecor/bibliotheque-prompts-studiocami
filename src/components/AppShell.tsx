@@ -27,18 +27,18 @@ function RailButton({
   active: boolean;
 }) {
   return (
-    <Link
-      to={to}
-      aria-label={label}
-      title={label}
-      className={[
-        "flex h-11 w-11 items-center justify-center rounded-full transition duration-200 hover:-translate-y-0.5",
-        active
-          ? "bg-primary text-primary-foreground shadow-[0_8px_20px_-8px_rgba(17,26,61,0.45)]"
-          : "border border-border bg-card text-primary shadow-[0_1px_2px_rgba(17,26,61,0.06),0_8px_18px_-14px_rgba(17,26,61,0.35)]",
-      ].join(" ")}
-    >
-      <Icon className="h-5 w-5" />
+    <Link to={to} aria-label={label} title={label} className="flex flex-col items-center gap-1.5">
+      <span
+        className={[
+          "flex h-11 w-11 items-center justify-center rounded-full transition duration-200 hover:-translate-y-0.5",
+          active
+            ? "bg-primary text-primary-foreground shadow-[0_8px_20px_-8px_rgba(17,26,61,0.45)]"
+            : "border border-border bg-card text-primary shadow-[0_1px_2px_rgba(17,26,61,0.06),0_8px_18px_-14px_rgba(17,26,61,0.35)]",
+        ].join(" ")}
+      >
+        <Icon className="h-5 w-5" />
+      </span>
+      <span className="text-[10px] font-medium text-muted-foreground">{label}</span>
     </Link>
   );
 }
