@@ -455,7 +455,7 @@ function GeneratorPage() {
         </button>
       </div>
 
-      <div className="grid grid-cols-2 gap-6 px-6 pt-6 sm:grid-cols-4 md:px-10">
+      <div className="grid grid-cols-2 gap-4 px-6 pt-4 sm:grid-cols-4 md:px-10">
         {[
           { label: "Prompts dans ma bibliothèque", valeur: stats.total },
           { label: "Ajoutés cette semaine", valeur: stats.cetteSemaine },
@@ -471,8 +471,8 @@ function GeneratorPage() {
 
       <div
         className={[
-          "px-6 py-8",
-          result ? "" : "flex min-h-[calc(100vh-61px)] items-center justify-center",
+          "px-6 py-4",
+          result ? "" : "flex min-h-[calc(100vh-150px)] items-center justify-center",
         ].join(" ")}
       >
         <div className="mx-auto w-full max-w-[820px]">
@@ -531,7 +531,7 @@ function GeneratorPage() {
                 : setIdee(event.target.value)
             }
             placeholder={phase === "questions" ? "Ta réponse…" : placeholderAnime}
-            className="min-h-[85px] w-full resize-none border-0 bg-transparent text-lg text-primary outline-none placeholder:text-sm placeholder:text-muted-foreground"
+            className="min-h-[70px] w-full resize-none border-0 bg-transparent text-lg text-primary outline-none placeholder:text-sm placeholder:text-muted-foreground"
           />
 
 
