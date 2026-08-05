@@ -195,7 +195,19 @@ function LibraryPage() {
         <option value="ancien">Plus anciens d'abord</option>
         <option value="alpha">Alphabétique (A → Z)</option>
         <option value="complexite">Complexité (simple → complexe)</option>
+        <option value="favoris">Favoris d'abord</option>
       </select>
+
+      <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold">
+        <input
+          type="checkbox"
+          checked={favorisUniquement}
+          onChange={(event) => setFavorisUniquement(event.target.checked)}
+          className="h-4 w-4 rounded border-border accent-[var(--coral)]"
+        />
+        <span>Favoris uniquement</span>
+      </label>
+
 
       {filtresActifs ? (
         <button
