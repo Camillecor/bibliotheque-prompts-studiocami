@@ -474,17 +474,60 @@ function GeneratorPage() {
             className="cami-card-hero relative w-full"
             onSubmit={(event) => {
               event.preventDefault();
-              if (peutGenerer) generation.mutate();
+              if (phase === "questions") {
+                envoyerReponse();
+                return;
+              }
+              if (peutGenerer) demandeQuestions.mutate();
             }}
           >
 
+          {phase === "questions" ? (
+            <div className="mb-4 space-y-3">
+              <div className="flex justify-end">
+                <p className="max-w-[85%] rounded-2xl bg-[var(--coral)] px-3.5 py-2 text-sm text-white">
+                  {idee}
+                </p>
+              </div>
+              {questions.slice(0, reponses.length + 1).map((question, index) => (
+                <div key={question} className="space-y-2">
+                  <div className="flex items-start gap-2">
+                    <img src={foxAi.url} alt="" aria-hidden="true" className="h-6 w-6 shrink-0" />
+                    <p
+                      className={[
+                        "max-w-[85%] rounded-2xl px-3.5 py-2 text-sm",
+                        index === reponses.length
+                          ? "bg-secondary font-semibold text-primary"
+                          : "bg-muted text-muted-foreground",
+                      ].join(" ")}
+                    >
+                      {question}
+                    </p>
+                  </div>
+                  {reponses[index] ? (
+                    <div className="flex justify-end">
+                      <p className="max-w-[85%] rounded-2xl bg-[var(--coral)] px-3.5 py-1.5 text-xs text-white">
+                        {reponses[index]}
+                      </p>
+                    </div>
+                  ) : null}
+                </div>
+              ))}
+            </div>
+          ) : null}
+
           <textarea
             rows={2}
-            value={idee}
-            onChange={(event) => setIdee(event.target.value)}
-            placeholder={placeholderAnime}
+            value={phase === "questions" ? reponseCourante : idee}
+            onChange={(event) =>
+              phase === "questions"
+                ? setReponseCourante(event.target.value)
+                : setIdee(event.target.value)
+            }
+            placeholder={phase === "questions" ? "Ta réponse…" : placeholderAnime}
             className="min-h-[85px] w-full resize-none border-0 bg-transparent text-lg text-primary outline-none placeholder:text-sm placeholder:text-muted-foreground"
           />
+
 
           {motsClesOuvert ? (
             <input
