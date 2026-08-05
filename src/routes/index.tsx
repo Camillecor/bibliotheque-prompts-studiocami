@@ -369,13 +369,12 @@ function GeneratorPage() {
         </div>
       }
     >
-      <div className="grid grid-cols-[1fr_auto_1fr] items-center border-b border-border px-6 py-3">
+      <div className="flex items-center justify-between border-b border-border px-6 py-3">
         <h2 className="text-lg font-semibold">Générateur de prompt</h2>
         <button type="button" onClick={nouveauPrompt} className="cami-btn">
           <Plus className="h-4 w-4" />
           Nouveau prompt
         </button>
-        <span />
       </div>
 
       <div
