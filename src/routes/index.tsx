@@ -390,7 +390,12 @@ function GeneratorPage() {
     setResult(null);
     setTitreEdit("");
     setMotsClesEdit("");
+    setPhase("idee");
+    setQuestions([]);
+    setReponses([]);
+    setReponseCourante("");
   }
+
 
   return (
     <AppShell
