@@ -170,6 +170,7 @@ function LibraryPage() {
     setMetierFiltre([]);
     setTypeFiltre([]);
     setComplexiteFiltre("");
+    setFavorisUniquement(false);
   }
 
   const panneauFiltres = (
