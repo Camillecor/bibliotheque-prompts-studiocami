@@ -114,34 +114,6 @@ function telecharger(nom: string, contenu: string, mime: string) {
   URL.revokeObjectURL(url);
 }
 
-function AutoTextarea({
-  value,
-  onChange,
-  ariaLabel,
-}: {
-  value: string;
-  onChange: (value: string) => void;
-  ariaLabel: string;
-}) {
-  const ref = useRef<HTMLTextAreaElement>(null);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    el.style.height = "auto";
-    el.style.height = `${el.scrollHeight}px`;
-  }, [value]);
-
-  return (
-    <textarea
-      ref={ref}
-      aria-label={ariaLabel}
-      value={value}
-      onChange={(event) => onChange(event.target.value)}
-      className="w-full resize-none border-0 bg-transparent text-sm leading-relaxed text-foreground outline-none"
-    />
-  );
-}
 
 export function PromptView({
   data,
