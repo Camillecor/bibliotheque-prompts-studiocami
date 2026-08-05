@@ -90,6 +90,7 @@ function DecorLignes() {
 
 export function AppShell({ children, panel }: { children: ReactNode; panel?: ReactNode }) {
   const pathname = useRouterState({ select: (router) => router.location.pathname });
+  const [menuOuvert, setMenuOuvert] = useState(false);
 
   return (
     <div className="relative flex h-screen w-full overflow-hidden bg-background">
