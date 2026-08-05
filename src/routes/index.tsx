@@ -109,13 +109,6 @@ const SUGGESTIONS_METIER = [
     prefill:
       "Un prompt pour écrire un communiqué de presse clair, factuel et prêt à diffuser.",
   },
-  {
-    titre: "Construire un calendrier éditorial",
-    description: "pour organiser mes contenus du mois…",
-    tags: ["Planning", "Contenu"],
-    prefill:
-      "Un prompt pour construire un calendrier éditorial afin d'organiser mes contenus du mois.",
-  },
 ] as const;
 
 function useTypewriterPlaceholder(phrases: readonly string[], active: boolean) {
