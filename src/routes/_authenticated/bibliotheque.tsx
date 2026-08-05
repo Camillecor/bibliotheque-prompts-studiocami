@@ -305,15 +305,19 @@ function LibraryPage() {
   return (
     <AppShell panel={selection ? undefined : panneauFiltres}>
       {selection ? (
-        <div className="mx-auto w-full max-w-5xl space-y-6 px-6 py-8">
+        <div className="mx-auto w-full max-w-5xl space-y-6 px-4 py-6 md:px-6 md:py-8">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <button type="button" className="cami-btn" onClick={() => setSelection(null)}>
+            <button
+              type="button"
+              className="cami-btn min-h-11 flex-1 sm:flex-none"
+              onClick={() => setSelection(null)}
+            >
               <ArrowLeft className="h-4 w-4" />
               Retour à la bibliothèque
             </button>
             <button
               type="button"
-              className="cami-btn"
+              className="cami-btn min-h-11 flex-1 sm:flex-none"
               disabled={suppression.isPending}
               onClick={() => suppression.mutate(selection.id)}
             >
@@ -343,28 +347,29 @@ function LibraryPage() {
         </div>
       ) : (
         <>
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-6 py-3">
-            <h2 className="text-lg font-semibold">Bibliothèque de prompts</h2>
-            <div className="relative">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-3 md:px-6">
+            <h2 className="text-base font-semibold sm:text-lg">Bibliothèque de prompts</h2>
+            <div className="relative w-full sm:w-auto">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
               <input
                 value={recherche}
                 onChange={(event) => setRecherche(event.target.value)}
                 placeholder="Recherche"
                 aria-label="Rechercher un prompt"
-                className="w-56 rounded-full border border-border bg-muted py-2 pl-9 pr-12 text-xs text-primary outline-none transition focus:border-[var(--info)] focus:bg-card"
+                className="h-11 w-full rounded-full border border-border bg-muted pl-9 pr-4 text-sm text-primary outline-none transition focus:border-[var(--info)] focus:bg-card sm:h-auto sm:w-56 sm:py-2 sm:pr-12 sm:text-xs"
               />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-muted-foreground bg-card border border-border rounded px-1.5 py-0.5">
+              <span className="absolute right-3 top-1/2 hidden -translate-y-1/2 rounded border border-border bg-card px-1.5 py-0.5 text-[10px] font-bold text-muted-foreground sm:inline">
                 ⌘K
               </span>
             </div>
           </div>
 
-          <div className="px-6 py-8">
+          <div className="px-4 py-6 md:px-6 md:py-8">
             <p className="mb-4 text-sm text-muted-foreground">
               {prompts.length} résultat{prompts.length > 1 ? "s" : ""} sur{" "}
               {(data ?? []).length} prompt{(data ?? []).length > 1 ? "s" : ""}
             </p>
+
 
             {isLoading ? (
               <div className="mt-4 flex justify-center">
@@ -375,16 +380,16 @@ function LibraryPage() {
                 Aucun prompt pour l'instant. Génère ton premier prompt depuis le générateur.
               </div>
             ) : (
-              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
                 {prompts.map((prompt) => (
                   <button
                     key={prompt.id}
                     type="button"
                     onClick={() => setSelection(prompt)}
-                    className="cami-card text-left transition hover:-translate-y-0.5 hover:shadow-md"
+                    className="cami-card min-w-0 text-left transition hover:-translate-y-0.5 hover:shadow-md"
                   >
                     <div className="flex items-start justify-between gap-3">
-                      <p className="text-xs font-medium uppercase tracking-[0.08em] text-muted-foreground">
+                      <p className="min-w-0 truncate text-xs font-medium uppercase tracking-[0.08em] text-muted-foreground">
                         {formatDateFr(prompt.date_ajout)}
                       </p>
                       <span
@@ -403,36 +408,41 @@ function LibraryPage() {
                             favori.mutate({ id: prompt.id, favori: !prompt.favori });
                           }
                         }}
-                        className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full transition ${
+                        className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition sm:h-5 sm:w-9 ${
                           prompt.favori ? "bg-[var(--coral)]" : "bg-muted"
                         }`}
                       >
                         <span
-                          className={`absolute h-4 w-4 rounded-full bg-white shadow-sm transition-all ${
-                            prompt.favori ? "left-[18px]" : "left-0.5"
+                          className={`absolute h-5 w-5 rounded-full bg-white shadow-sm transition-all sm:h-4 sm:w-4 ${
+                            prompt.favori ? "left-[22px] sm:left-[18px]" : "left-0.5"
                           }`}
                         />
                       </span>
                     </div>
                     <div className="mt-2 flex items-start gap-3">
                       <IconeMetier metier={prompt.metier} />
-                      <h2 className="text-lg font-bold leading-snug">{prompt.titre}</h2>
+                      <h2 className="min-w-0 break-words text-base font-bold leading-snug sm:text-lg">
+                        {prompt.titre}
+                      </h2>
                     </div>
                     <div className="mt-4 flex flex-wrap gap-2">
-                      <span className="cami-pill">{prompt.metier}</span>
+                      <span className="cami-pill max-w-full truncate">{prompt.metier}</span>
                       {prompt.type_prompt ? (
-                        <span className="cami-pill">{labelTypePrompt(prompt.type_prompt)}</span>
+                        <span className="cami-pill max-w-full truncate">
+                          {labelTypePrompt(prompt.type_prompt)}
+                        </span>
                       ) : null}
                       <span className="cami-pill text-muted-foreground">{prompt.complexite}</span>
                     </div>
                     {(prompt.mots_cles ?? []).length > 0 ? (
-                      <p className="mt-3 text-xs text-muted-foreground">
+                      <p className="mt-3 truncate text-xs text-muted-foreground">
                         Mots-clés : {(prompt.mots_cles ?? []).join(", ")}
                       </p>
                     ) : null}
                   </button>
                 ))}
               </div>
+
             )}
           </div>
         </>

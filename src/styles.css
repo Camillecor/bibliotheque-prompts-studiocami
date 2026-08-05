@@ -89,7 +89,18 @@
   html,
   body {
     overflow-x: hidden;
+    max-width: 100%;
   }
+
+  /* Mobile : évite le zoom automatique iOS au focus (police < 16px) */
+  @media (max-width: 767px) {
+    input,
+    select,
+    textarea {
+      font-size: 16px;
+    }
+  }
+
 
   body {
     background-color: var(--background);
@@ -207,16 +218,17 @@
 
 @layer components {
   .cami-card {
-    @apply rounded-[20px] border border-border bg-card p-6 md:p-8;
+    @apply rounded-[20px] border border-border bg-card p-4 sm:p-6 md:p-8;
     box-shadow:
       0 1px 2px rgba(17, 26, 61, 0.05),
       0 12px 32px -18px rgba(17, 26, 61, 0.16);
   }
 
   .cami-card-hero {
-    @apply rounded-[20px] border border-border bg-card p-6 md:p-8;
+    @apply rounded-[20px] border border-border bg-card p-4 sm:p-6 md:p-8;
     animation: cami-aura 5s ease-in-out infinite;
   }
+
 
   .cami-card-hero:focus-within {
     animation-duration: 2s;
@@ -254,13 +266,15 @@
   }
 
   .cami-select-pill {
-    @apply cursor-pointer appearance-none rounded-full border border-border bg-muted py-1.5 pl-3.5 pr-8 text-xs font-semibold text-primary outline-none transition [background-position:right_0.6rem_center] [background-repeat:no-repeat] [background-size:0.7rem] hover:border-[var(--coral)] focus:border-[var(--info)];
+    @apply min-h-10 cursor-pointer appearance-none rounded-full border border-border bg-muted py-1.5 pl-3.5 pr-8 text-xs font-semibold text-primary outline-none transition [background-position:right_0.6rem_center] [background-repeat:no-repeat] [background-size:0.7rem] hover:border-[var(--coral)] focus:border-[var(--info)] sm:min-h-0;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%235a6690'%3E%3Cpath fill-rule='evenodd' d='M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z' clip-rule='evenodd'/%3E%3C/svg%3E");
   }
 
+
   .cami-icon-btn {
-    @apply inline-flex h-8 w-8 items-center justify-center rounded-full border border-border bg-card text-muted-foreground transition hover:border-[var(--coral)] hover:text-[var(--coral)];
+    @apply inline-flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card text-muted-foreground transition hover:border-[var(--coral)] hover:text-[var(--coral)] sm:h-8 sm:w-8;
   }
+
 
   .cami-submit-btn {
     @apply inline-flex h-10 w-10 items-center justify-center rounded-full bg-[var(--coral)] text-white transition duration-200 hover:-translate-y-0.5 hover:bg-[var(--coral-dark)] active:scale-95 disabled:pointer-events-none disabled:opacity-40;

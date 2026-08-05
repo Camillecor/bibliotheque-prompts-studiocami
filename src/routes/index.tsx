@@ -447,35 +447,38 @@ function GeneratorPage() {
         </div>
       }
     >
-      <div className="flex items-center justify-between border-b border-border px-6 py-3">
-        <h2 className="text-lg font-semibold">Générateur de prompt</h2>
-        <button type="button" onClick={nouveauPrompt} className="cami-btn">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-3 md:px-6">
+        <h2 className="text-base font-semibold sm:text-lg">Générateur de prompt</h2>
+        <button type="button" onClick={nouveauPrompt} className="cami-btn min-h-11">
           <Plus className="h-4 w-4" />
           Nouveau prompt
         </button>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 px-6 pt-4 sm:grid-cols-4 md:px-10">
+      <div className="grid grid-cols-2 gap-3 px-4 pt-4 sm:gap-4 sm:grid-cols-4 md:px-10">
         {[
           { label: "Prompts dans ma bibliothèque", valeur: stats.total },
           { label: "Ajoutés cette semaine", valeur: stats.cetteSemaine },
           { label: "Métier le plus actif", valeur: stats.metierActif },
           { label: "Dernier ajout", valeur: stats.dernier },
         ].map((item) => (
-          <div key={item.label} className="flex flex-col gap-1">
-            <p className="text-xs text-muted-foreground">{item.label}</p>
-            <p className="font-chic text-lg font-semibold text-primary">{item.valeur}</p>
+          <div key={item.label} className="flex min-w-0 flex-col gap-1">
+            <p className="text-[11px] text-muted-foreground sm:text-xs">{item.label}</p>
+            <p className="font-chic truncate text-base font-semibold text-primary sm:text-lg">
+              {item.valeur}
+            </p>
           </div>
         ))}
       </div>
 
       <div
         className={[
-          "px-6 py-4",
-          result ? "" : "flex min-h-[calc(100vh-150px)] items-center justify-center",
+          "px-4 py-4 md:px-6",
+          result ? "" : "lg:flex lg:min-h-[calc(100vh-150px)] lg:items-center lg:justify-center",
         ].join(" ")}
       >
         <div className="mx-auto w-full max-w-[820px]">
+
           <form
             className="cami-card-hero relative w-full"
             onSubmit={(event) => {
@@ -531,8 +534,9 @@ function GeneratorPage() {
                 : setIdee(event.target.value)
             }
             placeholder={phase === "questions" ? "Ta réponse…" : placeholderAnime}
-            className="min-h-[70px] w-full resize-none border-0 bg-transparent text-lg text-primary outline-none placeholder:text-sm placeholder:text-muted-foreground"
+            className="min-h-[70px] w-full resize-none border-0 bg-transparent text-base text-primary outline-none placeholder:text-sm placeholder:text-muted-foreground md:text-lg"
           />
+
 
 
           {motsClesOuvert ? (
@@ -582,7 +586,7 @@ function GeneratorPage() {
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="start"
-                className="w-80 rounded-3xl border border-white/60 bg-white/75 p-2 shadow-2xl backdrop-blur-xl"
+                className="w-[min(20rem,calc(100vw-2rem))] rounded-3xl border border-white/60 bg-white/75 p-2 shadow-2xl backdrop-blur-xl"
               >
                 <button
                   type="button"
@@ -706,7 +710,7 @@ function GeneratorPage() {
           </div>
         </form>
 
-            <div className="mt-6 grid grid-cols-3 gap-2.5">
+            <div className="mt-6 grid grid-cols-1 gap-2.5 sm:grid-cols-3">
               {SUGGESTIONS_METIER.map((s) => (
                 <button
                   key={s.titre}
@@ -736,8 +740,9 @@ function GeneratorPage() {
           <div
             ref={resultRef}
             id="prompt-genere"
-            className="mx-auto mt-16 max-w-5xl scroll-mt-20 space-y-8"
+            className="mx-auto mt-10 max-w-5xl scroll-mt-20 space-y-8 px-4 md:mt-16 md:px-6"
           >
+
             <PromptView
               editable
               onPromptChange={(prompt) =>
