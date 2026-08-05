@@ -303,6 +303,36 @@ function GeneratorPage() {
     ].filter((g) => g.items.length > 0);
   }, [prompts, recherche]);
 
+  const stats = useMemo(() => {
+    const liste = prompts ?? [];
+    const total = liste.length;
+    const limite7j = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    const cetteSemaine = liste.filter(
+      (p) => new Date(p.date_ajout).getTime() >= limite7j,
+    ).length;
+    const metierComptes = new Map<string, number>();
+    for (const p of liste) {
+      metierComptes.set(p.metier, (metierComptes.get(p.metier) ?? 0) + 1);
+    }
+    let metierActif = "—";
+    let max = 0;
+    for (const [metier, count] of metierComptes) {
+      if (count > max) {
+        max = count;
+        metierActif = metier;
+      }
+    }
+    const dernier = liste
+      .slice()
+      .sort((a, b) => new Date(b.date_ajout).getTime() - new Date(a.date_ajout).getTime())[0];
+    return {
+      total,
+      cetteSemaine,
+      metierActif,
+      dernier: dernier ? formatDateFr(dernier.date_ajout) : "Aucun",
+    };
+  }, [prompts]);
+
   function nouveauPrompt() {
     setIdee("");
     setMotsCles("");
