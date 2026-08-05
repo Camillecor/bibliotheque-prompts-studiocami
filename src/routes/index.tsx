@@ -34,7 +34,13 @@ import {
   type TonValue,
   type TypePromptValue,
 } from "@/lib/mario";
-import { generateMarioPrompt, listPrompts, savePrompt } from "@/lib/mario.functions";
+import {
+  generateMarioPrompt,
+  listPrompts,
+  poserQuestionsMario,
+  savePrompt,
+} from "@/lib/mario.functions";
+
 
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024; // 5 Mo
 const IMAGE_SIGNATURES: { mediaType: "image/png" | "image/jpeg"; bytes: number[] }[] = [
@@ -220,8 +226,14 @@ function GeneratorPage() {
     }
   }
 
+  // Flux conversationnel : Mario pose 3 questions avant la génération finale.
+  const [phase, setPhase] = useState<"idee" | "questions">("idee");
+  const [questions, setQuestions] = useState<string[]>([]);
+  const [reponses, setReponses] = useState<string[]>([]);
+  const [reponseCourante, setReponseCourante] = useState("");
+
   const generation = useMutation({
-    mutationFn: () =>
+    mutationFn: (instructionsOverride?: string) =>
       generate({
         data: {
           idee,
@@ -229,7 +241,7 @@ function GeneratorPage() {
           modele,
           typePrompt,
           ton,
-          autresInstructions,
+          autresInstructions: instructionsOverride ?? autresInstructions,
           image: image ? { mediaType: image.mediaType, base64: image.base64 } : undefined,
         },
       }),
@@ -244,6 +256,40 @@ function GeneratorPage() {
 
     onError: (error: Error) => toast.error(error.message),
   });
+
+  const poserQuestions = useServerFn(poserQuestionsMario);
+  const demandeQuestions = useMutation({
+    mutationFn: () =>
+      poserQuestions({ data: { idee, motsCles, metier: metierEdit, typePrompt, ton } }),
+    onSuccess: (data) => {
+      setQuestions(data.questions);
+      setReponses([]);
+      setReponseCourante("");
+      setPhase("questions");
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+
+  function envoyerReponse() {
+    const reponse = reponseCourante.trim();
+    if (!reponse || generation.isPending) return;
+    const nouvellesReponses = [...reponses, reponse];
+    setReponses(nouvellesReponses);
+    setReponseCourante("");
+
+    if (nouvellesReponses.length >= questions.length) {
+      const echange = questions
+        .map((q, i) => `Q${i + 1}: ${q}\nR${i + 1}: ${nouvellesReponses[i] ?? ""}`)
+        .join("\n");
+      const bloc = `Précisions apportées en échangeant avec Mario :\n${echange}`;
+      const combine = autresInstructions.trim()
+        ? `${autresInstructions.trim()}\n\n${bloc}`
+        : bloc;
+      setAutresInstructions(combine);
+      generation.mutate(combine);
+    }
+  }
+
 
   const sauvegarde = useMutation({
     mutationFn: async () => {
@@ -277,6 +323,7 @@ function GeneratorPage() {
   });
 
   const peutGenerer = idee.trim().length >= 5 && !generation.isPending;
+
 
   // Panneau contextuel : historique récent, lu depuis le cache React Query déjà préchargé.
   const fetchPrompts = useServerFn(listPrompts);
@@ -344,7 +391,12 @@ function GeneratorPage() {
     setResult(null);
     setTitreEdit("");
     setMotsClesEdit("");
+    setPhase("idee");
+    setQuestions([]);
+    setReponses([]);
+    setReponseCourante("");
   }
+
 
   return (
     <AppShell
@@ -428,17 +480,60 @@ function GeneratorPage() {
             className="cami-card-hero relative w-full"
             onSubmit={(event) => {
               event.preventDefault();
-              if (peutGenerer) generation.mutate();
+              if (phase === "questions") {
+                envoyerReponse();
+                return;
+              }
+              if (peutGenerer) demandeQuestions.mutate();
             }}
           >
 
+          {phase === "questions" ? (
+            <div className="mb-4 space-y-3">
+              <div className="flex justify-end">
+                <p className="max-w-[85%] rounded-2xl bg-[var(--coral)] px-3.5 py-2 text-sm text-white">
+                  {idee}
+                </p>
+              </div>
+              {questions.slice(0, reponses.length + 1).map((question, index) => (
+                <div key={question} className="space-y-2">
+                  <div className="flex items-start gap-2">
+                    <img src={foxAi.url} alt="" aria-hidden="true" className="h-6 w-6 shrink-0" />
+                    <p
+                      className={[
+                        "max-w-[85%] rounded-2xl px-3.5 py-2 text-sm",
+                        index === reponses.length
+                          ? "bg-secondary font-semibold text-primary"
+                          : "bg-muted text-muted-foreground",
+                      ].join(" ")}
+                    >
+                      {question}
+                    </p>
+                  </div>
+                  {reponses[index] ? (
+                    <div className="flex justify-end">
+                      <p className="max-w-[85%] rounded-2xl bg-[var(--coral)] px-3.5 py-1.5 text-xs text-white">
+                        {reponses[index]}
+                      </p>
+                    </div>
+                  ) : null}
+                </div>
+              ))}
+            </div>
+          ) : null}
+
           <textarea
             rows={2}
-            value={idee}
-            onChange={(event) => setIdee(event.target.value)}
-            placeholder={placeholderAnime}
+            value={phase === "questions" ? reponseCourante : idee}
+            onChange={(event) =>
+              phase === "questions"
+                ? setReponseCourante(event.target.value)
+                : setIdee(event.target.value)
+            }
+            placeholder={phase === "questions" ? "Ta réponse…" : placeholderAnime}
             className="min-h-[85px] w-full resize-none border-0 bg-transparent text-lg text-primary outline-none placeholder:text-sm placeholder:text-muted-foreground"
           />
+
 
           {motsClesOuvert ? (
             <input
@@ -593,11 +688,16 @@ function GeneratorPage() {
             </button>
             <button
               type="submit"
-              disabled={!peutGenerer}
-              aria-label="Générer le prompt"
+              disabled={
+                phase === "questions"
+                  ? reponseCourante.trim().length === 0 || generation.isPending
+                  : !peutGenerer || demandeQuestions.isPending
+              }
+              aria-label={phase === "questions" ? "Envoyer ma réponse" : "Générer le prompt"}
               className="cami-submit-btn ml-auto shrink-0 h-8 w-8 md:ml-0 md:h-10 md:w-10 lg:ml-auto"
             >
-              {generation.isPending ? (
+              {generation.isPending || demandeQuestions.isPending ? (
+
                 <Loader2 className="h-4 w-4 animate-spin md:h-5 md:w-5" />
               ) : (
                 <ArrowUp className="h-4 w-4 md:h-5 md:w-5" />

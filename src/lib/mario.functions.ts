@@ -34,6 +34,23 @@ export const generateMarioPrompt = createServerFn({ method: "POST" })
     return callAnthropicMario(data);
   });
 
+const QuestionsInput = z.object({
+  idee: z.string().min(5),
+  motsCles: z.string().default(""),
+  metier: z.string().default(""),
+  typePrompt: z.string().default(""),
+  ton: z.string().default(""),
+});
+
+export const poserQuestionsMario = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => QuestionsInput.parse(input))
+  .handler(async ({ data }): Promise<{ questions: string[] }> => {
+    const { callAnthropicQuestions } = await import("@/lib/mario.server");
+    return callAnthropicQuestions(data);
+  });
+
+
+
 const SaveInput = z.object({
   titre: z.string().min(1),
   metier: z.string().min(1),
