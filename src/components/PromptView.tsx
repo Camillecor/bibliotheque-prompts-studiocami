@@ -161,15 +161,16 @@ export function PromptView({
       ) : null}
 
       {editable ? (
-        <section className="rounded-2xl bg-[var(--primary-dark)] p-5 md:p-6">
+        <section className="rounded-2xl bg-[var(--primary-dark)] p-4 sm:p-5 md:p-6">
           <textarea
             ref={promptRef}
             value={data.prompt}
             onChange={(event) => onPromptChange?.(event.target.value)}
             aria-label="Prompt généré"
-            className="w-full resize-none overflow-hidden border-0 bg-transparent text-sm leading-relaxed text-white outline-none placeholder:text-white/60"
+            className="w-full resize-none overflow-hidden whitespace-pre-wrap break-words border-0 bg-transparent text-sm leading-relaxed text-white outline-none placeholder:text-white/60"
           />
         </section>
+
       ) : (
         <section className="cami-code-card">
           <div className="glow-orb -right-10 -top-10 h-40 w-40 bg-[var(--info)] opacity-20" />
@@ -196,19 +197,23 @@ export function PromptView({
         </div>
       ) : null}
 
-      <div className="flex flex-wrap items-center justify-center gap-3">
+      <div className="flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:flex-wrap sm:items-center">
         <CopyButton value={data.prompt} label="Copier le prompt" className="cami-copy-btn" />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button type="button" className="cami-btn inline-flex items-center gap-2">
+            <button
+              type="button"
+              className="cami-btn min-h-12 w-full justify-center sm:w-auto"
+            >
               <Download className="h-4 w-4" />
               Exporter
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent
             align="center"
-            className="w-56 rounded-3xl border border-white/60 bg-white/75 p-2 shadow-2xl backdrop-blur-xl"
+            className="w-[min(14rem,calc(100vw-2rem))] rounded-3xl border border-white/60 bg-white/75 p-2 shadow-2xl backdrop-blur-xl"
           >
+
             <button
               type="button"
               onClick={() => telecharger(`${slug}.txt`, data.prompt, "text/plain")}
