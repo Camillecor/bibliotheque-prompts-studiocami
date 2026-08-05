@@ -403,6 +403,20 @@ function GeneratorPage() {
         </button>
       </div>
 
+      <div className="grid grid-cols-2 gap-6 px-6 pt-6 sm:grid-cols-4 md:px-10">
+        {[
+          { label: "Prompts dans ma bibliothèque", valeur: stats.total },
+          { label: "Ajoutés cette semaine", valeur: stats.cetteSemaine },
+          { label: "Métier le plus actif", valeur: stats.metierActif },
+          { label: "Dernier ajout", valeur: stats.dernier },
+        ].map((item) => (
+          <div key={item.label} className="flex flex-col gap-1">
+            <p className="text-xs text-muted-foreground">{item.label}</p>
+            <p className="font-chic text-lg font-semibold text-primary">{item.valeur}</p>
+          </div>
+        ))}
+      </div>
+
       <div
         className={[
           "px-6 py-8",
