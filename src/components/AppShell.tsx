@@ -1,8 +1,8 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Library, Plus, SlidersHorizontal } from "lucide-react";
+import { Library, Menu, Plus, SlidersHorizontal, X } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -12,6 +12,12 @@ import {
 } from "@/components/ui/sheet";
 import { listPrompts } from "@/lib/mario.functions";
 import logoAsset from "@/assets/studio-cami-logo.svg.asset.json";
+
+const NAV_ITEMS = [
+  { to: "/", icon: Plus, label: "Générateur" },
+  { to: "/bibliotheque", icon: Library, label: "Bibliothèque" },
+];
+
 
 // Précharge silencieusement la bibliothèque dès qu'on est sur l'app (peu importe l'écran),
 // pour que le clic sur "Bibliothèque" retrouve les données déjà en cache React Query
@@ -84,6 +90,7 @@ function DecorLignes() {
 
 export function AppShell({ children, panel }: { children: ReactNode; panel?: ReactNode }) {
   const pathname = useRouterState({ select: (router) => router.location.pathname });
+  const [menuOuvert, setMenuOuvert] = useState(false);
 
   return (
     <div className="relative flex h-screen w-full overflow-hidden bg-background">
@@ -109,26 +116,68 @@ export function AppShell({ children, panel }: { children: ReactNode; panel?: Rea
 
       {/* Contenu principal */}
       <main
-        className="flex-1 overflow-y-auto pb-[calc(64px+env(safe-area-inset-bottom))] lg:pb-0"
+        className="flex-1 overflow-y-auto"
         style={{
           backgroundImage:
             "radial-gradient(1100px 700px at 12% 0%, color-mix(in srgb, var(--info) 12%, transparent), transparent 60%), radial-gradient(900px 650px at 90% 15%, color-mix(in srgb, var(--primary) 8%, transparent), transparent 55%), radial-gradient(900px 700px at 50% 105%, color-mix(in srgb, var(--coral) 7%, transparent), transparent 60%)",
         }}
       >
-        {/* Barre mobile : logo + accès au panneau contextuel */}
-        <div className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-border bg-card/90 px-4 py-2 backdrop-blur lg:hidden">
-          <Link to="/" aria-label="Studio Cami — accueil" className="shrink-0">
+        {/* Barre mobile : burger + logo + panneau contextuel */}
+        <div className="sticky top-0 z-20 flex items-center justify-between gap-2 border-b border-border bg-card/90 px-3 py-2 backdrop-blur lg:hidden">
+          <Sheet open={menuOuvert} onOpenChange={setMenuOuvert}>
+            <SheetTrigger asChild>
+              <button
+                type="button"
+                aria-label={menuOuvert ? "Fermer le menu" : "Ouvrir le menu"}
+                aria-expanded={menuOuvert}
+                className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-border bg-card text-primary"
+              >
+                {menuOuvert ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              </button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-[82vw] max-w-xs p-0">
+              <SheetHeader className="border-b border-border px-4 py-3 text-left">
+                <SheetTitle className="text-base">Navigation</SheetTitle>
+              </SheetHeader>
+              <nav className="flex flex-col gap-1 p-3">
+                {NAV_ITEMS.map((item) => {
+                  const actif =
+                    item.to === "/" ? pathname === "/" : pathname.startsWith(item.to);
+                  return (
+                    <Link
+                      key={item.to}
+                      to={item.to}
+                      onClick={() => setMenuOuvert(false)}
+                      className={[
+                        "flex min-h-12 items-center gap-3 rounded-2xl px-4 text-sm font-semibold transition",
+                        actif
+                          ? "bg-primary text-primary-foreground"
+                          : "text-primary hover:bg-secondary",
+                      ].join(" ")}
+                    >
+                      <item.icon className="h-5 w-5 shrink-0" />
+                      <span className="min-w-0 truncate">{item.label}</span>
+                    </Link>
+                  );
+                })}
+              </nav>
+            </SheetContent>
+          </Sheet>
+
+          <Link to="/" aria-label="Studio Cami — accueil" className="flex h-11 shrink-0 items-center">
             <img src={logoAsset.url} alt="Studio Cami" className="w-9" />
           </Link>
+
           {panel ? (
             <Sheet>
               <SheetTrigger asChild>
                 <button
                   type="button"
-                  className="inline-flex h-11 min-w-11 items-center justify-center gap-2 rounded-full border border-border bg-card px-4 text-sm font-semibold text-primary"
+                  aria-label="Options"
+                  className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-full border border-border bg-card px-3 text-sm font-semibold text-primary"
                 >
                   <SlidersHorizontal className="h-4 w-4" />
-                  Options
+                  <span>Options</span>
                 </button>
               </SheetTrigger>
               <SheetContent side="right" className="w-[88vw] max-w-sm overflow-y-auto p-0">
@@ -138,7 +187,9 @@ export function AppShell({ children, panel }: { children: ReactNode; panel?: Rea
                 {panel}
               </SheetContent>
             </Sheet>
-          ) : null}
+          ) : (
+            <span className="h-11 w-11" aria-hidden="true" />
+          )}
         </div>
 
         {children}
@@ -150,32 +201,8 @@ export function AppShell({ children, panel }: { children: ReactNode; panel?: Rea
           {panel}
         </aside>
       ) : null}
-
-      {/* Navigation mobile */}
-      <nav className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-2 border-t border-border bg-card pb-[env(safe-area-inset-bottom)] lg:hidden">
-        {[
-          { to: "/", icon: Plus, label: "Générateur", active: pathname === "/" },
-          {
-            to: "/bibliotheque",
-            icon: Library,
-            label: "Bibliothèque",
-            active: pathname.startsWith("/bibliotheque"),
-          },
-        ].map((item) => (
-          <Link
-            key={item.to}
-            to={item.to}
-            className={[
-              "flex h-16 flex-col items-center justify-center gap-1 text-[11px] font-semibold",
-              item.active ? "text-[var(--coral)]" : "text-muted-foreground",
-            ].join(" ")}
-          >
-            <item.icon className="h-5 w-5" />
-            {item.label}
-          </Link>
-        ))}
-      </nav>
     </div>
   );
 }
+
 

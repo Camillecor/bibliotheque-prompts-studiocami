@@ -698,7 +698,7 @@ function GeneratorPage() {
                   : !peutGenerer || demandeQuestions.isPending
               }
               aria-label={phase === "questions" ? "Envoyer ma réponse" : "Générer le prompt"}
-              className="cami-submit-btn ml-auto shrink-0 h-8 w-8 md:ml-0 md:h-10 md:w-10 lg:ml-auto"
+              className="cami-submit-btn ml-auto shrink-0 h-11 w-11 md:ml-0 md:h-10 md:w-10 lg:ml-auto"
             >
               {generation.isPending || demandeQuestions.isPending ? (
 

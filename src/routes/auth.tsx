@@ -63,7 +63,7 @@ function AuthPage() {
 
   return (
     <AppShell>
-      <div className="mx-auto w-full max-w-md py-6">
+      <div className="mx-auto w-full max-w-md px-4 py-6">
         <div className="cami-card-hero space-y-5">
           <div>
             <h1 className="text-2xl font-extrabold">
