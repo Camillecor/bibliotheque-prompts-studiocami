@@ -591,7 +591,7 @@ function GeneratorPage() {
           <div
             ref={resultRef}
             id="prompt-genere"
-            className="cami-card mx-auto mt-16 max-w-5xl scroll-mt-20 space-y-8"
+            className="mx-auto mt-16 max-w-5xl scroll-mt-20 space-y-8"
           >
             <PromptView
               editable
