@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { AlertTriangle, Download, Sparkles } from "lucide-react";
 import { CopyButton } from "@/components/CopyButton";
 import {
