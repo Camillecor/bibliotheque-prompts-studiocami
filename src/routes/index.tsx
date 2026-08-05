@@ -324,6 +324,7 @@ function GeneratorPage() {
 
   const peutGenerer = idee.trim().length >= 5 && !generation.isPending;
 
+
   // Panneau contextuel : historique récent, lu depuis le cache React Query déjà préchargé.
   const fetchPrompts = useServerFn(listPrompts);
   const { data: prompts } = useQuery({ queryKey: ["prompts"], queryFn: () => fetchPrompts() });
