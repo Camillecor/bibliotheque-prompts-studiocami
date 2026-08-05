@@ -163,7 +163,8 @@ function LibraryPage() {
     recherche.trim().length > 0 ||
     metierFiltre.length > 0 ||
     typeFiltre.length > 0 ||
-    complexiteFiltre.length > 0;
+    complexiteFiltre.length > 0 ||
+    favorisUniquement;
 
   function reinitialiserFiltres() {
     setRecherche("");
