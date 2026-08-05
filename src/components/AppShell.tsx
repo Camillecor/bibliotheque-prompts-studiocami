@@ -177,7 +177,7 @@ export function AppShell({ children, panel }: { children: ReactNode; panel?: Rea
                   className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-full border border-border bg-card px-3 text-sm font-semibold text-primary"
                 >
                   <SlidersHorizontal className="h-4 w-4" />
-                  <span className="hidden xs:inline">Options</span>
+                  <span>Options</span>
                 </button>
               </SheetTrigger>
               <SheetContent side="right" className="w-[88vw] max-w-sm overflow-y-auto p-0">
