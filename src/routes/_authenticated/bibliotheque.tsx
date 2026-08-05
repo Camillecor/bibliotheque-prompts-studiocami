@@ -380,16 +380,16 @@ function LibraryPage() {
                 Aucun prompt pour l'instant. Génère ton premier prompt depuis le générateur.
               </div>
             ) : (
-              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
                 {prompts.map((prompt) => (
                   <button
                     key={prompt.id}
                     type="button"
                     onClick={() => setSelection(prompt)}
-                    className="cami-card text-left transition hover:-translate-y-0.5 hover:shadow-md"
+                    className="cami-card min-w-0 text-left transition hover:-translate-y-0.5 hover:shadow-md"
                   >
                     <div className="flex items-start justify-between gap-3">
-                      <p className="text-xs font-medium uppercase tracking-[0.08em] text-muted-foreground">
+                      <p className="min-w-0 truncate text-xs font-medium uppercase tracking-[0.08em] text-muted-foreground">
                         {formatDateFr(prompt.date_ajout)}
                       </p>
                       <span
@@ -408,36 +408,41 @@ function LibraryPage() {
                             favori.mutate({ id: prompt.id, favori: !prompt.favori });
                           }
                         }}
-                        className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full transition ${
+                        className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition sm:h-5 sm:w-9 ${
                           prompt.favori ? "bg-[var(--coral)]" : "bg-muted"
                         }`}
                       >
                         <span
-                          className={`absolute h-4 w-4 rounded-full bg-white shadow-sm transition-all ${
-                            prompt.favori ? "left-[18px]" : "left-0.5"
+                          className={`absolute h-5 w-5 rounded-full bg-white shadow-sm transition-all sm:h-4 sm:w-4 ${
+                            prompt.favori ? "left-[22px] sm:left-[18px]" : "left-0.5"
                           }`}
                         />
                       </span>
                     </div>
                     <div className="mt-2 flex items-start gap-3">
                       <IconeMetier metier={prompt.metier} />
-                      <h2 className="text-lg font-bold leading-snug">{prompt.titre}</h2>
+                      <h2 className="min-w-0 break-words text-base font-bold leading-snug sm:text-lg">
+                        {prompt.titre}
+                      </h2>
                     </div>
                     <div className="mt-4 flex flex-wrap gap-2">
-                      <span className="cami-pill">{prompt.metier}</span>
+                      <span className="cami-pill max-w-full truncate">{prompt.metier}</span>
                       {prompt.type_prompt ? (
-                        <span className="cami-pill">{labelTypePrompt(prompt.type_prompt)}</span>
+                        <span className="cami-pill max-w-full truncate">
+                          {labelTypePrompt(prompt.type_prompt)}
+                        </span>
                       ) : null}
                       <span className="cami-pill text-muted-foreground">{prompt.complexite}</span>
                     </div>
                     {(prompt.mots_cles ?? []).length > 0 ? (
-                      <p className="mt-3 text-xs text-muted-foreground">
+                      <p className="mt-3 truncate text-xs text-muted-foreground">
                         Mots-clés : {(prompt.mots_cles ?? []).join(", ")}
                       </p>
                     ) : null}
                   </button>
                 ))}
               </div>
+
             )}
           </div>
         </>
