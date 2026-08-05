@@ -67,12 +67,6 @@ export function decouperSections(prompt: string): Section[] {
   return sections;
 }
 
-function recomposer(sections: Section[]) {
-  return sections
-    .map((s) => (s.header ? `${s.header}\n${s.body.replace(/^\n+/, "")}` : s.body))
-    .join("\n\n")
-    .trim();
-}
 
 function titreLisible(header: string) {
   const nu = header.replace(/^\[|\]$/g, "").trim();
