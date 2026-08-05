@@ -472,63 +472,31 @@ function GeneratorPage() {
           </div>
         </form>
 
-        <div className="mx-auto mt-16 max-w-3xl text-center">
-          <p className="text-xl font-bold text-primary">
-            Compatible avec toutes les IA
-          </p>
-          <div className="cami-marquee-mask relative mt-5 overflow-hidden">
-            <div className="cami-marquee-track flex w-max items-center gap-3">
-              {[...IA_LOGO_NAMES, ...IA_LOGO_NAMES].map((nom, index) => (
-                <span
-                  key={`${nom}-${index}`}
-                  className="inline-flex shrink-0 items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm font-semibold text-primary"
+            <div className="mt-6 grid grid-cols-2 gap-2.5">
+              {SUGGESTIONS_METIER.map((s) => (
+                <button
+                  key={s.titre}
+                  type="button"
+                  onClick={() => setIdee(s.prefill)}
+                  className="rounded-2xl border border-border bg-card p-3.5 text-left transition hover:-translate-y-0.5 hover:border-[var(--coral)]"
                 >
-                  <IaLogo nom={nom} />
-                  {nom}
-                </span>
+                  <p className="text-sm font-bold text-primary">{s.titre}</p>
+                  <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                    {s.description}
+                  </p>
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {s.tags.map((tag) => (
+                      <span key={tag} className="cami-pill">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </button>
               ))}
             </div>
           </div>
         </div>
 
-        <section className="mx-auto mt-16 max-w-4xl">
-          <p className="text-center text-xl font-bold text-primary">
-            Un générateur en 3 étapes
-          </p>
-          <div className="mt-8 grid gap-6 md:grid-cols-3">
-            {[
-              {
-                titre: "Décris ton besoin",
-                texte: "En français, comme tu le dirais à un collègue. Pas de jargon requis.",
-                image: foxWave.url,
-              },
-              {
-                titre: "Affine en 3 questions",
-                texte: "Mario cerne ton besoin exact avant de générer, pour un prompt qui tombe juste du premier coup.",
-                image: foxAi.url,
-              },
-              {
-                titre: "Sauvegarde et retrouve-le",
-                texte: "Classé par métier, type et mots-clés, modifiable et exportable, disponible à tout moment dans ta bibliothèque.",
-                image: foxBook.url,
-              },
-            ].map((etape) => (
-              <div key={etape.titre} className="cami-card flex flex-col items-center text-center">
-                <img
-                  src={etape.image}
-                  alt=""
-                  aria-hidden="true"
-                  className="h-40 w-auto object-contain sm:h-48"
-                  loading="lazy"
-                />
-                <h2 className="mt-4 text-base font-bold md:text-sm">{etape.titre}</h2>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground md:text-xs lg:text-sm">{etape.texte}</p>
-              </div>
-            ))}
-
-          </div>
-
-        </section>
 
         {result ? (
           <div
