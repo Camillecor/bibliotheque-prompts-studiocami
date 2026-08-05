@@ -356,9 +356,37 @@ function LibraryPage() {
                     onClick={() => setSelection(prompt)}
                     className="cami-card text-left transition hover:-translate-y-0.5 hover:shadow-md"
                   >
-                    <p className="text-xs font-medium uppercase tracking-[0.08em] text-muted-foreground">
-                      {formatDateFr(prompt.date_ajout)}
-                    </p>
+                    <div className="flex items-start justify-between gap-3">
+                      <p className="text-xs font-medium uppercase tracking-[0.08em] text-muted-foreground">
+                        {formatDateFr(prompt.date_ajout)}
+                      </p>
+                      <span
+                        role="switch"
+                        tabIndex={0}
+                        aria-checked={prompt.favori}
+                        aria-label="Marquer comme favori"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          favori.mutate({ id: prompt.id, favori: !prompt.favori });
+                        }}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter" || event.key === " ") {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            favori.mutate({ id: prompt.id, favori: !prompt.favori });
+                          }
+                        }}
+                        className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full transition ${
+                          prompt.favori ? "bg-[var(--coral)]" : "bg-muted"
+                        }`}
+                      >
+                        <span
+                          className={`absolute h-4 w-4 rounded-full bg-white shadow-sm transition-all ${
+                            prompt.favori ? "left-[18px]" : "left-0.5"
+                          }`}
+                        />
+                      </span>
+                    </div>
                     <div className="mt-2 flex items-start gap-3">
                       <IconeMetier metier={prompt.metier} />
                       <h2 className="text-lg font-bold leading-snug">{prompt.titre}</h2>
