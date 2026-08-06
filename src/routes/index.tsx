@@ -227,12 +227,8 @@ function GeneratorPage() {
   }
 
   // Flux conversationnel : Mario pose 3 questions avant la génération finale.
-  const [phase, setPhase] = useState<"idee" | "questions">("questions");
-  const [questions, setQuestions] = useState<string[]>([
-    "Quel est ton objectif principal ?",
-    "Quel ton souhaites-tu adopter ?",
-    "Y a-t-il des contraintes à respecter ?",
-  ]);
+  const [phase, setPhase] = useState<"idee" | "questions">("idee");
+  const [questions, setQuestions] = useState<string[]>([]);
   const [reponses, setReponses] = useState<string[]>([]);
   const [reponseCourante, setReponseCourante] = useState("");
 
