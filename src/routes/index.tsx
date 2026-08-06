@@ -551,6 +551,17 @@ function GeneratorPage() {
                 ? setReponseCourante(event.target.value)
                 : setIdee(event.target.value)
             }
+            onKeyDown={(event) => {
+              if (
+                phase === "questions" &&
+                event.key === "Enter" &&
+                !event.shiftKey &&
+                !event.nativeEvent.isComposing
+              ) {
+                event.preventDefault();
+                envoyerReponse();
+              }
+            }}
             placeholder={phase === "questions" ? "Ta réponse…" : placeholderAnime}
             className="min-h-[70px] w-full resize-none border-0 bg-transparent text-base text-primary outline-none placeholder:text-sm placeholder:text-muted-foreground md:text-lg"
           />

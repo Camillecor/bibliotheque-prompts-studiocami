@@ -31,6 +31,96 @@ import {
 } from "@/lib/mario";
 import { deletePrompt, listPrompts, toggleFavori } from "@/lib/mario.functions";
 
+// Mots-clés désignant un type de livrable, mis en avant dans le titre.
+const MOTS_LIVRABLE = [
+  "lettre de motivation",
+  "fiche de poste",
+  "communiqué de presse",
+  "communiqué",
+  "article",
+  "post",
+  "email",
+  "e-mail",
+  "mail",
+  "newsletter",
+  "script",
+  "storyboard",
+  "landing page",
+  "page de vente",
+  "annonce",
+  "publicité",
+  "slogan",
+  "pitch",
+  "présentation",
+  "rapport",
+  "compte rendu",
+  "synthèse",
+  "résumé",
+  "cv",
+  "devis",
+  "facture",
+  "contrat",
+  "tutoriel",
+  "guide",
+  "checklist",
+  "questionnaire",
+  "sondage",
+  "interview",
+  "biographie",
+  "description",
+  "légende",
+  "caption",
+  "tweet",
+  "carrousel",
+  "reel",
+  "vidéo",
+  "podcast",
+  "blog",
+  "menu",
+  "recette",
+  "plan",
+  "roadmap",
+  "stratégie",
+  "campagne",
+  "brief",
+  "chronique",
+  "discours",
+  "invitation",
+  "relance",
+  "réponse",
+  "message",
+];
+
+function TitreLivrable({ titre }: { titre: string }) {
+  const bas = titre.toLowerCase();
+  let trouve: { index: number; longueur: number } | null = null;
+
+  for (const mot of MOTS_LIVRABLE) {
+    const index = bas.indexOf(mot);
+    if (index === -1) continue;
+    // On garde l'occurrence la plus à gauche, et le mot le plus long à égalité.
+    if (
+      !trouve ||
+      index < trouve.index ||
+      (index === trouve.index && mot.length > trouve.longueur)
+    ) {
+      trouve = { index, longueur: mot.length };
+    }
+  }
+
+  if (!trouve) return <>{titre}</>;
+
+  return (
+    <>
+      {titre.slice(0, trouve.index)}
+      <span className="text-[var(--coral)]">
+        {titre.slice(trouve.index, trouve.index + trouve.longueur)}
+      </span>
+      {titre.slice(trouve.index + trouve.longueur)}
+    </>
+  );
+}
+
 export const Route = createFileRoute("/_authenticated/bibliotheque")({
   validateSearch: z.object({ id: z.string().uuid().optional() }),
   head: () => ({
@@ -422,7 +512,7 @@ function LibraryPage() {
                     <div className="mt-2 flex items-start gap-3">
                       <IconeMetier metier={prompt.metier} />
                       <h2 className="min-w-0 break-words text-base font-bold leading-snug sm:text-lg">
-                        {prompt.titre}
+                        <TitreLivrable titre={prompt.titre} />
                       </h2>
                     </div>
                     <div className="mt-4 flex flex-wrap gap-2">
