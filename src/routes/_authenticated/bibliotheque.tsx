@@ -512,7 +512,7 @@ function LibraryPage() {
                     <div className="mt-2 flex items-start gap-3">
                       <IconeMetier metier={prompt.metier} />
                       <h2 className="min-w-0 break-words text-base font-bold leading-snug sm:text-lg">
-                        {prompt.titre}
+                        <TitreLivrable titre={prompt.titre} />
                       </h2>
                     </div>
                     <div className="mt-4 flex flex-wrap gap-2">
