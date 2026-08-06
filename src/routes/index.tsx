@@ -270,9 +270,15 @@ function GeneratorPage() {
     onError: (error: Error) => toast.error(error.message),
   });
 
-  function envoyerReponse() {
-    const reponse = reponseCourante.trim();
-    if (!reponse || generation.isPending) return;
+  function soumettreReponse(reponseForcee?: string) {
+    if (generation.isPending) return;
+
+    const reponse =
+      reponseForcee !== undefined ? reponseForcee : reponseCourante.trim();
+
+    // En mode normal (pas forcé), on refuse une réponse vide.
+    if (reponseForcee === undefined && reponse === "") return;
+
     const nouvellesReponses = [...reponses, reponse];
     setReponses(nouvellesReponses);
     setReponseCourante("");
@@ -288,6 +294,18 @@ function GeneratorPage() {
       setAutresInstructions(combine);
       generation.mutate(combine);
     }
+  }
+
+  function envoyerReponse() {
+    soumettreReponse();
+  }
+
+  function repondreJeNeSaisPas() {
+    soumettreReponse("Je ne sais pas");
+  }
+
+  function passerQuestion() {
+    soumettreReponse("");
   }
 
 
@@ -536,6 +554,27 @@ function GeneratorPage() {
             placeholder={phase === "questions" ? "Ta réponse…" : placeholderAnime}
             className="min-h-[70px] w-full resize-none border-0 bg-transparent text-base text-primary outline-none placeholder:text-sm placeholder:text-muted-foreground md:text-lg"
           />
+
+          {phase === "questions" ? (
+            <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                onClick={passerQuestion}
+                disabled={generation.isPending}
+                className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full border border-border bg-card px-4 text-xs font-medium text-muted-foreground transition hover:border-[var(--coral)] hover:text-primary disabled:opacity-50 sm:w-auto"
+              >
+                Question suivante
+              </button>
+              <button
+                type="button"
+                onClick={repondreJeNeSaisPas}
+                disabled={generation.isPending}
+                className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full border border-border bg-card px-4 text-xs font-medium text-muted-foreground transition hover:border-[var(--coral)] hover:text-primary disabled:opacity-50 sm:w-auto"
+              >
+                Je ne sais pas
+              </button>
+            </div>
+          ) : null}
 
 
 
