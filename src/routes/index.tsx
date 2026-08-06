@@ -555,6 +555,27 @@ function GeneratorPage() {
             className="min-h-[70px] w-full resize-none border-0 bg-transparent text-base text-primary outline-none placeholder:text-sm placeholder:text-muted-foreground md:text-lg"
           />
 
+          {phase === "questions" ? (
+            <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                onClick={passerQuestion}
+                disabled={generation.isPending}
+                className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full border border-border bg-card px-4 text-xs font-medium text-muted-foreground transition hover:border-[var(--coral)] hover:text-primary disabled:opacity-50 sm:w-auto"
+              >
+                Question suivante
+              </button>
+              <button
+                type="button"
+                onClick={repondreJeNeSaisPas}
+                disabled={generation.isPending}
+                className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full border border-border bg-card px-4 text-xs font-medium text-muted-foreground transition hover:border-[var(--coral)] hover:text-primary disabled:opacity-50 sm:w-auto"
+              >
+                Je ne sais pas
+              </button>
+            </div>
+          ) : null}
+
 
 
           {motsClesOuvert ? (
