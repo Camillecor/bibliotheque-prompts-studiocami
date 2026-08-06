@@ -348,6 +348,13 @@ function GeneratorPage() {
       setTypeEdit(typePrompt === "" ? "standard" : typePrompt);
       setMotsClesEdit(data.mots_cles.join(", "));
       setDateEdit(new Date().toISOString().slice(0, 10));
+      setUsages((precedent) => {
+        const suivant = precedent + 1;
+        if (typeof window !== "undefined") {
+          window.localStorage.setItem(CLE_USAGES, String(suivant));
+        }
+        return suivant;
+      });
     },
 
     onError: (error: Error) => toast.error(error.message),
