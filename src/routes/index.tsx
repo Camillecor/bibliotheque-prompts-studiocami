@@ -94,7 +94,7 @@ const SUGGESTIONS_IDEE = [
   "Un prompt pour analyser un contrat et repérer les clauses à risque…",
 ] as const;
 
-const SUGGESTIONS_METIER = [
+const POOL_SUGGESTIONS = [
   {
     titre: "Rédiger un post Instagram",
     description: "qui capte l'attention et donne envie de réagir…",
@@ -116,7 +116,88 @@ const SUGGESTIONS_METIER = [
     prefill:
       "Un prompt pour écrire un communiqué de presse clair, factuel et prêt à diffuser.",
   },
+  {
+    titre: "Préparer un entretien annuel",
+    description: "trame d'échange, objectifs et points de progression…",
+    tags: ["RH", "Entretien"],
+    prefill:
+      "Un prompt pour préparer un entretien annuel avec une trame d'échange, des objectifs et des points de progression.",
+  },
+  {
+    titre: "Analyser un contrat",
+    description: "repérer les clauses à risque et les points à négocier…",
+    tags: ["Juridique", "Contrat"],
+    prefill:
+      "Un prompt pour analyser un contrat, repérer les clauses à risque et les points à négocier.",
+  },
+  {
+    titre: "Relancer un client par email",
+    description: "facture impayée, ton ferme mais courtois…",
+    tags: ["Finance", "Relance"],
+    prefill:
+      "Un prompt pour relancer un client par email au sujet d'une facture impayée, sur un ton ferme mais courtois.",
+  },
+  {
+    titre: "Rédiger une fiche produit",
+    description: "bénéfices clairs, caractéristiques et argumentaire…",
+    tags: ["Produit", "Fiche"],
+    prefill:
+      "Un prompt pour rédiger une fiche produit avec des bénéfices clairs, les caractéristiques et un argumentaire de vente.",
+  },
+  {
+    titre: "Répondre à un client mécontent",
+    description: "désamorcer, reformuler et proposer une solution…",
+    tags: ["Support", "Email"],
+    prefill:
+      "Un prompt pour répondre à un client mécontent : désamorcer, reformuler sa demande et proposer une solution.",
+  },
+  {
+    titre: "Structurer un plan d'action",
+    description: "étapes, responsables et jalons sur 90 jours…",
+    tags: ["Opérations", "Plan"],
+    prefill:
+      "Un prompt pour structurer un plan d'action avec des étapes, des responsables et des jalons sur 90 jours.",
+  },
 ] as const;
+
+type Suggestion = (typeof POOL_SUGGESTIONS)[number];
+
+function hashSeed(str: string): number {
+  let h = 2166136261;
+  for (let i = 0; i < str.length; i += 1) {
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
+}
+
+function mulberry32(seed: number) {
+  let a = seed >>> 0;
+  return () => {
+    a = (a + 0x6d2b79f5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function tirerSuggestions(
+  pool: readonly Suggestion[],
+  seed: string,
+  n: number,
+): Suggestion[] {
+  const random = mulberry32(hashSeed(seed));
+  const copie = [...pool];
+  for (let i = copie.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(random() * (i + 1));
+    [copie[i], copie[j]] = [copie[j] as Suggestion, copie[i] as Suggestion];
+  }
+  return copie.slice(0, n);
+}
+
+const CLE_USAGES = "mario_suggestions_usages";
+
 
 function useTypewriterPlaceholder(phrases: readonly string[], active: boolean) {
   const [text, setText] = useState("");
@@ -186,6 +267,21 @@ function GeneratorPage() {
   const save = useServerFn(savePrompt);
 
   const [idee, setIdee] = useState("");
+  const [usages, setUsages] = useState(() => {
+    if (typeof window === "undefined") return 0;
+    const brut = window.localStorage.getItem(CLE_USAGES);
+    const valeur = Number(brut);
+    return Number.isFinite(valeur) ? valeur : 0;
+  });
+  const suggestionsAffichees = useMemo(
+    () =>
+      tirerSuggestions(
+        POOL_SUGGESTIONS,
+        `${new Date().toISOString().slice(0, 10)}-${usages}`,
+        3,
+      ),
+    [usages],
+  );
   const [motsCles, setMotsCles] = useState("");
   const [motsClesOuvert, setMotsClesOuvert] = useState(false);
   const [typePrompt, setTypePrompt] = useState<TypePromptValue | "">("");
@@ -252,6 +348,13 @@ function GeneratorPage() {
       setTypeEdit(typePrompt === "" ? "standard" : typePrompt);
       setMotsClesEdit(data.mots_cles.join(", "));
       setDateEdit(new Date().toISOString().slice(0, 10));
+      setUsages((precedent) => {
+        const suivant = precedent + 1;
+        if (typeof window !== "undefined") {
+          window.localStorage.setItem(CLE_USAGES, String(suivant));
+        }
+        return suivant;
+      });
     },
 
     onError: (error: Error) => toast.error(error.message),
@@ -761,7 +864,7 @@ function GeneratorPage() {
         </form>
 
             <div className="mt-6 grid grid-cols-1 gap-2.5 sm:grid-cols-3">
-              {SUGGESTIONS_METIER.map((s) => (
+              {suggestionsAffichees.map((s) => (
                 <button
                   key={s.titre}
                   type="button"
