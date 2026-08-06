@@ -267,13 +267,13 @@ function LibraryPage() {
   const panneauFiltres = (
     <div className="space-y-6 p-4">
       <div className="relative">
-        <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--primary)]" />
         <input
           value={recherche}
           onChange={(event) => setRecherche(event.target.value)}
           placeholder="Catégorie"
           aria-label="Filtrer par catégorie"
-          className="cami-input pl-11"
+          className="cami-input pl-11 !text-[var(--primary)]"
         />
       </div>
 
@@ -281,7 +281,7 @@ function LibraryPage() {
         value={tri}
         onChange={(event) => setTri(event.target.value as Tri)}
         aria-label="Trier"
-        className="cami-input"
+        className="cami-input !text-[var(--primary)]"
       >
         <option value="recent">Plus récents d'abord</option>
         <option value="ancien">Plus anciens d'abord</option>
