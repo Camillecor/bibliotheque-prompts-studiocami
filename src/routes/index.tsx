@@ -267,6 +267,21 @@ function GeneratorPage() {
   const save = useServerFn(savePrompt);
 
   const [idee, setIdee] = useState("");
+  const [usages, setUsages] = useState(() => {
+    if (typeof window === "undefined") return 0;
+    const brut = window.localStorage.getItem(CLE_USAGES);
+    const valeur = Number(brut);
+    return Number.isFinite(valeur) ? valeur : 0;
+  });
+  const suggestionsAffichees = useMemo(
+    () =>
+      tirerSuggestions(
+        POOL_SUGGESTIONS,
+        `${new Date().toISOString().slice(0, 10)}-${usages}`,
+        3,
+      ),
+    [usages],
+  );
   const [motsCles, setMotsCles] = useState("");
   const [motsClesOuvert, setMotsClesOuvert] = useState(false);
   const [typePrompt, setTypePrompt] = useState<TypePromptValue | "">("");
