@@ -270,9 +270,15 @@ function GeneratorPage() {
     onError: (error: Error) => toast.error(error.message),
   });
 
-  function envoyerReponse() {
-    const reponse = reponseCourante.trim();
-    if (!reponse || generation.isPending) return;
+  function soumettreReponse(reponseForcee?: string) {
+    if (generation.isPending) return;
+
+    const reponse =
+      reponseForcee !== undefined ? reponseForcee : reponseCourante.trim();
+
+    // En mode normal (pas forcé), on refuse une réponse vide.
+    if (reponseForcee === undefined && reponse === "") return;
+
     const nouvellesReponses = [...reponses, reponse];
     setReponses(nouvellesReponses);
     setReponseCourante("");
@@ -288,6 +294,18 @@ function GeneratorPage() {
       setAutresInstructions(combine);
       generation.mutate(combine);
     }
+  }
+
+  function envoyerReponse() {
+    soumettreReponse();
+  }
+
+  function repondreJeNeSaisPas() {
+    soumettreReponse("Je ne sais pas");
+  }
+
+  function passerQuestion() {
+    soumettreReponse("");
   }
 
 
