@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import {
   ArrowUp,
@@ -39,6 +39,7 @@ import {
   listPrompts,
   poserQuestionsMario,
   savePrompt,
+  suggererIdeesMario,
 } from "@/lib/mario.functions";
 
 
@@ -273,7 +274,7 @@ function GeneratorPage() {
     const valeur = Number(brut);
     return Number.isFinite(valeur) ? valeur : 0;
   });
-  const suggestionsAffichees = useMemo(
+  const suggestionsSecours = useMemo(
     () =>
       tirerSuggestions(
         POOL_SUGGESTIONS,
@@ -282,6 +283,8 @@ function GeneratorPage() {
       ),
     [usages],
   );
+  const [suggestions, setSuggestions] = useState<Suggestion[]>(suggestionsSecours);
+  const [suggestionsChargement, setSuggestionsChargement] = useState(false);
   const [motsCles, setMotsCles] = useState("");
   const [motsClesOuvert, setMotsClesOuvert] = useState(false);
   const [typePrompt, setTypePrompt] = useState<TypePromptValue | "">("");
@@ -451,6 +454,46 @@ function GeneratorPage() {
   const { data: prompts } = useQuery({ queryKey: ["prompts"], queryFn: () => fetchPrompts() });
   const [recherche, setRecherche] = useState("");
 
+  // Suggestions personnalisées : dès qu'il existe un historique, on demande à Mario
+  // d'analyser les métiers/types/mots-clés déjà utilisés pour proposer 3 idées sur
+  // mesure. Sans historique (bibliothèque vide), on retombe sur le pool fixe tiré
+  // localement (suggestionsSecours), sans appel IA.
+  const suggererIdees = useServerFn(suggererIdeesMario);
+  const suggestionsInitialiseesRef = useRef(false);
+
+  const rafraichirSuggestions = useCallback(async () => {
+    const historique = prompts ?? [];
+    if (historique.length === 0) {
+      setSuggestions(suggestionsSecours);
+      return;
+    }
+    setSuggestionsChargement(true);
+    try {
+      const resume = historique.slice(0, 20).map((p) => ({
+        titre: p.titre,
+        metier: p.metier,
+        type_prompt: p.type_prompt ?? "",
+        mots_cles: p.mots_cles ?? [],
+      }));
+      const reponse = await suggererIdees({ data: { historique: resume } });
+      setSuggestions(reponse.suggestions.length > 0 ? reponse.suggestions : suggestionsSecours);
+    } catch (error) {
+      console.error("Suggestions IA indisponibles, repli sur le pool fixe.", error);
+      setSuggestions(suggestionsSecours);
+    } finally {
+      setSuggestionsChargement(false);
+    }
+  }, [prompts, suggestionsSecours, suggererIdees]);
+
+  // Premier chargement : dès que l'historique arrive du cache/serveur, on personnalise
+  // une première fois les suggestions affichées (une seule fois, pas à chaque refetch).
+  useEffect(() => {
+    if (suggestionsInitialiseesRef.current || prompts === undefined) return;
+    suggestionsInitialiseesRef.current = true;
+    if (prompts.length > 0) rafraichirSuggestions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prompts]);
+
   const groupesHistorique = useMemo(() => {
     const aujourdhui = new Date().toISOString().slice(0, 10);
     const limite = Date.now() - 7 * 24 * 60 * 60 * 1000;
@@ -516,6 +559,7 @@ function GeneratorPage() {
     setQuestions([]);
     setReponses([]);
     setReponseCourante("");
+    rafraichirSuggestions();
   }
 
 
@@ -863,12 +907,19 @@ function GeneratorPage() {
           </div>
         </form>
 
-            <div className="mt-6 grid grid-cols-1 gap-2.5 sm:grid-cols-3">
-              {suggestionsAffichees.map((s) => (
+            <div
+              className={[
+                "mt-6 grid grid-cols-1 gap-2.5 transition-opacity sm:grid-cols-3",
+                suggestionsChargement ? "opacity-50" : "",
+              ].join(" ")}
+              aria-busy={suggestionsChargement}
+            >
+              {suggestions.map((s) => (
                 <button
                   key={s.titre}
                   type="button"
                   onClick={() => setIdee(s.prefill)}
+                  disabled={suggestionsChargement}
                   className="rounded-2xl border border-border bg-card p-3.5 text-left transition hover:-translate-y-0.5 hover:border-[var(--coral)]"
                 >
                   <p className="text-sm font-bold text-primary">{s.titre}</p>
@@ -915,13 +966,13 @@ function GeneratorPage() {
             />
 
 
-            <div className="space-y-4 border-t border-border pt-6">
+            <div className="cami-card space-y-4">
               <h3 className="flex items-center gap-3 text-lg font-bold">
                 <span className="cami-step-badge bg-[var(--coral)]">3</span>
                 Je range mon nouveau prompt dans ma bibliothèque
               </h3>
               <div className="grid gap-4 sm:grid-cols-2">
-                <div>
+                <div className="sm:col-span-2">
                   <label htmlFor="titre-edit" className="mb-2 block text-sm font-semibold">
                     Titre
                   </label>
@@ -978,7 +1029,7 @@ function GeneratorPage() {
                     className="cami-input"
                   />
                 </div>
-                <div className="sm:col-span-2">
+                <div>
                   <label htmlFor="date-edit" className="mb-2 block text-sm font-semibold">
                     Date
                   </label>

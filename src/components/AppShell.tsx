@@ -2,7 +2,7 @@ import { useState, type ReactNode } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Library, Menu, Plus, SlidersHorizontal, X } from "lucide-react";
+import { BookOpen, Library, Menu, Plus, SlidersHorizontal, X } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -16,6 +16,7 @@ import logoAsset from "@/assets/studio-cami-logo.svg.asset.json";
 const NAV_ITEMS = [
   { to: "/", icon: Plus, label: "Générateur" },
   { to: "/bibliotheque", icon: Library, label: "Bibliothèque" },
+  { to: "/glossaire", icon: BookOpen, label: "Glossaire" },
 ];
 
 
@@ -93,7 +94,7 @@ export function AppShell({ children, panel }: { children: ReactNode; panel?: Rea
   const [menuOuvert, setMenuOuvert] = useState(false);
 
   return (
-    <div className="relative flex h-screen w-full overflow-hidden bg-background">
+    <div className="relative flex h-dvh w-full overflow-hidden bg-background">
       <PrechargementBibliotheque />
       <DecorLignes />
 
@@ -110,6 +111,12 @@ export function AppShell({ children, panel }: { children: ReactNode; panel?: Rea
             icon={Library}
             label="Bibliothèque"
             active={pathname.startsWith("/bibliotheque")}
+          />
+          <RailButton
+            to="/glossaire"
+            icon={BookOpen}
+            label="Glossaire"
+            active={pathname.startsWith("/glossaire")}
           />
         </nav>
       </aside>

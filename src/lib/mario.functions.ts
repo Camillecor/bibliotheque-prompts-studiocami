@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import type { MarioResult, PromptRow } from "@/lib/mario";
+import type { SuggestionIdee } from "@/lib/mario.server";
 
 // TEMPORAIRE : connexion désactivée pour les tests (demande du 2026-08-03).
 // Toutes les fonctions ci-dessous utilisent supabaseAdmin (service role, contourne le RLS)
@@ -47,6 +48,26 @@ export const poserQuestionsMario = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<{ questions: string[] }> => {
     const { callAnthropicQuestions } = await import("@/lib/mario.server");
     return callAnthropicQuestions(data);
+  });
+
+const SuggestionsInput = z.object({
+  historique: z
+    .array(
+      z.object({
+        titre: z.string(),
+        metier: z.string(),
+        type_prompt: z.string().default(""),
+        mots_cles: z.array(z.string()).default([]),
+      }),
+    )
+    .max(20),
+});
+
+export const suggererIdeesMario = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => SuggestionsInput.parse(input))
+  .handler(async ({ data }): Promise<{ suggestions: SuggestionIdee[] }> => {
+    const { callAnthropicSuggestions } = await import("@/lib/mario.server");
+    return callAnthropicSuggestions(data.historique);
   });
 
 

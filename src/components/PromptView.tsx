@@ -240,18 +240,27 @@ export function PromptView({
             <span className="cami-step-badge bg-[var(--success)]">2</span>
             Je suis ces étapes pour lancer mon prompt
           </h3>
-          <ol className="space-y-2.5">
-            {data.etapes_lancement.map((etape, index) => (
-              <li key={etape} className="flex items-start gap-3">
-                <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--success)_14%,transparent)] text-xs font-bold text-[var(--success)]">
-                  {index + 1}
-                </span>
-                <p className="text-sm leading-relaxed text-foreground">
-                  {etape.replace(/^Étape\s*\d+\s*:\s*/i, "")}
-                </p>
-              </li>
-            ))}
-          </ol>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {data.etapes_lancement.map((etape, index) => {
+              const role = ["--info", "--coral", "--primary", "--warning"][index % 4];
+              return (
+                <div key={etape} className="cami-card">
+                  <span
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-full text-xs font-bold"
+                    style={{
+                      background: `color-mix(in srgb, var(${role}) 14%, white)`,
+                      color: `var(${role})`,
+                    }}
+                  >
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <p className="mt-3 text-sm leading-relaxed text-foreground">
+                    {etape.replace(/^Étape\s*\d+\s*:\s*/i, "")}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
         </section>
       ) : null}
     </div>

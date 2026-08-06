@@ -380,3 +380,107 @@ export async function callAnthropicQuestions(input: {
     );
   }
 }
+
+export type SuggestionIdee = {
+  titre: string;
+  description: string;
+  tags: string[];
+  prefill: string;
+};
+
+export const MARIO_SUGGESTIONS_SYSTEM_PROMPT = `Tu es Mario le renard, l'agent IA de Studio Cami. On te donne un résumé des prompts déjà sauvegardés par l'utilisateur (titres, métiers, types, mots-clés). À partir de ces habitudes, propose exactement 3 NOUVELLES idées de prompts pertinentes pour cette personne, différentes de ce qu'elle a déjà, dans le même esprit (mêmes métiers dominants ou métiers adjacents cohérents avec son historique).
+
+Chaque suggestion doit avoir :
+- "titre" : un intitulé d'action court (3 à 6 mots, ex. "Rédiger un post Instagram")
+- "description" : la suite de la phrase du titre, courte, terminée par "…" (ex. "qui capte l'attention et donne envie de réagir…")
+- "tags" : 1 à 2 mots-clés courts (ex. ["Instagram", "Post"])
+- "prefill" : une phrase complète commençant par "Un prompt pour " qui reprend le titre et la description
+
+Réponds UNIQUEMENT avec ce JSON (aucun texte avant/après, aucun markdown) :
+{ "suggestions": [ { "titre": "...", "description": "...", "tags": ["..."], "prefill": "..." }, { "titre": "...", "description": "...", "tags": ["..."], "prefill": "..." }, { "titre": "...", "description": "...", "tags": ["..."], "prefill": "..." } ] }`;
+
+// Tâche légère (classification/reformulation à partir d'un historique, pas de génération créative
+// longue) : on reste sur Haiku, conformément à la règle RSE du projet.
+export async function callAnthropicSuggestions(
+  historique: { titre: string; metier: string; type_prompt: string; mots_cles: string[] }[],
+): Promise<{ suggestions: SuggestionIdee[] }> {
+  const apiKey = process.env["ANTHROPIC_API_KEY"];
+  if (!apiKey) {
+    throw new Error(
+      "ANTHROPIC_API_KEY n'est pas configurée. Ajoute la clé dans Project Settings → Secrets.",
+    );
+  }
+
+  const resume = historique
+    .map((p, i) => {
+      const details = [
+        `métier : ${p.metier}`,
+        p.type_prompt ? `type : ${p.type_prompt}` : "",
+        p.mots_cles.length ? `mots-clés : ${p.mots_cles.join(", ")}` : "",
+      ]
+        .filter(Boolean)
+        .join(", ");
+      return `${i + 1}. "${p.titre}" (${details})`;
+    })
+    .join("\n");
+
+  const response = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      "x-api-key": apiKey,
+      "anthropic-version": "2023-06-01",
+    },
+    body: JSON.stringify({
+      model: "claude-haiku-4-5",
+      max_tokens: 768,
+      system: MARIO_SUGGESTIONS_SYSTEM_PROMPT,
+      messages: [
+        {
+          role: "user",
+          content: [{ type: "text", text: `Prompts déjà sauvegardés par l'utilisateur :\n${resume}` }],
+        },
+      ],
+    }),
+  });
+
+  if (!response.ok) {
+    const detail = await response.text();
+    console.error("[mario] Anthropic suggestions error", response.status, detail);
+    if (response.status === 429) {
+      throw new Error("Trop de requêtes vers l'IA. Réessaie dans quelques instants.");
+    }
+    throw new Error(`L'appel à l'IA a échoué (${response.status}).`);
+  }
+
+  const payload = (await response.json()) as { content?: AnthropicContentBlock[] };
+  const raw = (payload.content ?? [])
+    .filter((block) => block.type === "text")
+    .map((block) => block.text ?? "")
+    .join("")
+    .trim();
+
+  const debut = raw.indexOf("{");
+  const fin = raw.lastIndexOf("}");
+  const cleaned = debut !== -1 && fin > debut ? raw.slice(debut, fin + 1) : raw;
+
+  try {
+    const parsed = JSON.parse(echapperSautsDeLigneDansLesChaines(cleaned));
+    const brutes = Array.isArray(parsed.suggestions) ? parsed.suggestions.slice(0, 3) : [];
+    const suggestions: SuggestionIdee[] = brutes
+      .map((s: Record<string, unknown>) => ({
+        titre: String(s.titre ?? ""),
+        description: String(s.description ?? ""),
+        tags: Array.isArray(s.tags) ? s.tags.map(String).slice(0, 3) : [],
+        prefill: String(s.prefill ?? ""),
+      }))
+      .filter((s: SuggestionIdee) => s.titre.length > 0 && s.prefill.length > 0);
+    return { suggestions };
+  } catch (error) {
+    console.error("[mario] JSON parse failed (suggestions)", error, raw.slice(0, 500));
+    throw Object.assign(
+      new Error("Mario n'a pas réussi à générer des suggestions. Réessaie."),
+      { statusCode: 502 },
+    );
+  }
+}
