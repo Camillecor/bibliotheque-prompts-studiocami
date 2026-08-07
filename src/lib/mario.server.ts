@@ -469,10 +469,10 @@ export async function callAnthropicSuggestions(
     const brutes = Array.isArray(parsed.suggestions) ? parsed.suggestions.slice(0, 3) : [];
     const suggestions: SuggestionIdee[] = brutes
       .map((s: Record<string, unknown>) => ({
-        titre: String(s.titre ?? ""),
-        description: String(s.description ?? ""),
-        tags: Array.isArray(s.tags) ? s.tags.map(String).slice(0, 3) : [],
-        prefill: String(s.prefill ?? ""),
+        titre: String(s["titre"] ?? ""),
+        description: String(s["description"] ?? ""),
+        tags: Array.isArray(s["tags"]) ? (s["tags"] as unknown[]).map(String).slice(0, 3) : [],
+        prefill: String(s["prefill"] ?? ""),
       }))
       .filter((s: SuggestionIdee) => s.titre.length > 0 && s.prefill.length > 0);
     return { suggestions };
