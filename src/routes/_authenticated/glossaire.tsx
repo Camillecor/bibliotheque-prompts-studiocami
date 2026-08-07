@@ -3,24 +3,62 @@ import { useMemo, useState } from "react";
 import { Search } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 
-type Terme = { nom: string; definition: string };
+type Terme = { nom: string; definition: string; niveau?: "debutant" | "avance" };
 type SectionLettre = { lettre: string; termes: Terme[] };
 type FAQ = { question: string; reponse: string };
 
-// Contenu repris à l'identique de prompt-engine.fr/glossaire (53 définitions, classées de A à Z).
+const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+
+// Contenu du glossaire : prompt engineering, IA, communication, marketing, no-code et JavaScript, classé de A à Z.
 const SECTIONS: SectionLettre[] = [
   {
     lettre: "A",
     termes: [
+      {
+        nom: "A/B testing",
+        definition:
+          "Méthode comparant deux variantes d'un même contenu pour identifier la plus performante.",
+        niveau: "avance",
+      },
       {
         nom: "Agent IA",
         definition:
           "Système autonome utilisant un LLM pour planifier et exécuter des actions en séquence.",
       },
       {
+        nom: "API",
+        definition:
+          "Interface permettant à deux logiciels d'échanger des données selon des règles définies.",
+        niveau: "debutant",
+      },
+      {
+        nom: "API REST",
+        definition:
+          "Style d'architecture d'API s'appuyant sur les méthodes HTTP standards pour manipuler des ressources.",
+        niveau: "avance",
+      },
+      {
+        nom: "Array (tableau)",
+        definition:
+          "Structure de données ordonnée regroupant plusieurs valeurs sous un seul nom.",
+        niveau: "debutant",
+      },
+      {
+        nom: "Async/await",
+        definition:
+          "Syntaxe JavaScript simplifiant l'écriture de code asynchrone en attendant qu'une promesse se résolve.",
+        niveau: "avance",
+      },
+      {
         nom: "Attention",
         definition:
           "Composant des Transformers permettant de pondérer l'importance de chaque token.",
+      },
+      {
+        nom: "Automatisation (workflow)",
+        definition:
+          "Enchaînement automatique de tâches entre plusieurs outils, sans intervention manuelle.",
+        niveau: "debutant",
       },
     ],
   },
@@ -37,11 +75,35 @@ const SECTIONS: SectionLettre[] = [
         definition:
           "Tendance du LLM à favoriser certains points de vue selon les données d'entraînement.",
       },
+      {
+        nom: "Brand content",
+        definition:
+          "Contenu de marque conçu pour informer ou divertir plutôt que vendre directement.",
+        niveau: "avance",
+      },
+      {
+        nom: "Brief créatif",
+        definition:
+          "Document synthétique définissant l'objectif, la cible et le message clé avant une création.",
+        niveau: "debutant",
+      },
+      {
+        nom: "Builder visuel",
+        definition:
+          "Outil permettant de construire une interface par glisser-déposer plutôt qu'en codant.",
+        niveau: "debutant",
+      },
     ],
   },
   {
     lettre: "C",
     termes: [
+      {
+        nom: "Call-to-action (CTA)",
+        definition:
+          "Élément incitant l'utilisateur à effectuer une action précise, comme cliquer ou s'inscrire.",
+        niveau: "debutant",
+      },
       {
         nom: "Chain-of-Thought (CoT)",
         definition:
@@ -50,6 +112,18 @@ const SECTIONS: SectionLettre[] = [
       {
         nom: "Claude",
         definition: "LLM développé par Anthropic en versions Haiku, Sonnet et Opus.",
+      },
+      {
+        nom: "Closure",
+        definition:
+          "Fonction JavaScript qui conserve l'accès aux variables de son contexte de création même après son exécution.",
+        niveau: "avance",
+      },
+      {
+        nom: "Communication de crise",
+        definition:
+          "Ensemble des actions de communication déployées pour protéger une réputation face à un incident.",
+        niveau: "avance",
       },
       {
         nom: "Constitutional AI",
@@ -62,6 +136,29 @@ const SECTIONS: SectionLettre[] = [
       {
         nom: "Contrainte de format",
         definition: "Instructions spécifiant la forme de la réponse attendue.",
+      },
+    ],
+  },
+  {
+    lettre: "D",
+    termes: [
+      {
+        nom: "Dataset",
+        definition:
+          "Ensemble de données structuré utilisé pour entraîner ou évaluer un modèle d'IA.",
+        niveau: "debutant",
+      },
+      {
+        nom: "Deep Learning",
+        definition:
+          "Branche du machine learning basée sur des réseaux de neurones à plusieurs couches.",
+        niveau: "debutant",
+      },
+      {
+        nom: "DOM (Document Object Model)",
+        definition:
+          "Représentation en arbre d'une page web que le code JavaScript peut lire et modifier.",
+        niveau: "debutant",
       },
     ],
   },
@@ -89,8 +186,20 @@ const SECTIONS: SectionLettre[] = [
           "Réentraînement sur un dataset spécialisé pour améliorer les performances.",
       },
       {
+        nom: "Fonction",
+        definition:
+          "Bloc de code réutilisable, exécuté à la demande, qui peut recevoir des paramètres et retourner un résultat.",
+        niveau: "debutant",
+      },
+      {
         nom: "Function calling (Tool use)",
         definition: "Capacité à appeler des fonctions externes structurées en JSON.",
+      },
+      {
+        nom: "Funnel de conversion",
+        definition:
+          "Parcours structuré en étapes menant un prospect de la découverte à l'achat.",
+        niveau: "avance",
       },
     ],
   },
@@ -108,6 +217,12 @@ const SECTIONS: SectionLettre[] = [
       {
         nom: "GPT",
         definition: "Famille de modèles développée par OpenAI.",
+      },
+      {
+        nom: "Growth hacking",
+        definition:
+          "Approche marketing combinant expérimentation rapide et leviers techniques pour accélérer la croissance.",
+        niveau: "avance",
       },
       {
         nom: "Guardrails",
@@ -128,6 +243,18 @@ const SECTIONS: SectionLettre[] = [
   {
     lettre: "I",
     termes: [
+      {
+        nom: "IA générative",
+        definition:
+          "Intelligence artificielle capable de créer du texte, des images ou du code plutôt que de simplement classifier.",
+        niveau: "debutant",
+      },
+      {
+        nom: "Inbound marketing",
+        definition:
+          "Stratégie attirant les clients via du contenu utile plutôt que de la publicité intrusive.",
+        niveau: "avance",
+      },
       {
         nom: "Inference",
         definition:
@@ -159,17 +286,58 @@ const SECTIONS: SectionLettre[] = [
     ],
   },
   {
+    lettre: "K",
+    termes: [
+      {
+        nom: "KPI (indicateur clé de performance)",
+        definition:
+          "Métrique chiffrée permettant de mesurer l'atteinte d'un objectif business.",
+        niveau: "debutant",
+      },
+    ],
+  },
+  {
     lettre: "L",
     termes: [
       {
+        nom: "Landing page",
+        definition:
+          "Page web dédiée à la conversion d'un visiteur suite à un clic publicitaire ou un lien.",
+        niveau: "debutant",
+      },
+      {
+        nom: "Lead",
+        definition:
+          "Contact ayant manifesté un intérêt commercial, potentiellement convertible en client.",
+        niveau: "debutant",
+      },
+      {
+        nom: "Ligne éditoriale",
+        definition:
+          "Ensemble de règles définissant le ton, les sujets et le style d'une marque sur ses contenus.",
+        niveau: "debutant",
+      },
+      {
         nom: "LLM (Large Language Model)",
         definition: "Modèle entraîné sur de vastes corpus textuels.",
+      },
+      {
+        nom: "Low-code",
+        definition:
+          "Approche de développement combinant interfaces visuelles et code léger pour plus de flexibilité.",
+        niveau: "debutant",
       },
     ],
   },
   {
     lettre: "M",
     termes: [
+      {
+        nom: "Machine Learning",
+        definition:
+          "Sous-domaine de l'IA où un système apprend des motifs à partir de données plutôt que de règles codées.",
+        niveau: "debutant",
+      },
       {
         nom: "Méta-prompt",
         definition: "Prompt générant d'autres prompts optimisés.",
@@ -191,6 +359,12 @@ const SECTIONS: SectionLettre[] = [
         nom: "Negative prompting",
         definition: "Instructions indiquant ce que le modèle ne doit PAS faire.",
       },
+      {
+        nom: "No-code",
+        definition:
+          "Approche permettant de créer une application sans écrire de code, via des interfaces visuelles.",
+        niveau: "debutant",
+      },
     ],
   },
   {
@@ -205,14 +379,32 @@ const SECTIONS: SectionLettre[] = [
         definition:
           "Extraction et structuration des données depuis la réponse brute.",
       },
+      {
+        nom: "Overfitting (surapprentissage)",
+        definition:
+          "Défaut d'un modèle trop ajusté à ses données d'entraînement, peu performant sur de nouvelles données.",
+        niveau: "avance",
+      },
     ],
   },
   {
     lettre: "P",
     termes: [
       {
+        nom: "Persona (marketing)",
+        definition:
+          "Profil semi-fictif représentant un segment type de clientèle, utilisé pour orienter les décisions marketing.",
+        niveau: "debutant",
+      },
+      {
         nom: "Persona prompting",
         definition: "Assignation d'un rôle ou d'une identité précise au modèle.",
+      },
+      {
+        nom: "Promise",
+        definition:
+          "Objet JavaScript représentant le résultat futur, encore inconnu, d'une opération asynchrone.",
+        niveau: "avance",
       },
       {
         nom: "Prompt",
@@ -256,6 +448,12 @@ const SECTIONS: SectionLettre[] = [
           "Framework alternant raisonnement explicite et action concrète.",
       },
       {
+        nom: "Réseau de neurones",
+        definition:
+          "Modèle mathématique inspiré du cerveau, composé de couches de neurones artificiels interconnectés.",
+        niveau: "avance",
+      },
+      {
         nom: "RLHF",
         definition:
           "Technique d'entraînement par renforcement à partir de retours humains.",
@@ -270,8 +468,26 @@ const SECTIONS: SectionLettre[] = [
     lettre: "S",
     termes: [
       {
+        nom: "SEA (référencement payant)",
+        definition:
+          "Achat d'espaces publicitaires sur les moteurs de recherche, facturé au clic ou à l'impression.",
+        niveau: "avance",
+      },
+      {
         nom: "Semantic search",
         definition: "Recherche basée sur le sens plutôt que la correspondance exacte.",
+      },
+      {
+        nom: "SEO (référencement naturel)",
+        definition:
+          "Ensemble de techniques visant à améliorer la visibilité d'un site dans les moteurs de recherche.",
+        niveau: "debutant",
+      },
+      {
+        nom: "Storytelling",
+        definition:
+          "Technique consistant à raconter une histoire pour rendre un message mémorable et engageant.",
+        niveau: "debutant",
       },
       {
         nom: "Structured output",
@@ -308,6 +524,12 @@ const SECTIONS: SectionLettre[] = [
         definition:
           "Extension du CoT explorant plusieurs branches en parallèle.",
       },
+      {
+        nom: "TypeScript",
+        definition:
+          "Sur-ensemble de JavaScript ajoutant un typage statique optionnel pour fiabiliser le code.",
+        niveau: "avance",
+      },
     ],
   },
   {
@@ -324,6 +546,12 @@ const SECTIONS: SectionLettre[] = [
     lettre: "V",
     termes: [
       {
+        nom: "Variable (JavaScript)",
+        definition:
+          "Emplacement nommé en mémoire permettant de stocker et réutiliser une valeur dans un programme.",
+        niveau: "debutant",
+      },
+      {
         nom: "Variable de prompt",
         definition: "Placeholder remplacé dynamiquement dans un template.",
       },
@@ -331,6 +559,23 @@ const SECTIONS: SectionLettre[] = [
         nom: "Vectorisation",
         definition:
           "Transformation d'un texte en embedding pour recherche sémantique.",
+      },
+      {
+        nom: "Vibecoding",
+        definition:
+          "Pratique consistant à construire un logiciel en dialoguant avec un assistant IA plutôt qu'en écrivant le code à la main.",
+        niveau: "debutant",
+      },
+    ],
+  },
+  {
+    lettre: "W",
+    termes: [
+      {
+        nom: "Webhook",
+        definition:
+          "Notification automatique envoyée par une application vers une URL dès qu'un événement se produit.",
+        niveau: "avance",
       },
     ],
   },
@@ -382,7 +627,7 @@ export const Route = createFileRoute("/_authenticated/glossaire")({
       {
         name: "description",
         content:
-          "53 définitions claires sur le prompt engineering, les LLMs et l'IA générative, classées de A à Z.",
+          "Définitions claires sur le prompt engineering, l'IA, la communication, le marketing, le no-code et JavaScript, classées de A à Z.",
       },
     ],
   }),
@@ -412,6 +657,11 @@ function GlossairePage() {
   const resultatsCount = sectionsFiltrees.reduce(
     (somme, section) => somme + section.termes.length,
     0,
+  );
+
+  const lettresDisponibles = useMemo(
+    () => new Set(sectionsFiltrees.map((section) => section.lettre)),
+    [sectionsFiltrees],
   );
 
   return (
@@ -446,6 +696,29 @@ function GlossairePage() {
           </p>
         </div>
 
+        <nav aria-label="Aller à une lettre" className="mb-8 flex flex-wrap gap-1.5">
+          {ALPHABET.map((lettre) => {
+            const disponible = lettresDisponibles.has(lettre);
+            return disponible ? (
+              <a
+                key={lettre}
+                href={`#lettre-${lettre}`}
+                className="flex h-8 w-8 items-center justify-center rounded-full border border-border bg-card text-xs font-bold text-primary transition hover:-translate-y-0.5 hover:border-[var(--coral)] hover:text-[var(--coral)]"
+              >
+                {lettre}
+              </a>
+            ) : (
+              <span
+                key={lettre}
+                aria-hidden="true"
+                className="flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold text-muted-foreground/40"
+              >
+                {lettre}
+              </span>
+            );
+          })}
+        </nav>
+
         {sectionsFiltrees.length === 0 ? (
           <div className="cami-block-resume text-center text-sm text-muted-foreground">
             Aucun terme ne correspond à « {recherche} ».
@@ -455,7 +728,7 @@ function GlossairePage() {
             {sectionsFiltrees.map((section, sectionIndex) => {
               const role = ROLES[sectionIndex % ROLES.length];
               return (
-                <section key={section.lettre}>
+                <section key={section.lettre} id={`lettre-${section.lettre}`} className="scroll-mt-24">
                   <div className="mb-3 flex items-center gap-3">
                     <span
                       className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold"
@@ -473,7 +746,24 @@ function GlossairePage() {
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
                     {section.termes.map((t) => (
                       <div key={t.nom} className="cami-card">
-                        <p className="text-sm font-bold text-primary">{t.nom}</p>
+                        <div className="flex items-start justify-between gap-2">
+                          <p className="text-sm font-bold text-primary">{t.nom}</p>
+                          {t.niveau ? (
+                            <span
+                              className="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.05em]"
+                              style={{
+                                background:
+                                  t.niveau === "debutant"
+                                    ? "color-mix(in srgb, var(--success) 14%, white)"
+                                    : "color-mix(in srgb, var(--coral) 14%, white)",
+                                color:
+                                  t.niveau === "debutant" ? "var(--success)" : "var(--coral)",
+                              }}
+                            >
+                              {t.niveau === "debutant" ? "Débutant" : "Avancé"}
+                            </span>
+                          ) : null}
+                        </div>
                         <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
                           {t.definition}
                         </p>
