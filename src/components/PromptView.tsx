@@ -30,7 +30,7 @@ const COULEURS: { motif: RegExp; couleur: string }[] = [
   { motif: /^\[\s*M\b/i, couleur: "var(--info)" },
   { motif: /^\[\s*A\s*[-–]/i, couleur: "var(--coral)" },
   { motif: /^\[\s*R\b/i, couleur: "var(--success, #16a34a)" },
-  { motif: /^\[\s*I\b/i, couleur: "#a855f7" },
+  { motif: /^\[\s*I\b/i, couleur: "var(--violet)" },
   { motif: /^\[\s*O\b/i, couleur: "var(--warning, #f59e0b)" },
   { motif: /^\[\s*AUTRES/i, couleur: "#64748b" },
 ];
@@ -240,9 +240,9 @@ export function PromptView({
             <span className="cami-step-badge bg-[var(--success)]">2</span>
             Je suis ces étapes pour lancer mon prompt
           </h3>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {data.etapes_lancement.map((etape, index) => {
-              const role = ["--info", "--coral", "--primary", "--warning"][index % 4];
+              const role = ["--info", "--coral", "--violet", "--warning"][index % 4];
               return (
                 <div key={etape} className="cami-card">
                   <span

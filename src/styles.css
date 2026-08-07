@@ -43,6 +43,7 @@
   --color-info: var(--info);
   --color-success: var(--success);
   --color-warning: var(--warning);
+  --color-violet: var(--violet);
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-border: var(--sidebar-border);
@@ -71,6 +72,7 @@
   --info: #3abef9;
   --success: #0f9d6d;
   --warning: #f0a839;
+  --violet: #a855f7;
   --destructive: #e0483c;
   --destructive-foreground: #ffffff;
   --border: #e7e7ee;

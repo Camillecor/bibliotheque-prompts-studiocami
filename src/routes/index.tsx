@@ -34,6 +34,7 @@ import {
   type TonValue,
   type TypePromptValue,
 } from "@/lib/mario";
+import { type SuggestionIdee } from "@/lib/mario.server";
 import {
   generateMarioPrompt,
   listPrompts,
@@ -187,14 +188,19 @@ function tirerSuggestions(
   pool: readonly Suggestion[],
   seed: string,
   n: number,
-): Suggestion[] {
+): SuggestionIdee[] {
   const random = mulberry32(hashSeed(seed));
   const copie = [...pool];
   for (let i = copie.length - 1; i > 0; i -= 1) {
     const j = Math.floor(random() * (i + 1));
     [copie[i], copie[j]] = [copie[j] as Suggestion, copie[i] as Suggestion];
   }
-  return copie.slice(0, n);
+  return copie.slice(0, n).map((s) => ({
+    titre: s.titre,
+    description: s.description,
+    tags: [...s.tags],
+    prefill: s.prefill,
+  }));
 }
 
 const CLE_USAGES = "mario_suggestions_usages";
@@ -274,7 +280,7 @@ function GeneratorPage() {
     const valeur = Number(brut);
     return Number.isFinite(valeur) ? valeur : 0;
   });
-  const suggestionsSecours = useMemo(
+  const suggestionsSecours = useMemo<SuggestionIdee[]>(
     () =>
       tirerSuggestions(
         POOL_SUGGESTIONS,
@@ -283,7 +289,7 @@ function GeneratorPage() {
       ),
     [usages],
   );
-  const [suggestions, setSuggestions] = useState<Suggestion[]>(suggestionsSecours);
+  const [suggestions, setSuggestions] = useState<SuggestionIdee[]>(suggestionsSecours);
   const [suggestionsChargement, setSuggestionsChargement] = useState(false);
   const [motsCles, setMotsCles] = useState("");
   const [motsClesOuvert, setMotsClesOuvert] = useState(false);
@@ -927,7 +933,7 @@ function GeneratorPage() {
                     {s.description}
                   </p>
                   <div className="mt-2 flex flex-wrap gap-1.5">
-                    {s.tags.map((tag) => (
+                    {s.tags.map((tag: string) => (
                       <span key={tag} className="cami-pill">
                         {tag}
                       </span>
@@ -966,96 +972,56 @@ function GeneratorPage() {
             />
 
 
-            <div className="cami-card space-y-4">
+            <div className="space-y-4">
               <h3 className="flex items-center gap-3 text-lg font-bold">
                 <span className="cami-step-badge bg-[var(--coral)]">3</span>
                 Je range mon nouveau prompt dans ma bibliothèque
               </h3>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="sm:col-span-2">
-                  <label htmlFor="titre-edit" className="mb-2 block text-sm font-semibold">
+              <div className="grid gap-3.5 sm:grid-cols-2">
+                <div className="cami-card p-4 sm:col-span-2">
+                  <label htmlFor="titre-edit" className="mb-2 block text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
                     Titre
                   </label>
-                  <input
-                    id="titre-edit"
-                    value={titreEdit}
-                    onChange={(event) => setTitreEdit(event.target.value)}
-                    className="cami-input"
-                  />
+                  <input id="titre-edit" value={titreEdit} onChange={(event) => setTitreEdit(event.target.value)} className="cami-input" />
                 </div>
-                <div>
-                  <label htmlFor="metier-edit" className="mb-2 block text-sm font-semibold">
+                <div className="cami-card p-4">
+                  <label htmlFor="metier-edit" className="mb-2 block text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
                     Métier
                   </label>
-                  <select
-                    id="metier-edit"
-                    value={metierEdit}
-                    onChange={(event) => setMetierEdit(event.target.value)}
-                    className="cami-input"
-                  >
-                    {METIERS.map((item) => (
-                      <option key={item} value={item}>
-                        {item}
-                      </option>
-                    ))}
+                  <select id="metier-edit" value={metierEdit} onChange={(event) => setMetierEdit(event.target.value)} className="cami-input">
+                    {METIERS.map((item) => (<option key={item} value={item}>{item}</option>))}
                   </select>
                 </div>
-                <div>
-                  <label htmlFor="type-edit" className="mb-2 block text-sm font-semibold">
+                <div className="cami-card p-4">
+                  <label htmlFor="type-edit" className="mb-2 block text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
                     Type
                   </label>
-                  <select
-                    id="type-edit"
-                    value={typeEdit}
-                    onChange={(event) => setTypeEdit(event.target.value as TypePromptValue)}
-                    className="cami-input"
-                  >
-                    {TYPES_PROMPT.map((item) => (
-                      <option key={item.value} value={item.value}>
-                        {item.label}
-                      </option>
-                    ))}
+                  <select id="type-edit" value={typeEdit} onChange={(event) => setTypeEdit(event.target.value as TypePromptValue)} className="cami-input">
+                    {TYPES_PROMPT.map((item) => (<option key={item.value} value={item.value}>{item.label}</option>))}
                   </select>
                 </div>
-                <div>
-                  <label htmlFor="mots-edit" className="mb-2 block text-sm font-semibold">
+                <div className="cami-card p-4">
+                  <label htmlFor="mots-edit" className="mb-2 block text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
                     Mots-clés
                   </label>
-                  <input
-                    id="mots-edit"
-
-                    value={motsClesEdit}
-                    onChange={(event) => setMotsClesEdit(event.target.value)}
-                    className="cami-input"
-                  />
+                  <input id="mots-edit" value={motsClesEdit} onChange={(event) => setMotsClesEdit(event.target.value)} className="cami-input" />
                 </div>
-                <div>
-                  <label htmlFor="date-edit" className="mb-2 block text-sm font-semibold">
+                <div className="cami-card p-4">
+                  <label htmlFor="date-edit" className="mb-2 block text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
                     Date
                   </label>
-                  <input
-                    id="date-edit"
-                    type="date"
-                    value={dateEdit}
-                    onChange={(event) => setDateEdit(event.target.value)}
-                    className="cami-input"
-                  />
+                  <input id="date-edit" type="date" value={dateEdit} onChange={(event) => setDateEdit(event.target.value)} className="cami-input" />
                 </div>
+                <button
+                  type="button"
+                  className="cami-save-btn w-full sm:col-span-2"
+                  disabled={sauvegarde.isPending}
+                  onClick={() => sauvegarde.mutate()}
+                >
+                  {sauvegarde.isPending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Save className="h-5 w-5" />}
+                  Sauvegarder dans ma bibliothèque
+                </button>
               </div>
-
-              <button
-                type="button"
-                className="cami-save-btn"
-                disabled={sauvegarde.isPending}
-                onClick={() => sauvegarde.mutate()}
-              >
-                {sauvegarde.isPending ? (
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                ) : (
-                  <Save className="h-5 w-5" />
-                )}
-                Sauvegarder dans ma bibliothèque
-              </button>
             </div>
           </div>
         ) : null}
