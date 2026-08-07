@@ -829,78 +829,56 @@ function GlossairePage() {
           </p>
         </div>
 
-        <form onSubmit={ajouterTerme} className="mb-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <div className="cami-card p-4 sm:col-span-2">
-            <label
-              htmlFor="nouveau-mot"
-              className="mb-2 block text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground"
-            >
-              Mot
-            </label>
+        <form onSubmit={ajouterTerme} className="cami-card mb-8 space-y-2 p-3 sm:p-4">
+          <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
+            Ajouter un mot
+          </p>
+          <div className="flex flex-wrap gap-2">
             <input
-              id="nouveau-mot"
               value={nouveauMot}
               onChange={(event) => changerMot(event.target.value)}
-              placeholder="Ex. Growth loop"
-              className="cami-input"
+              placeholder="Mot"
+              aria-label="Mot à ajouter"
+              className="cami-input h-9 min-w-[120px] flex-[2] px-3 py-0 text-sm"
             />
-          </div>
-          <div className="cami-card p-4">
-            <label
-              htmlFor="nouvelle-lettre"
-              className="mb-2 block text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground"
-            >
-              Lettre
-            </label>
             <input
-              id="nouvelle-lettre"
               value={nouvelleLettre}
               onChange={(event) => changerLettre(event.target.value)}
-              placeholder="G"
+              placeholder="Lettre"
+              aria-label="Lettre"
               maxLength={1}
-              className="cami-input text-center uppercase"
+              className="cami-input h-9 w-14 px-2 py-0 text-center text-sm uppercase"
             />
-          </div>
-          <div className="cami-card p-4">
-            <label
-              htmlFor="nouveau-niveau"
-              className="mb-2 block text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground"
-            >
-              Niveau
-            </label>
             <select
-              id="nouveau-niveau"
               value={nouveauNiveau}
               onChange={(event) =>
                 setNouveauNiveau(event.target.value as "" | "debutant" | "avance")
               }
-              className="cami-input"
+              aria-label="Niveau"
+              className="cami-input h-9 flex-1 px-2 py-0 text-sm"
             >
-              <option value="">Aucun</option>
+              <option value="">Niveau</option>
               <option value="debutant">Débutant</option>
               <option value="avance">Avancé</option>
             </select>
           </div>
-          <div className="cami-card p-4 sm:col-span-2">
-            <label
-              htmlFor="nouveau-texte"
-              className="mb-2 block text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground"
-            >
-              Définition
-            </label>
-            <textarea
-              id="nouveau-texte"
+          <div className="flex gap-2">
+            <input
               value={nouveauTexte}
               onChange={(event) => setNouveauTexte(event.target.value)}
-              placeholder="Explique ce mot en une phrase claire."
-              rows={2}
-              className="cami-input resize-none"
+              placeholder="Définition en une phrase"
+              aria-label="Définition"
+              className="cami-input h-9 flex-1 px-3 py-0 text-sm"
             />
+            <button
+              type="submit"
+              aria-label="Ajouter au glossaire"
+              title="Ajouter au glossaire"
+              className="cami-submit-btn h-9 w-9 shrink-0"
+            >
+              <Plus className="h-4 w-4" />
+            </button>
           </div>
-          <button type="submit" className="cami-btn w-full sm:col-span-2">
-            <Plus className="h-4 w-4" />
-            Ajouter au glossaire
-          </button>
         </form>
 
         <nav aria-label="Aller à une lettre" className="mb-8 flex flex-wrap gap-1.5">
