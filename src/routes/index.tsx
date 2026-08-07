@@ -1014,11 +1014,11 @@ function GeneratorPage() {
                 </div>
                 <button
                   type="button"
-                  className="cami-save-btn w-full sm:col-span-2"
+                  className="cami-save-btn w-full sm:col-span-2 px-5 py-3 text-sm mb-5"
                   disabled={sauvegarde.isPending}
                   onClick={() => sauvegarde.mutate()}
                 >
-                  {sauvegarde.isPending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Save className="h-5 w-5" />}
+                  {sauvegarde.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                   Sauvegarder dans ma bibliothèque
                 </button>
               </div>
