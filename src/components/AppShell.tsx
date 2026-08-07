@@ -34,17 +34,19 @@ function RailButton({
   icon: Icon,
   label,
   active,
+  labelClassName = "",
 }: {
   to: string;
   icon: typeof Library;
   label: string;
   active: boolean;
+  labelClassName?: string;
 }) {
   return (
     <Link to={to} aria-label={label} title={label} className="flex flex-col items-center gap-1.5">
       <span
         className={[
-          "flex h-11 w-11 items-center justify-center rounded-full transition duration-200 hover:-translate-y-0.5",
+          "flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition duration-200 hover:-translate-y-0.5",
           active
             ? "bg-primary text-primary-foreground shadow-[0_8px_20px_-8px_rgba(17,26,61,0.45)]"
             : "border border-border bg-card text-primary shadow-[0_1px_2px_rgba(17,26,61,0.06),0_8px_18px_-14px_rgba(17,26,61,0.35)]",
@@ -52,7 +54,14 @@ function RailButton({
       >
         <Icon className="h-5 w-5" />
       </span>
-      <span className="text-center text-[10px] font-medium leading-tight text-muted-foreground">{label}</span>
+      <span
+        className={[
+          "text-center text-[10px] font-medium leading-tight text-muted-foreground",
+          labelClassName,
+        ].join(" ")}
+      >
+        {label}
+      </span>
     </Link>
   );
 }
@@ -105,7 +114,13 @@ export function AppShell({ children, panel }: { children: ReactNode; panel?: Rea
         </Link>
 
         <nav className="flex flex-col items-center gap-3">
-          <RailButton to="/" icon={Plus} label="Générateur de prompt" active={pathname === "/"} />
+          <RailButton
+            to="/"
+            icon={Plus}
+            label="Générateur de prompt"
+            active={pathname === "/"}
+            labelClassName="w-16"
+          />
           <RailButton
             to="/bibliotheque"
             icon={Library}

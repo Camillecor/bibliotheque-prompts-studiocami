@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
-import { Search } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { ArrowUp, Search } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 
 type Terme = { nom: string; definition: string; niveau?: "debutant" | "avance" };
@@ -678,8 +678,27 @@ function GlossairePage() {
     [sectionsFiltrees],
   );
 
+  const hautDePageRef = useRef<HTMLDivElement>(null);
+  const [afficherRemonter, setAfficherRemonter] = useState(false);
+
+  useEffect(() => {
+    const noeud = hautDePageRef.current;
+    if (!noeud) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setAfficherRemonter(!(entry?.isIntersecting ?? true)),
+      { threshold: 0 },
+    );
+    observer.observe(noeud);
+    return () => observer.disconnect();
+  }, []);
+
+  function remonterEnHaut() {
+    hautDePageRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
   return (
     <AppShell>
+      <div ref={hautDePageRef} aria-hidden="true" className="h-px" />
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-3 md:px-6">
         <h2 className="text-base font-semibold sm:text-lg">Glossaire</h2>
         <div className="relative w-full sm:w-auto">
@@ -802,6 +821,18 @@ function GlossairePage() {
           </div>
         </section>
       </div>
+
+      {afficherRemonter ? (
+        <button
+          type="button"
+          onClick={remonterEnHaut}
+          aria-label="Remonter en haut de la page"
+          title="Remonter en haut"
+          className="fixed bottom-6 right-6 z-30 flex h-11 w-11 items-center justify-center rounded-full bg-[var(--primary)] text-white shadow-[0_8px_20px_-8px_rgba(17,26,61,0.45)] transition duration-200 hover:-translate-y-0.5 hover:bg-[var(--primary-dark)] active:scale-95"
+        >
+          <ArrowUp className="h-5 w-5" />
+        </button>
+      ) : null}
     </AppShell>
   );
 }
