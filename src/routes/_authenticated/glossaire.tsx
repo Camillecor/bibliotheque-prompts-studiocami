@@ -137,6 +137,18 @@ const SECTIONS: SectionLettre[] = [
         nom: "Contrainte de format",
         definition: "Instructions spécifiant la forme de la réponse attendue.",
       },
+      {
+        nom: "CPC (coût par clic)",
+        definition:
+          "Prix payé par un annonceur chaque fois qu'un internaute clique sur une publicité.",
+        niveau: "debutant",
+      },
+      {
+        nom: "CTR (taux de clic)",
+        definition:
+          "Proportion de personnes ayant cliqué sur un lien ou une publicité parmi celles qui l'ont vue.",
+        niveau: "debutant",
+      },
     ],
   },
   {
@@ -208,7 +220,9 @@ const SECTIONS: SectionLettre[] = [
     termes: [
       {
         nom: "GEO (Generative Engine Optimization)",
-        definition: "Optimisation du contenu pour les IA conversationnelles.",
+        definition:
+          "Optimisation du contenu pour qu'il soit repris par les IA conversationnelles — une forme de référencement complémentaire au SEO et au SEA.",
+        niveau: "avance",
       },
       {
         nom: "Gemini",

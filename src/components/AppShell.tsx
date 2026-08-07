@@ -14,7 +14,7 @@ import { listPrompts } from "@/lib/mario.functions";
 import logoAsset from "@/assets/studio-cami-logo.svg.asset.json";
 
 const NAV_ITEMS = [
-  { to: "/", icon: Plus, label: "Générateur" },
+  { to: "/", icon: Plus, label: "Générateur de prompt" },
   { to: "/bibliotheque", icon: Library, label: "Bibliothèque" },
   { to: "/glossaire", icon: BookOpen, label: "Glossaire" },
 ];
@@ -52,7 +52,7 @@ function RailButton({
       >
         <Icon className="h-5 w-5" />
       </span>
-      <span className="text-[10px] font-medium text-muted-foreground">{label}</span>
+      <span className="text-center text-[10px] font-medium leading-tight text-muted-foreground">{label}</span>
     </Link>
   );
 }
@@ -105,7 +105,7 @@ export function AppShell({ children, panel }: { children: ReactNode; panel?: Rea
         </Link>
 
         <nav className="flex flex-col items-center gap-3">
-          <RailButton to="/" icon={Plus} label="Générateur" active={pathname === "/"} />
+          <RailButton to="/" icon={Plus} label="Générateur de prompt" active={pathname === "/"} />
           <RailButton
             to="/bibliotheque"
             icon={Library}
