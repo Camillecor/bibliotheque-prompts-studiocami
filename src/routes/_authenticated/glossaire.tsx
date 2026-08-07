@@ -1,13 +1,36 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowUp, Search } from "lucide-react";
+import { ArrowUp, Plus, Search } from "lucide-react";
+import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 
 type Terme = { nom: string; definition: string; niveau?: "debutant" | "avance" };
+type TermeAjoute = Terme & { id: string; lettre: string };
 type SectionLettre = { lettre: string; termes: Terme[] };
 type FAQ = { question: string; reponse: string };
 
 const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+const CLE_TERMES_AJOUTES = "glossaire_termes_ajoutes";
+
+function normaliserLettre(valeur: string): string {
+  return valeur
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim()
+    .charAt(0)
+    .toUpperCase();
+}
+
+function chargerTermesAjoutes(): TermeAjoute[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const brut = window.localStorage.getItem(CLE_TERMES_AJOUTES);
+    const parsed = brut ? JSON.parse(brut) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
 
 // Contenu du glossaire : prompt engineering, IA, communication, marketing, no-code et JavaScript, classé de A à Z.
 const SECTIONS: SectionLettre[] = [
@@ -651,22 +674,99 @@ export const Route = createFileRoute("/_authenticated/glossaire")({
 function GlossairePage() {
   const [recherche, setRecherche] = useState("");
 
+  const [termesAjoutes, setTermesAjoutes] = useState<TermeAjoute[]>(() => chargerTermesAjoutes());
+
+  const sectionsCombinees = useMemo(() => {
+    if (termesAjoutes.length === 0) return SECTIONS;
+    const parLettre = new Map<string, Terme[]>();
+    for (const section of SECTIONS) parLettre.set(section.lettre, [...section.termes]);
+    for (const terme of termesAjoutes) {
+      const liste = parLettre.get(terme.lettre) ?? [];
+      liste.push(terme);
+      parLettre.set(terme.lettre, liste);
+    }
+    return ALPHABET.map((lettre) => ({
+      lettre,
+      termes: (parLettre.get(lettre) ?? [])
+        .slice()
+        .sort((a, b) => a.nom.localeCompare(b.nom, "fr")),
+    })).filter((section) => section.termes.length > 0);
+  }, [termesAjoutes]);
+
   const totalTermes = useMemo(
-    () => SECTIONS.reduce((somme, section) => somme + section.termes.length, 0),
-    [],
+    () => sectionsCombinees.reduce((somme, section) => somme + section.termes.length, 0),
+    [sectionsCombinees],
   );
 
   const sectionsFiltrees = useMemo(() => {
     const terme = recherche.trim().toLowerCase();
-    if (!terme) return SECTIONS;
-    return SECTIONS.map((section) => ({
-      ...section,
-      termes: section.termes.filter(
-        (t) =>
-          t.nom.toLowerCase().includes(terme) || t.definition.toLowerCase().includes(terme),
-      ),
-    })).filter((section) => section.termes.length > 0);
-  }, [recherche]);
+    if (!terme) return sectionsCombinees;
+    return sectionsCombinees
+      .map((section) => ({
+        ...section,
+        termes: section.termes.filter(
+          (t) =>
+            t.nom.toLowerCase().includes(terme) || t.definition.toLowerCase().includes(terme),
+        ),
+      }))
+      .filter((section) => section.termes.length > 0);
+  }, [recherche, sectionsCombinees]);
+
+  const [nouveauMot, setNouveauMot] = useState("");
+  const [nouvelleLettre, setNouvelleLettre] = useState("");
+  const [nouveauTexte, setNouveauTexte] = useState("");
+  const [nouveauNiveau, setNouveauNiveau] = useState<"" | "debutant" | "avance">("");
+  const lettreModifieeManuellement = useRef(false);
+
+  function changerMot(valeur: string) {
+    setNouveauMot(valeur);
+    if (!lettreModifieeManuellement.current) {
+      const lettre = normaliserLettre(valeur);
+      setNouvelleLettre(/^[A-Z]$/.test(lettre) ? lettre : "");
+    }
+  }
+
+  function changerLettre(valeur: string) {
+    lettreModifieeManuellement.current = true;
+    setNouvelleLettre(normaliserLettre(valeur));
+  }
+
+  function ajouterTerme(event: React.FormEvent) {
+    event.preventDefault();
+    const mot = nouveauMot.trim();
+    const texte = nouveauTexte.trim();
+    const lettre = nouvelleLettre.trim().toUpperCase();
+
+    if (!mot || !texte || !/^[A-Z]$/.test(lettre)) {
+      toast.error("Renseigne au moins le mot, une lettre (A-Z) et la définition.");
+      return;
+    }
+
+    const nouveau: TermeAjoute = {
+      id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      nom: mot,
+      definition: texte,
+      lettre,
+      ...(nouveauNiveau ? { niveau: nouveauNiveau } : {}),
+    };
+
+    setTermesAjoutes((precedent) => {
+      const suivant = [...precedent, nouveau];
+      try {
+        window.localStorage.setItem(CLE_TERMES_AJOUTES, JSON.stringify(suivant));
+      } catch {
+        // stockage indisponible (navigation privée…) — le mot reste ajouté pour la session en cours
+      }
+      return suivant;
+    });
+
+    setNouveauMot("");
+    setNouvelleLettre("");
+    setNouveauTexte("");
+    setNouveauNiveau("");
+    lettreModifieeManuellement.current = false;
+    toast.success(`« ${mot} » ajouté au glossaire.`);
+  }
 
   const resultatsCount = sectionsFiltrees.reduce(
     (somme, section) => somme + section.termes.length,
@@ -728,6 +828,80 @@ function GlossairePage() {
             ) : null}
           </p>
         </div>
+
+        <form onSubmit={ajouterTerme} className="mb-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="cami-card p-4 sm:col-span-2">
+            <label
+              htmlFor="nouveau-mot"
+              className="mb-2 block text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground"
+            >
+              Mot
+            </label>
+            <input
+              id="nouveau-mot"
+              value={nouveauMot}
+              onChange={(event) => changerMot(event.target.value)}
+              placeholder="Ex. Growth loop"
+              className="cami-input"
+            />
+          </div>
+          <div className="cami-card p-4">
+            <label
+              htmlFor="nouvelle-lettre"
+              className="mb-2 block text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground"
+            >
+              Lettre
+            </label>
+            <input
+              id="nouvelle-lettre"
+              value={nouvelleLettre}
+              onChange={(event) => changerLettre(event.target.value)}
+              placeholder="G"
+              maxLength={1}
+              className="cami-input text-center uppercase"
+            />
+          </div>
+          <div className="cami-card p-4">
+            <label
+              htmlFor="nouveau-niveau"
+              className="mb-2 block text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground"
+            >
+              Niveau
+            </label>
+            <select
+              id="nouveau-niveau"
+              value={nouveauNiveau}
+              onChange={(event) =>
+                setNouveauNiveau(event.target.value as "" | "debutant" | "avance")
+              }
+              className="cami-input"
+            >
+              <option value="">Aucun</option>
+              <option value="debutant">Débutant</option>
+              <option value="avance">Avancé</option>
+            </select>
+          </div>
+          <div className="cami-card p-4 sm:col-span-2">
+            <label
+              htmlFor="nouveau-texte"
+              className="mb-2 block text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground"
+            >
+              Définition
+            </label>
+            <textarea
+              id="nouveau-texte"
+              value={nouveauTexte}
+              onChange={(event) => setNouveauTexte(event.target.value)}
+              placeholder="Explique ce mot en une phrase claire."
+              rows={2}
+              className="cami-input resize-none"
+            />
+          </div>
+          <button type="submit" className="cami-btn w-full sm:col-span-2">
+            <Plus className="h-4 w-4" />
+            Ajouter au glossaire
+          </button>
+        </form>
 
         <nav aria-label="Aller à une lettre" className="mb-8 flex flex-wrap gap-1.5">
           {ALPHABET.map((lettre) => {
