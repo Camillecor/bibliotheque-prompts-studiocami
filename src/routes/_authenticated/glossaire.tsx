@@ -49,6 +49,36 @@ const SECTIONS: SectionLettre[] = [
           "Système autonome utilisant un LLM pour planifier et exécuter des actions en séquence.",
       },
       {
+        nom: "Agentique",
+        definition:
+          "Qualifie tout ce qui touche aux agents IA : un système est agentique s'il prend des décisions intermédiaires et exécute des actions de façon autonome.",
+        niveau: "avance",
+      },
+      {
+        nom: "AGI",
+        definition:
+          "Stade hypothétique d'une IA capable de raisonner à un niveau humain sur n'importe quel sujet, d'apprendre seule et de transférer ses connaissances entre domaines.",
+        niveau: "avance",
+      },
+      {
+        nom: "AI Act",
+        definition:
+          "Règlement européen sur l'IA, premier cadre juridique de ce type au monde, entré en vigueur en août 2024, qui classe les usages par niveau de risque.",
+        niveau: "avance",
+      },
+      {
+        nom: "Algorithme",
+        definition:
+          "Suite d'instructions transformant des données d'entrée en résultat ; en IA, désigne la recette d'apprentissage ou de décision du modèle.",
+        niveau: "debutant",
+      },
+      {
+        nom: "Alignement",
+        definition:
+          "Champ de recherche visant à faire en sorte qu'une IA fasse ce que les humains veulent vraiment, au-delà de la lettre de leurs instructions.",
+        niveau: "avance",
+      },
+      {
         nom: "API",
         definition:
           "Interface permettant à deux logiciels d'échanger des données selon des règles définies.",
@@ -64,6 +94,12 @@ const SECTIONS: SectionLettre[] = [
         nom: "Array (tableau)",
         definition:
           "Structure de données ordonnée regroupant plusieurs valeurs sous un seul nom.",
+        niveau: "debutant",
+      },
+      {
+        nom: "Assistant IA (copilote)",
+        definition:
+          "IA intégrée dans un outil de travail qui épaule l'utilisateur en contexte : code, résumés, brouillons.",
         niveau: "debutant",
       },
       {
@@ -133,8 +169,20 @@ const SECTIONS: SectionLettre[] = [
           "Technique demandant au modèle d'expliciter ses étapes de raisonnement.",
       },
       {
+        nom: "Chatbot",
+        definition:
+          "Interface de conversation avec une IA, du plus simple au plus sophistiqué — la porte d'entrée grand public de l'IA depuis 2023.",
+        niveau: "debutant",
+      },
+      {
         nom: "Claude",
         definition: "LLM développé par Anthropic en versions Haiku, Sonnet et Opus.",
+      },
+      {
+        nom: "Clonage de voix",
+        definition:
+          "Reproduction d'une voix précise à partir de quelques secondes d'enregistrement — légitime avec consentement, problématique sans.",
+        niveau: "avance",
       },
       {
         nom: "Closure",
@@ -146,6 +194,12 @@ const SECTIONS: SectionLettre[] = [
         nom: "Communication de crise",
         definition:
           "Ensemble des actions de communication déployées pour protéger une réputation face à un incident.",
+        niveau: "avance",
+      },
+      {
+        nom: "Computer use",
+        definition:
+          "Capacité d'un agent IA à piloter un ordinateur comme le ferait un humain : voir l'écran, cliquer, taper, naviguer dans des applications.",
         niveau: "avance",
       },
       {
@@ -190,9 +244,21 @@ const SECTIONS: SectionLettre[] = [
         niveau: "debutant",
       },
       {
+        nom: "Distillation",
+        definition:
+          "Entraîner un petit modèle à imiter les réponses d'un grand modèle, pour obtenir une version plus rapide et moins coûteuse.",
+        niveau: "avance",
+      },
+      {
         nom: "DOM (Document Object Model)",
         definition:
           "Représentation en arbre d'une page web que le code JavaScript peut lire et modifier.",
+        niveau: "debutant",
+      },
+      {
+        nom: "Données d'entraînement",
+        definition:
+          "Textes, images ou sons utilisés pour entraîner un modèle — sujets à débat sur les droits d'auteur et les données personnelles.",
         niveau: "debutant",
       },
     ],
@@ -204,6 +270,12 @@ const SECTIONS: SectionLettre[] = [
         nom: "Embedding",
         definition:
           "Représentation vectorielle d'un texte dans un espace numérique multidimensionnel.",
+      },
+      {
+        nom: "Entraînement",
+        definition:
+          "Phase où un modèle apprend en ajustant des milliards de réglages internes sur d'immenses volumes de données — un processus long et coûteux.",
+        niveau: "debutant",
       },
     ],
   },
@@ -252,6 +324,18 @@ const SECTIONS: SectionLettre[] = [
         definition: "LLM multimodal développé par Google DeepMind.",
       },
       {
+        nom: "Génération d'images",
+        definition:
+          "Production d'images à partir d'une description textuelle, avec un contrôle croissant et un photoréalisme atteint dès 2024.",
+        niveau: "debutant",
+      },
+      {
+        nom: "Génération vidéo",
+        definition:
+          "Création de clips de quelques secondes à partir d'un prompt ou d'une image — une frontière actuelle de l'IA créative, encore inégale sur la durée.",
+        niveau: "avance",
+      },
+      {
         nom: "GPT",
         definition: "Famille de modèles développée par OpenAI.",
       },
@@ -281,6 +365,12 @@ const SECTIONS: SectionLettre[] = [
     lettre: "I",
     termes: [
       {
+        nom: "IA étroite (ANI)",
+        definition:
+          "IA conçue et performante pour un domaine délimité, comme la traduction, les échecs ou la génération d'images.",
+        niveau: "debutant",
+      },
+      {
         nom: "IA générative",
         definition:
           "Intelligence artificielle capable de créer du texte, des images ou du code plutôt que de simplement classifier.",
@@ -301,6 +391,12 @@ const SECTIONS: SectionLettre[] = [
         nom: "Instruction prompting",
         definition:
           "Formulation explicite d'une tâche sous forme d'instruction directe.",
+      },
+      {
+        nom: "Intelligence artificielle (IA)",
+        definition:
+          "Programmes informatiques capables d'accomplir des tâches qui demandent normalement l'intelligence humaine, du filtrage anti-spam aux assistants conversationnels.",
+        niveau: "debutant",
       },
       {
         nom: "Iterative prompting",
@@ -376,6 +472,12 @@ const SECTIONS: SectionLettre[] = [
         niveau: "debutant",
       },
       {
+        nom: "MCP (Model Context Protocol)",
+        definition:
+          "Protocole ouvert standardisant la connexion entre une IA et des services externes, lancé par Anthropic fin 2024.",
+        niveau: "avance",
+      },
+      {
         nom: "Méta-prompt",
         definition: "Prompt générant d'autres prompts optimisés.",
       },
@@ -384,8 +486,32 @@ const SECTIONS: SectionLettre[] = [
         definition: "LLM open-source développé par Mistral AI.",
       },
       {
+        nom: "Modèle",
+        definition:
+          "Résultat concret d'un entraînement : un fichier volumineux contenant tout ce que le système a appris.",
+        niveau: "debutant",
+      },
+      {
+        nom: "Modèle de diffusion",
+        definition:
+          "Famille de modèles qui génèrent des images en partant d'un bruit aléatoire et en le transformant progressivement en image nette.",
+        niveau: "avance",
+      },
+      {
         nom: "Modèle de fondation",
         definition: "LLM pré-entraîné servant de base pour le fine-tuning.",
+      },
+      {
+        nom: "Modèle de raisonnement",
+        definition:
+          "LLM entraîné à « réfléchir avant de répondre » étape par étape, excellent en maths et en code, au prix d'un temps de réponse plus long.",
+        niveau: "avance",
+      },
+      {
+        nom: "Multimodal",
+        definition:
+          "Modèle capable de traiter plusieurs types de données — texte, image, audio, vidéo — en entrée comme en sortie.",
+        niveau: "debutant",
       },
     ],
   },
@@ -412,6 +538,24 @@ const SECTIONS: SectionLettre[] = [
         definition: "Fournir exactement un exemple avant la tâche réelle.",
       },
       {
+        nom: "Open source",
+        definition:
+          "Au sens strict : code, poids et données d'entraînement rendus publics, permettant l'auto-hébergement et l'indépendance vis-à-vis d'un fournisseur.",
+        niveau: "avance",
+      },
+      {
+        nom: "Opt-out",
+        definition:
+          "Réglage permettant de refuser que ses conversations ou fichiers servent à entraîner les modèles de l'éditeur — un réflexe prioritaire en usage professionnel.",
+        niveau: "debutant",
+      },
+      {
+        nom: "Orchestration",
+        definition:
+          "Coordination de plusieurs modèles, outils ou agents au sein d'un même processus — le travail d'outils comme n8n ou Make.",
+        niveau: "avance",
+      },
+      {
         nom: "Output parsing",
         definition:
           "Extraction et structuration des données depuis la réponse brute.",
@@ -428,6 +572,12 @@ const SECTIONS: SectionLettre[] = [
     lettre: "P",
     termes: [
       {
+        nom: "Paramètres",
+        definition:
+          "Réglages internes appris pendant l'entraînement, qui encodent la « connaissance » du modèle — comptés en milliards.",
+        niveau: "avance",
+      },
+      {
         nom: "Persona (marketing)",
         definition:
           "Profil semi-fictif représentant un segment type de clientèle, utilisé pour orienter les décisions marketing.",
@@ -436,6 +586,12 @@ const SECTIONS: SectionLettre[] = [
       {
         nom: "Persona prompting",
         definition: "Assignation d'un rôle ou d'une identité précise au modèle.",
+      },
+      {
+        nom: "Poids ouverts",
+        definition:
+          "Modèle dont le fichier de paramètres est téléchargeable, modifiable et redistribuable selon une licence donnée — Llama, Mistral, DeepSeek, Qwen.",
+        niveau: "avance",
       },
       {
         nom: "Promise",
@@ -491,6 +647,12 @@ const SECTIONS: SectionLettre[] = [
         niveau: "avance",
       },
       {
+        nom: "RGPD et IA",
+        definition:
+          "Le règlement européen sur les données personnelles s'applique pleinement à l'IA : base légale, information, droits d'accès et d'effacement.",
+        niveau: "avance",
+      },
+      {
         nom: "RLHF",
         definition:
           "Technique d'entraînement par renforcement à partir de retours humains.",
@@ -521,6 +683,18 @@ const SECTIONS: SectionLettre[] = [
         niveau: "debutant",
       },
       {
+        nom: "Slop",
+        definition:
+          "Terme péjoratif désignant le contenu produit en masse par l'IA sans relecture ni valeur ajoutée : articles génériques, images kitsch qui saturent le web.",
+        niveau: "avance",
+      },
+      {
+        nom: "Souveraineté numérique",
+        definition:
+          "Capacité d'un pays ou d'une organisation à maîtriser ses outils et ses données sans dépendre d'acteurs étrangers.",
+        niveau: "avance",
+      },
+      {
         nom: "Storytelling",
         definition:
           "Technique consistant à raconter une histoire pour rendre un message mémorable et engageant.",
@@ -529,6 +703,12 @@ const SECTIONS: SectionLettre[] = [
       {
         nom: "Structured output",
         definition: "Sortie formatée selon un schéma prédéfini.",
+      },
+      {
+        nom: "Synthèse vocale (TTS)",
+        definition:
+          "Transformation d'un texte en voix parlée, avec intonations et émotions, souvent multilingue.",
+        niveau: "debutant",
       },
       {
         nom: "System prompt",
@@ -577,6 +757,12 @@ const SECTIONS: SectionLettre[] = [
         definition:
           "Message envoyé par l'utilisateur dans une conversation avec le LLM.",
       },
+      {
+        nom: "Upscaling",
+        definition:
+          "Augmentation de la résolution d'une image ou d'une vidéo par IA, qui invente les détails manquants de façon plausible.",
+        niveau: "avance",
+      },
     ],
   },
   {
@@ -608,6 +794,12 @@ const SECTIONS: SectionLettre[] = [
   {
     lettre: "W",
     termes: [
+      {
+        nom: "Watermark",
+        definition:
+          "Signature invisible insérée dans un contenu généré par IA pour permettre son identification ultérieure — progressivement exigée par les régulateurs.",
+        niveau: "avance",
+      },
       {
         nom: "Webhook",
         definition:
