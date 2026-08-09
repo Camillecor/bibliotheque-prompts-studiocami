@@ -22,16 +22,20 @@ type SectionCategorie = { categorie: string; outils: Outil[] };
 type FAQ = { question: string; reponse: string };
 
 const CLE_OUTILS_AJOUTES = "outils_ia_ajoutes";
-// Taxonomie alignée sur la nomenclature du marché (promptfacile.fr/outils/) —
+// Taxonomie fine, alignée sur la nomenclature du marché (promptfacile.fr/outils/) —
 // seules les catégories où j'ai vraiment un outil sont affichées.
 const CATEGORIES_LABELS = [
   "Chatbots",
   "Recherche",
-  "Design",
+  "Maquettes & UI",
+  "Design graphique",
   "Images",
   "Code",
+  "Base de données",
   "Sites web",
   "Productivité",
+  "Stockage & fichiers",
+  "E-mailing",
   "Automatisation",
 ];
 
