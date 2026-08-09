@@ -444,7 +444,7 @@ function OutilsPage() {
                       <div key={o.nom} className="cami-card">
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex min-w-0 items-center gap-2.5">
-                            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-border bg-muted">
+                            <span className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border bg-card">
                               <ToolLogo nom={o.logo} />
                             </span>
                             <p className="truncate text-sm font-bold text-primary">{o.nom}</p>
