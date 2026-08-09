@@ -326,6 +326,7 @@ function OutilsPage() {
     const nouveau: OutilAjoute = {
       id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
       nom,
+      slug: nom.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""),
       definition,
       prix: nouveauPrix,
       categorie: nouvelleCategorie,
