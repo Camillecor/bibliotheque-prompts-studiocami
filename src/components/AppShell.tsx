@@ -2,7 +2,7 @@ import { useState, type ReactNode } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { BookOpen, Library, Menu, Plus, SlidersHorizontal, X } from "lucide-react";
+import { BookOpen, Library, Menu, Plus, SlidersHorizontal, Wrench, X } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -17,6 +17,7 @@ const NAV_ITEMS = [
   { to: "/", icon: Plus, label: "Générateur de prompt" },
   { to: "/bibliotheque", icon: Library, label: "Bibliothèque" },
   { to: "/glossaire", icon: BookOpen, label: "Glossaire" },
+  { to: "/outils", icon: Wrench, label: "Outils" },
 ];
 
 
@@ -132,6 +133,12 @@ export function AppShell({ children, panel }: { children: ReactNode; panel?: Rea
             icon={BookOpen}
             label="Glossaire"
             active={pathname.startsWith("/glossaire")}
+          />
+          <RailButton
+            to="/outils"
+            icon={Wrench}
+            label="Outils"
+            active={pathname.startsWith("/outils")}
           />
         </nav>
       </aside>
