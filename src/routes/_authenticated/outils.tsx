@@ -286,6 +286,7 @@ export const Route = createFileRoute("/_authenticated/outils")({
 
 function OutilsPage() {
   const [recherche, setRecherche] = useState("");
+  const [categorieActive, setCategorieActive] = useState<string | null>(null);
   const [outilsAjoutes, setOutilsAjoutes] = useState<OutilAjoute[]>(() => chargerOutilsAjoutes());
 
   const sectionsCombinees = useMemo(() => {
@@ -372,6 +373,10 @@ function OutilsPage() {
     (somme, section) => somme + section.outils.length,
     0,
   );
+
+  const sectionsAffichees = categorieActive
+    ? sectionsFiltrees.filter((section) => section.categorie === categorieActive)
+    : sectionsFiltrees;
 
   const hautDePageRef = useRef<HTMLDivElement>(null);
   const [afficherRemonter, setAfficherRemonter] = useState(false);
@@ -520,13 +525,13 @@ function OutilsPage() {
         </nav>
 
 
-        {sectionsFiltrees.length === 0 ? (
+        {sectionsAffichees.length === 0 ? (
           <div className="cami-block-resume text-center text-sm text-muted-foreground">
             Aucun outil ne correspond à « {recherche} ».
           </div>
         ) : (
           <div className="space-y-8">
-            {sectionsFiltrees.map((section) => {
+            {sectionsAffichees.map((section) => {
               const roleIndex = CATEGORIES_LABELS.indexOf(section.categorie);
               const role = ROLES[roleIndex % ROLES.length];
               return (
