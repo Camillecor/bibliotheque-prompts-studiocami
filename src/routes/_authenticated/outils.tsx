@@ -476,15 +476,36 @@ function OutilsPage() {
           </div>
         </form>
 
-        <nav aria-label="Aller à une catégorie" className="mb-8 flex flex-wrap gap-1.5">
+        <nav aria-label="Filtrer par catégorie" className="mb-8 flex flex-wrap gap-1.5">
+          <button
+            type="button"
+            onClick={() => setCategorieActive(null)}
+            aria-pressed={categorieActive === null}
+            className={`inline-flex h-8 items-center gap-1.5 rounded-full border px-3 text-xs font-bold transition hover:-translate-y-0.5 ${
+              categorieActive === null
+                ? "border-transparent bg-primary text-primary-foreground"
+                : "border-border bg-card text-primary hover:border-[var(--coral)] hover:text-[var(--coral)]"
+            }`}
+          >
+            Tout
+            <span className="opacity-60">· {resultatsCount}</span>
+          </button>
           {CATEGORIES_LABELS.map((categorie, index) => {
-            const disponible = sectionsFiltrees.some((s) => s.categorie === categorie);
+            const section = sectionsFiltrees.find((s) => s.categorie === categorie);
+            if (!section) return null;
             const role = ROLES[index % ROLES.length];
-            return disponible ? (
-              <a
+            const actif = categorieActive === categorie;
+            return (
+              <button
                 key={categorie}
-                href={`#categorie-${index}`}
-                className="inline-flex h-8 items-center gap-1.5 rounded-full border border-border bg-card px-3 text-xs font-bold text-primary transition hover:-translate-y-0.5 hover:border-[var(--coral)] hover:text-[var(--coral)]"
+                type="button"
+                onClick={() => setCategorieActive(actif ? null : categorie)}
+                aria-pressed={actif}
+                className={`inline-flex h-8 items-center gap-1.5 rounded-full border px-3 text-xs font-bold transition hover:-translate-y-0.5 ${
+                  actif
+                    ? "border-transparent bg-primary text-primary-foreground"
+                    : "border-border bg-card text-primary hover:border-[var(--coral)] hover:text-[var(--coral)]"
+                }`}
               >
                 <span
                   className="h-1.5 w-1.5 rounded-full"
@@ -492,10 +513,12 @@ function OutilsPage() {
                   aria-hidden="true"
                 />
                 {categorie}
-              </a>
-            ) : null;
+                <span className="opacity-60">· {section.outils.length}</span>
+              </button>
+            );
           })}
         </nav>
+
 
         {sectionsFiltrees.length === 0 ? (
           <div className="cami-block-resume text-center text-sm text-muted-foreground">
