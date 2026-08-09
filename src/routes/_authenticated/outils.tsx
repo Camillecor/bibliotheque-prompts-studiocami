@@ -309,7 +309,7 @@ function OutilsPage() {
   }, [recherche, sectionsCombinees]);
 
   const [nouveauNom, setNouveauNom] = useState("");
-  const [nouvelleCategorie, setNouvelleCategorie] = useState(CATEGORIES_LABELS[0]);
+  const [nouvelleCategorie, setNouvelleCategorie] = useState<string>(CATEGORIES_LABELS[0] ?? "");
   const [nouveauPrix, setNouveauPrix] = useState<Prix>("freemium");
   const [nouvelleDefinition, setNouvelleDefinition] = useState("");
 
