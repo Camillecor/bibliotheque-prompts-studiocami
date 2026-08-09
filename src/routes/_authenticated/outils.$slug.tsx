@@ -50,7 +50,7 @@ function StatCard({ label, value }: { label: string; value: string }) {
 }
 
 function OutilDetailPage() {
-  const o = Route.useLoaderData();
+  const o = Route.useLoaderData() as ToolDetail;
   const global = noteGlobale(o.notes);
 
   return (
