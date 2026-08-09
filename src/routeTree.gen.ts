@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedBibliothequeRouteImport } from './routes/_authenticated/bibliotheque'
 import { Route as AuthenticatedGlossaireRouteImport } from './routes/_authenticated/glossaire'
 import { Route as AuthenticatedOutilsRouteImport } from './routes/_authenticated/outils'
+import { Route as AuthenticatedOutilsSlugRouteImport } from './routes/_authenticated/outils.$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -46,6 +47,11 @@ const AuthenticatedOutilsRoute = AuthenticatedOutilsRouteImport.update({
   path: '/outils',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedOutilsSlugRoute = AuthenticatedOutilsSlugRouteImport.update({
+  id: '/outils/$slug',
+  path: '/outils/$slug',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -53,6 +59,7 @@ export interface FileRoutesByFullPath {
   '/bibliotheque': typeof AuthenticatedBibliothequeRoute
   '/glossaire': typeof AuthenticatedGlossaireRoute
   '/outils': typeof AuthenticatedOutilsRoute
+  '/outils/$slug': typeof AuthenticatedOutilsSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -60,6 +67,7 @@ export interface FileRoutesByTo {
   '/bibliotheque': typeof AuthenticatedBibliothequeRoute
   '/glossaire': typeof AuthenticatedGlossaireRoute
   '/outils': typeof AuthenticatedOutilsRoute
+  '/outils/$slug': typeof AuthenticatedOutilsSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -69,12 +77,25 @@ export interface FileRoutesById {
   '/_authenticated/bibliotheque': typeof AuthenticatedBibliothequeRoute
   '/_authenticated/glossaire': typeof AuthenticatedGlossaireRoute
   '/_authenticated/outils': typeof AuthenticatedOutilsRoute
+  '/_authenticated/outils/$slug': typeof AuthenticatedOutilsSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/bibliotheque' | '/glossaire' | '/outils'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/bibliotheque'
+    | '/glossaire'
+    | '/outils'
+    | '/outils/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/bibliotheque' | '/glossaire' | '/outils'
+  to:
+    | '/'
+    | '/auth'
+    | '/bibliotheque'
+    | '/glossaire'
+    | '/outils'
+    | '/outils/$slug'
   id:
     | '__root__'
     | '/'
@@ -83,6 +104,7 @@ export interface FileRouteTypes {
     | '/_authenticated/bibliotheque'
     | '/_authenticated/glossaire'
     | '/_authenticated/outils'
+    | '/_authenticated/outils/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -135,6 +157,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOutilsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/outils/$slug': {
+      id: '/_authenticated/outils/$slug'
+      path: '/outils/$slug'
+      fullPath: '/outils/$slug'
+      preLoaderRoute: typeof AuthenticatedOutilsSlugRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -142,12 +171,14 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedBibliothequeRoute: typeof AuthenticatedBibliothequeRoute
   AuthenticatedGlossaireRoute: typeof AuthenticatedGlossaireRoute
   AuthenticatedOutilsRoute: typeof AuthenticatedOutilsRoute
+  AuthenticatedOutilsSlugRoute: typeof AuthenticatedOutilsSlugRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedBibliothequeRoute: AuthenticatedBibliothequeRoute,
   AuthenticatedGlossaireRoute: AuthenticatedGlossaireRoute,
   AuthenticatedOutilsRoute: AuthenticatedOutilsRoute,
+  AuthenticatedOutilsSlugRoute: AuthenticatedOutilsSlugRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

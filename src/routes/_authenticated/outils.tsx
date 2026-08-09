@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowUp, Plus, Search } from "lucide-react";
 import { toast } from "sonner";
@@ -8,6 +8,7 @@ import { ToolLogo, type ToolLogoName } from "@/components/ToolLogos";
 type Prix = "gratuit" | "freemium" | "payant";
 type Outil = {
   nom: string;
+  slug: string;
   logo: ToolLogoName;
   definition: string;
   prix: Prix;
@@ -45,18 +46,21 @@ const SECTIONS: SectionCategorie[] = [
     outils: [
       {
         nom: "Claude",
+        slug: "claude",
         logo: "Claude",
         definition: "Assistant d'Anthropic, à l'aise en rédaction longue, code et raisonnement.",
         prix: "freemium",
       },
       {
         nom: "ChatGPT",
+        slug: "chatgpt",
         logo: "ChatGPT",
         definition: "Assistant généraliste d'OpenAI, pour écrire, coder et réfléchir au quotidien.",
         prix: "freemium",
       },
       {
         nom: "Mistral AI",
+        slug: "mistral",
         logo: "Mistral",
         definition: "IA française, rapide, hébergée en Europe.",
         prix: "freemium",
@@ -64,6 +68,7 @@ const SECTIONS: SectionCategorie[] = [
       },
       {
         nom: "Perplexity AI",
+        slug: "perplexity",
         logo: "Perplexity",
         definition: "Moteur de réponse IA qui cite toujours ses sources.",
         prix: "freemium",
@@ -75,6 +80,7 @@ const SECTIONS: SectionCategorie[] = [
     outils: [
       {
         nom: "Figma",
+        slug: "figma",
         logo: "Figma",
         definition: "Design d'interface : maquettes, prototypes et design system.",
         prix: "freemium",
@@ -82,6 +88,7 @@ const SECTIONS: SectionCategorie[] = [
       },
       {
         nom: "Canva",
+        slug: "canva",
         logo: "Canva",
         definition: "Création graphique rapide : visuels, présentations, réseaux sociaux.",
         prix: "freemium",
@@ -89,6 +96,7 @@ const SECTIONS: SectionCategorie[] = [
       },
       {
         nom: "Midjourney",
+        slug: "midjourney",
         logo: "Midjourney",
         definition: "Générateur d'images IA à la qualité artistique inégalée.",
         prix: "payant",
@@ -100,12 +108,14 @@ const SECTIONS: SectionCategorie[] = [
     outils: [
       {
         nom: "Claude Code",
+        slug: "claude-code",
         logo: "ClaudeCode",
         definition: "Agent IA en ligne de commande : code, débogue et gère les projets dans le terminal.",
         prix: "freemium",
       },
       {
         nom: "Lovable",
+        slug: "lovable",
         logo: "Lovable",
         definition: "Génère une app web complète à partir d'une conversation, code et déploiement inclus.",
         prix: "freemium",
@@ -113,6 +123,7 @@ const SECTIONS: SectionCategorie[] = [
       },
       {
         nom: "Supabase",
+        slug: "supabase",
         logo: "Supabase",
         definition: "Backend open-source : base de données, auth et stockage prêts à l'emploi.",
         prix: "freemium",
@@ -125,6 +136,7 @@ const SECTIONS: SectionCategorie[] = [
     outils: [
       {
         nom: "Notion",
+        slug: "notion",
         logo: "Notion",
         definition: "Notes, bases de données et docs dans un seul espace de travail.",
         prix: "freemium",
@@ -132,6 +144,7 @@ const SECTIONS: SectionCategorie[] = [
       },
       {
         nom: "Google Drive",
+        slug: "google-drive",
         logo: "GoogleDrive",
         definition: "Stockage et partage de fichiers, intégré à la suite Google.",
         prix: "gratuit",
@@ -139,6 +152,7 @@ const SECTIONS: SectionCategorie[] = [
       },
       {
         nom: "Gmail",
+        slug: "gmail",
         logo: "Gmail",
         definition: "Messagerie et automatisation des e-mails pros.",
         prix: "gratuit",
@@ -151,6 +165,7 @@ const SECTIONS: SectionCategorie[] = [
     outils: [
       {
         nom: "Zapier",
+        slug: "zapier",
         logo: "Zapier",
         definition: "Connecte les outils entre eux et automatise les tâches répétitives.",
         prix: "freemium",
@@ -212,9 +227,9 @@ function OutilsPage() {
     if (outilsAjoutes.length === 0) return SECTIONS;
     const parCategorie = new Map<string, Outil[]>();
     for (const section of SECTIONS) parCategorie.set(section.categorie, [...section.outils]);
-    for (const { id: _id, categorie, ...reste } of outilsAjoutes) {
+    for (const { id, categorie, ...reste } of outilsAjoutes) {
       const liste = parCategorie.get(categorie) ?? [];
-      liste.push({ ...reste, logo: "Claude" });
+      liste.push({ ...reste, slug: id, logo: "Claude" });
       parCategorie.set(categorie, liste);
     }
     return CATEGORIES_LABELS.map((categorie) => ({
@@ -441,7 +456,12 @@ function OutilsPage() {
                   </div>
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
                     {section.outils.map((o) => (
-                      <div key={o.nom} className="cami-card">
+                      <Link
+                        key={o.nom}
+                        to="/outils/$slug"
+                        params={{ slug: o.slug }}
+                        className="cami-card block transition hover:-translate-y-0.5 hover:border-[var(--coral)]"
+                      >
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex min-w-0 items-center gap-2.5">
                             <span className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border bg-card">
@@ -488,7 +508,7 @@ function OutilsPage() {
                             ) : null}
                           </div>
                         ) : null}
-                      </div>
+                      </Link>
                     ))}
                   </div>
                 </section>
