@@ -43,7 +43,7 @@ export const TOOL_DETAILS: Record<string, ToolDetail> = {
     nom: "Claude",
     logo: "Claude",
     tagline: "L'assistant d'Anthropic, à l'aise en rédaction longue, code et raisonnement.",
-    tags: ["Chatbots & assistants", "IA générative"],
+    tags: ["Chatbots", "IA générative"],
     notes: { fonctionnalites: 9, facilite: 8, valeur: 8, confiance: 8.5 },
     ctaLabel: "Essayer Claude →",
     ctaUrl: "https://claude.ai",

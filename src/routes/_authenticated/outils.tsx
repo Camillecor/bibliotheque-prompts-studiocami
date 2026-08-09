@@ -22,10 +22,15 @@ type SectionCategorie = { categorie: string; outils: Outil[] };
 type FAQ = { question: string; reponse: string };
 
 const CLE_OUTILS_AJOUTES = "outils_ia_ajoutes";
+// Taxonomie alignée sur la nomenclature du marché (promptfacile.fr/outils/) —
+// seules les catégories où j'ai vraiment un outil sont affichées.
 const CATEGORIES_LABELS = [
-  "Chatbots & assistants",
-  "Design & visuel",
-  "Dev & no-code",
+  "Chatbots",
+  "Recherche",
+  "Design",
+  "Images",
+  "Code",
+  "Sites web",
   "Productivité",
   "Automatisation",
 ];
@@ -44,7 +49,7 @@ function chargerOutilsAjoutes(): OutilAjoute[] {
 // Outils IA utilisés au quotidien chez Studio Cami, classés par usage.
 const SECTIONS: SectionCategorie[] = [
   {
-    categorie: "Chatbots & assistants",
+    categorie: "Chatbots",
     outils: [
       {
         nom: "Claude",
@@ -71,6 +76,11 @@ const SECTIONS: SectionCategorie[] = [
         souverain: true,
         notes: { fonctionnalites: 7, facilite: 7.5, valeur: 8.5, confiance: 8.5 },
       },
+    ],
+  },
+  {
+    categorie: "Recherche",
+    outils: [
       {
         nom: "Perplexity AI",
         slug: "perplexity",
@@ -82,7 +92,7 @@ const SECTIONS: SectionCategorie[] = [
     ],
   },
   {
-    categorie: "Design & visuel",
+    categorie: "Design",
     outils: [
       {
         nom: "Figma",
@@ -102,6 +112,11 @@ const SECTIONS: SectionCategorie[] = [
         mcp: true,
         notes: { fonctionnalites: 8, facilite: 9.5, valeur: 8, confiance: 8 },
       },
+    ],
+  },
+  {
+    categorie: "Images",
+    outils: [
       {
         nom: "Midjourney",
         slug: "midjourney",
@@ -113,7 +128,7 @@ const SECTIONS: SectionCategorie[] = [
     ],
   },
   {
-    categorie: "Dev & no-code",
+    categorie: "Code",
     outils: [
       {
         nom: "Claude Code",
@@ -124,15 +139,6 @@ const SECTIONS: SectionCategorie[] = [
         notes: { fonctionnalites: 9, facilite: 7, valeur: 8, confiance: 8.5 },
       },
       {
-        nom: "Lovable",
-        slug: "lovable",
-        logo: "Lovable",
-        definition: "Génère une app web complète à partir d'une conversation, code et déploiement inclus.",
-        prix: "freemium",
-        mcp: true,
-        notes: { fonctionnalites: 8, facilite: 8.5, valeur: 7, confiance: 7 },
-      },
-      {
         nom: "Supabase",
         slug: "supabase",
         logo: "Supabase",
@@ -140,6 +146,20 @@ const SECTIONS: SectionCategorie[] = [
         prix: "freemium",
         mcp: true,
         notes: { fonctionnalites: 8.5, facilite: 7.5, valeur: 8.5, confiance: 8 },
+      },
+    ],
+  },
+  {
+    categorie: "Sites web",
+    outils: [
+      {
+        nom: "Lovable",
+        slug: "lovable",
+        logo: "Lovable",
+        definition: "Génère une app web complète à partir d'une conversation, code et déploiement inclus.",
+        prix: "freemium",
+        mcp: true,
+        notes: { fonctionnalites: 8, facilite: 8.5, valeur: 7, confiance: 7 },
       },
     ],
   },
