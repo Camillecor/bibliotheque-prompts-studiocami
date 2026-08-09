@@ -3,6 +3,7 @@ import { ArrowLeft, ExternalLink } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { ToolLogo } from "@/components/ToolLogos";
 import { getToolDetail } from "@/lib/toolDetails";
+import { CRITERES, formatNote, noteGlobale } from "@/lib/toolNotes";
 
 export const Route = createFileRoute("/_authenticated/outils/$slug")({
   loader: ({ params }) => {
@@ -50,6 +51,7 @@ function StatCard({ label, value }: { label: string; value: string }) {
 
 function OutilDetailPage() {
   const o = Route.useLoaderData();
+  const global = noteGlobale(o.notes);
 
   return (
     <AppShell>
@@ -69,8 +71,14 @@ function OutilDetailPage() {
           <span className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-border bg-card shadow-[0_1px_2px_rgba(17,26,61,0.06),0_12px_32px_-18px_rgba(17,26,61,0.35)]">
             <ToolLogo nom={o.logo} />
           </span>
-          <div className="min-w-0">
-            <h1 className="text-2xl font-bold text-primary sm:text-3xl">{o.nom}</h1>
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <h1 className="text-2xl font-bold text-primary sm:text-3xl">{o.nom}</h1>
+              <span className="flex shrink-0 items-baseline gap-1 rounded-2xl bg-primary px-3 py-1.5 text-primary-foreground">
+                <span className="text-xl font-bold">{formatNote(global)}</span>
+                <span className="text-xs opacity-60">/10</span>
+              </span>
+            </div>
             <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{o.tagline}</p>
             <div className="mt-2 flex flex-wrap gap-1.5">
               {o.tags.map((tag) => (
@@ -88,6 +96,35 @@ function OutilDetailPage() {
             <ExternalLink className="h-4 w-4" />
           </a>
           <span className="text-xs text-muted-foreground">Testé le {o.testeLe}</span>
+        </div>
+
+        {/* Note détaillée */}
+        <div className="cami-card mt-8">
+          <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
+            Note Studio Cami
+          </p>
+          <div className="mt-3 space-y-3">
+            {CRITERES.map((c) => {
+              const valeur = o.notes[c.key];
+              return (
+                <div key={c.key}>
+                  <div className="flex items-baseline justify-between gap-2">
+                    <p className="text-xs font-semibold text-foreground">{c.label}</p>
+                    <p className="text-xs font-bold text-primary">{formatNote(valeur)}/10</p>
+                  </div>
+                  <div className="mt-1 h-1.5 rounded-full bg-muted">
+                    <div
+                      className="h-1.5 rounded-full bg-[var(--info)]"
+                      style={{ width: `${valeur * 10}%` }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <p className="mt-3 text-[11px] text-muted-foreground">
+            Évaluation éditoriale Studio Cami, moyenne arrondie au demi-point.
+          </p>
         </div>
 
         {/* Essentiel */}

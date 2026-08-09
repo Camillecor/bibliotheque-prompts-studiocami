@@ -1,4 +1,5 @@
 import type { ToolLogoName } from "@/components/ToolLogos";
+import type { Notes } from "@/lib/toolNotes";
 
 export type Tarif = { nom: string; prix: string; inclus: string };
 export type Feature = { titre: string; description: string };
@@ -11,6 +12,7 @@ export type ToolDetail = {
   logo: ToolLogoName;
   tagline: string;
   tags: string[];
+  notes: Notes;
   ctaLabel: string;
   ctaUrl: string;
   testeLe: string;
@@ -42,6 +44,7 @@ export const TOOL_DETAILS: Record<string, ToolDetail> = {
     logo: "Claude",
     tagline: "L'assistant d'Anthropic, à l'aise en rédaction longue, code et raisonnement.",
     tags: ["Chatbots & assistants", "IA générative"],
+    notes: { fonctionnalites: 9, facilite: 8, valeur: 8, confiance: 8.5 },
     ctaLabel: "Essayer Claude →",
     ctaUrl: "https://claude.ai",
     testeLe: "9 août 2026",

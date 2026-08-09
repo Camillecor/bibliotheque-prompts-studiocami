@@ -4,6 +4,7 @@ import { ArrowUp, Plus, Search } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { ToolLogo, type ToolLogoName } from "@/components/ToolLogos";
+import { formatNote, noteGlobale, type Notes } from "@/lib/toolNotes";
 
 type Prix = "gratuit" | "freemium" | "payant";
 type Outil = {
@@ -14,6 +15,7 @@ type Outil = {
   prix: Prix;
   souverain?: boolean;
   mcp?: boolean;
+  notes?: Notes;
 };
 type OutilAjoute = Omit<Outil, "logo"> & { id: string; categorie: string };
 type SectionCategorie = { categorie: string; outils: Outil[] };
@@ -50,6 +52,7 @@ const SECTIONS: SectionCategorie[] = [
         logo: "Claude",
         definition: "Assistant d'Anthropic, à l'aise en rédaction longue, code et raisonnement.",
         prix: "freemium",
+        notes: { fonctionnalites: 9, facilite: 8, valeur: 8, confiance: 8.5 },
       },
       {
         nom: "ChatGPT",
@@ -57,6 +60,7 @@ const SECTIONS: SectionCategorie[] = [
         logo: "ChatGPT",
         definition: "Assistant généraliste d'OpenAI, pour écrire, coder et réfléchir au quotidien.",
         prix: "freemium",
+        notes: { fonctionnalites: 9.5, facilite: 9, valeur: 7.5, confiance: 8 },
       },
       {
         nom: "Mistral AI",
@@ -65,6 +69,7 @@ const SECTIONS: SectionCategorie[] = [
         definition: "IA française, rapide, hébergée en Europe.",
         prix: "freemium",
         souverain: true,
+        notes: { fonctionnalites: 7, facilite: 7.5, valeur: 8.5, confiance: 8.5 },
       },
       {
         nom: "Perplexity AI",
@@ -72,6 +77,7 @@ const SECTIONS: SectionCategorie[] = [
         logo: "Perplexity",
         definition: "Moteur de réponse IA qui cite toujours ses sources.",
         prix: "freemium",
+        notes: { fonctionnalites: 7.5, facilite: 8.5, valeur: 7, confiance: 7.5 },
       },
     ],
   },
@@ -85,6 +91,7 @@ const SECTIONS: SectionCategorie[] = [
         definition: "Design d'interface : maquettes, prototypes et design system.",
         prix: "freemium",
         mcp: true,
+        notes: { fonctionnalites: 9, facilite: 7, valeur: 7.5, confiance: 8.5 },
       },
       {
         nom: "Canva",
@@ -93,6 +100,7 @@ const SECTIONS: SectionCategorie[] = [
         definition: "Création graphique rapide : visuels, présentations, réseaux sociaux.",
         prix: "freemium",
         mcp: true,
+        notes: { fonctionnalites: 8, facilite: 9.5, valeur: 8, confiance: 8 },
       },
       {
         nom: "Midjourney",
@@ -100,6 +108,7 @@ const SECTIONS: SectionCategorie[] = [
         logo: "Midjourney",
         definition: "Générateur d'images IA à la qualité artistique inégalée.",
         prix: "payant",
+        notes: { fonctionnalites: 8.5, facilite: 6, valeur: 6.5, confiance: 7.5 },
       },
     ],
   },
@@ -112,6 +121,7 @@ const SECTIONS: SectionCategorie[] = [
         logo: "ClaudeCode",
         definition: "Agent IA en ligne de commande : code, débogue et gère les projets dans le terminal.",
         prix: "freemium",
+        notes: { fonctionnalites: 9, facilite: 7, valeur: 8, confiance: 8.5 },
       },
       {
         nom: "Lovable",
@@ -120,6 +130,7 @@ const SECTIONS: SectionCategorie[] = [
         definition: "Génère une app web complète à partir d'une conversation, code et déploiement inclus.",
         prix: "freemium",
         mcp: true,
+        notes: { fonctionnalites: 8, facilite: 8.5, valeur: 7, confiance: 7 },
       },
       {
         nom: "Supabase",
@@ -128,6 +139,7 @@ const SECTIONS: SectionCategorie[] = [
         definition: "Backend open-source : base de données, auth et stockage prêts à l'emploi.",
         prix: "freemium",
         mcp: true,
+        notes: { fonctionnalites: 8.5, facilite: 7.5, valeur: 8.5, confiance: 8 },
       },
     ],
   },
@@ -141,6 +153,7 @@ const SECTIONS: SectionCategorie[] = [
         definition: "Notes, bases de données et docs dans un seul espace de travail.",
         prix: "freemium",
         mcp: true,
+        notes: { fonctionnalites: 8.5, facilite: 7.5, valeur: 8, confiance: 8.5 },
       },
       {
         nom: "Google Drive",
@@ -149,6 +162,7 @@ const SECTIONS: SectionCategorie[] = [
         definition: "Stockage et partage de fichiers, intégré à la suite Google.",
         prix: "gratuit",
         mcp: true,
+        notes: { fonctionnalites: 7, facilite: 9, valeur: 9, confiance: 9 },
       },
       {
         nom: "Gmail",
@@ -157,6 +171,7 @@ const SECTIONS: SectionCategorie[] = [
         definition: "Messagerie et automatisation des e-mails pros.",
         prix: "gratuit",
         mcp: true,
+        notes: { fonctionnalites: 7, facilite: 9, valeur: 9, confiance: 9 },
       },
     ],
   },
@@ -170,6 +185,7 @@ const SECTIONS: SectionCategorie[] = [
         definition: "Connecte les outils entre eux et automatise les tâches répétitives.",
         prix: "freemium",
         mcp: true,
+        notes: { fonctionnalites: 8.5, facilite: 7.5, valeur: 6.5, confiance: 8 },
       },
     ],
   },
@@ -190,6 +206,11 @@ const FAQ: FAQ[] = [
     question: "Que veut dire le badge Souverain ?",
     reponse:
       "L'outil est développé et hébergé en Europe, un critère utile quand la conformité RGPD ou l'indépendance vis-à-vis des fournisseurs américains compte pour le projet.",
+  },
+  {
+    question: "Comment la note sur 10 est-elle calculée ?",
+    reponse:
+      "C'est la moyenne de 4 critères notés séparément — Fonctionnalités, Facilité d'usage, Rapport qualité-prix, Fiabilité & confiance — arrondie au demi-point. Le détail des 4 sous-notes est visible sur la fiche de chaque outil. C'est une évaluation éditoriale, pas un calcul automatisé : elle est à corriger si l'expérience réelle diverge.",
   },
 ];
 
@@ -245,14 +266,20 @@ function OutilsPage() {
 
   const sectionsFiltrees = useMemo(() => {
     const terme = recherche.trim().toLowerCase();
-    if (!terme) return sectionsCombinees;
     return sectionsCombinees
       .map((section) => ({
         ...section,
-        outils: section.outils.filter(
-          (o) =>
-            o.nom.toLowerCase().includes(terme) || o.definition.toLowerCase().includes(terme),
-        ),
+        outils: section.outils
+          .filter(
+            (o) =>
+              !terme ||
+              o.nom.toLowerCase().includes(terme) ||
+              o.definition.toLowerCase().includes(terme),
+          )
+          .slice()
+          .sort(
+            (a, b) => (b.notes ? noteGlobale(b.notes) : -1) - (a.notes ? noteGlobale(a.notes) : -1),
+          ),
       }))
       .filter((section) => section.outils.length > 0);
   }, [recherche, sectionsCombinees]);
@@ -455,7 +482,7 @@ function OutilsPage() {
                     </p>
                   </div>
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                    {section.outils.map((o) => (
+                    {section.outils.map((o, index) => (
                       <Link
                         key={o.nom}
                         to="/outils/$slug"
@@ -469,8 +496,30 @@ function OutilsPage() {
                             </span>
                             <p className="truncate text-sm font-bold text-primary">{o.nom}</p>
                           </div>
+                          {o.notes ? (
+                            <span className="shrink-0 rounded-full bg-primary px-2 py-0.5 text-[11px] font-bold text-primary-foreground">
+                              {formatNote(noteGlobale(o.notes))}
+                              <span className="opacity-60">/10</span>
+                            </span>
+                          ) : null}
+                        </div>
+                        <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
+                          {o.definition}
+                        </p>
+                        <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
+                          {index === 0 && o.notes ? (
+                            <span
+                              className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.05em]"
+                              style={{
+                                background: `color-mix(in srgb, var(${role}) 16%, white)`,
+                                color: `var(${role})`,
+                              }}
+                            >
+                              ★ Top {section.categorie}
+                            </span>
+                          ) : null}
                           <span
-                            className="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.05em]"
+                            className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.05em]"
                             style={{
                               background: `color-mix(in srgb, var(${PRIX_ROLE[o.prix]}) 14%, white)`,
                               color: `var(${PRIX_ROLE[o.prix]})`,
@@ -478,36 +527,29 @@ function OutilsPage() {
                           >
                             {PRIX_LABEL[o.prix]}
                           </span>
+                          {o.souverain ? (
+                            <span
+                              className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.05em]"
+                              style={{
+                                background: "color-mix(in srgb, var(--violet) 14%, white)",
+                                color: "var(--violet)",
+                              }}
+                            >
+                              Souverain
+                            </span>
+                          ) : null}
+                          {o.mcp ? (
+                            <span
+                              className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.05em]"
+                              style={{
+                                background: "color-mix(in srgb, var(--primary) 14%, white)",
+                                color: "var(--primary)",
+                              }}
+                            >
+                              MCP
+                            </span>
+                          ) : null}
                         </div>
-                        <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
-                          {o.definition}
-                        </p>
-                        {o.souverain || o.mcp ? (
-                          <div className="mt-2.5 flex flex-wrap gap-1.5">
-                            {o.souverain ? (
-                              <span
-                                className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.05em]"
-                                style={{
-                                  background: "color-mix(in srgb, var(--violet) 14%, white)",
-                                  color: "var(--violet)",
-                                }}
-                              >
-                                Souverain
-                              </span>
-                            ) : null}
-                            {o.mcp ? (
-                              <span
-                                className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.05em]"
-                                style={{
-                                  background: "color-mix(in srgb, var(--primary) 14%, white)",
-                                  color: "var(--primary)",
-                                }}
-                              >
-                                MCP
-                              </span>
-                            ) : null}
-                          </div>
-                        ) : null}
                       </Link>
                     ))}
                   </div>
