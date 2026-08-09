@@ -48,9 +48,9 @@ const AuthenticatedOutilsRoute = AuthenticatedOutilsRouteImport.update({
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedOutilsSlugRoute = AuthenticatedOutilsSlugRouteImport.update({
-  id: '/outils/$slug',
-  path: '/outils/$slug',
-  getParentRoute: () => AuthenticatedRouteRoute,
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => AuthenticatedOutilsRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -58,7 +58,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/bibliotheque': typeof AuthenticatedBibliothequeRoute
   '/glossaire': typeof AuthenticatedGlossaireRoute
-  '/outils': typeof AuthenticatedOutilsRoute
+  '/outils': typeof AuthenticatedOutilsRouteWithChildren
   '/outils/$slug': typeof AuthenticatedOutilsSlugRoute
 }
 export interface FileRoutesByTo {
@@ -66,7 +66,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/bibliotheque': typeof AuthenticatedBibliothequeRoute
   '/glossaire': typeof AuthenticatedGlossaireRoute
-  '/outils': typeof AuthenticatedOutilsRoute
+  '/outils': typeof AuthenticatedOutilsRouteWithChildren
   '/outils/$slug': typeof AuthenticatedOutilsSlugRoute
 }
 export interface FileRoutesById {
@@ -76,26 +76,16 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/bibliotheque': typeof AuthenticatedBibliothequeRoute
   '/_authenticated/glossaire': typeof AuthenticatedGlossaireRoute
-  '/_authenticated/outils': typeof AuthenticatedOutilsRoute
+  '/_authenticated/outils': typeof AuthenticatedOutilsRouteWithChildren
   '/_authenticated/outils/$slug': typeof AuthenticatedOutilsSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/'
-    | '/auth'
-    | '/bibliotheque'
-    | '/glossaire'
-    | '/outils'
-    | '/outils/$slug'
+    '/' | '/auth' | '/bibliotheque' | '/glossaire' | '/outils' | '/outils/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/'
-    | '/auth'
-    | '/bibliotheque'
-    | '/glossaire'
-    | '/outils'
-    | '/outils/$slug'
+    '/' | '/auth' | '/bibliotheque' | '/glossaire' | '/outils' | '/outils/$slug'
   id:
     | '__root__'
     | '/'
@@ -159,26 +149,35 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/outils/$slug': {
       id: '/_authenticated/outils/$slug'
-      path: '/outils/$slug'
+      path: '/$slug'
       fullPath: '/outils/$slug'
       preLoaderRoute: typeof AuthenticatedOutilsSlugRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedOutilsRoute
     }
   }
 }
 
+interface AuthenticatedOutilsRouteChildren {
+  AuthenticatedOutilsSlugRoute: typeof AuthenticatedOutilsSlugRoute
+}
+
+const AuthenticatedOutilsRouteChildren: AuthenticatedOutilsRouteChildren = {
+  AuthenticatedOutilsSlugRoute: AuthenticatedOutilsSlugRoute,
+}
+
+const AuthenticatedOutilsRouteWithChildren =
+  AuthenticatedOutilsRoute._addFileChildren(AuthenticatedOutilsRouteChildren)
+
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedBibliothequeRoute: typeof AuthenticatedBibliothequeRoute
   AuthenticatedGlossaireRoute: typeof AuthenticatedGlossaireRoute
-  AuthenticatedOutilsRoute: typeof AuthenticatedOutilsRoute
-  AuthenticatedOutilsSlugRoute: typeof AuthenticatedOutilsSlugRoute
+  AuthenticatedOutilsRoute: typeof AuthenticatedOutilsRouteWithChildren
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedBibliothequeRoute: AuthenticatedBibliothequeRoute,
   AuthenticatedGlossaireRoute: AuthenticatedGlossaireRoute,
-  AuthenticatedOutilsRoute: AuthenticatedOutilsRoute,
-  AuthenticatedOutilsSlugRoute: AuthenticatedOutilsSlugRoute,
+  AuthenticatedOutilsRoute: AuthenticatedOutilsRouteWithChildren,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -192,3 +191,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
