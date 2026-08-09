@@ -96,7 +96,7 @@ const SECTIONS: SectionCategorie[] = [
     ],
   },
   {
-    categorie: "Design",
+    categorie: "Maquettes & UI",
     outils: [
       {
         nom: "Figma",
@@ -107,6 +107,11 @@ const SECTIONS: SectionCategorie[] = [
         mcp: true,
         notes: { fonctionnalites: 9, facilite: 7, valeur: 7.5, confiance: 8.5 },
       },
+    ],
+  },
+  {
+    categorie: "Design graphique",
+    outils: [
       {
         nom: "Canva",
         slug: "canva",
@@ -142,6 +147,11 @@ const SECTIONS: SectionCategorie[] = [
         prix: "freemium",
         notes: { fonctionnalites: 9, facilite: 7, valeur: 8, confiance: 8.5 },
       },
+    ],
+  },
+  {
+    categorie: "Base de données",
+    outils: [
       {
         nom: "Supabase",
         slug: "supabase",
@@ -179,6 +189,11 @@ const SECTIONS: SectionCategorie[] = [
         mcp: true,
         notes: { fonctionnalites: 8.5, facilite: 7.5, valeur: 8, confiance: 8.5 },
       },
+    ],
+  },
+  {
+    categorie: "Stockage & fichiers",
+    outils: [
       {
         nom: "Google Drive",
         slug: "google-drive",
@@ -188,6 +203,11 @@ const SECTIONS: SectionCategorie[] = [
         mcp: true,
         notes: { fonctionnalites: 7, facilite: 9, valeur: 9, confiance: 9 },
       },
+    ],
+  },
+  {
+    categorie: "E-mailing",
+    outils: [
       {
         nom: "Gmail",
         slug: "gmail",
