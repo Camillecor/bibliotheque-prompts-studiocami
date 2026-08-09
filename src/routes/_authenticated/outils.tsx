@@ -22,16 +22,20 @@ type SectionCategorie = { categorie: string; outils: Outil[] };
 type FAQ = { question: string; reponse: string };
 
 const CLE_OUTILS_AJOUTES = "outils_ia_ajoutes";
-// Taxonomie alignée sur la nomenclature du marché (promptfacile.fr/outils/) —
+// Taxonomie fine, alignée sur la nomenclature du marché (promptfacile.fr/outils/) —
 // seules les catégories où j'ai vraiment un outil sont affichées.
 const CATEGORIES_LABELS = [
   "Chatbots",
   "Recherche",
-  "Design",
+  "Maquettes & UI",
+  "Design graphique",
   "Images",
   "Code",
+  "Base de données",
   "Sites web",
   "Productivité",
+  "Stockage & fichiers",
+  "E-mailing",
   "Automatisation",
 ];
 
@@ -92,7 +96,7 @@ const SECTIONS: SectionCategorie[] = [
     ],
   },
   {
-    categorie: "Design",
+    categorie: "Maquettes & UI",
     outils: [
       {
         nom: "Figma",
@@ -103,6 +107,11 @@ const SECTIONS: SectionCategorie[] = [
         mcp: true,
         notes: { fonctionnalites: 9, facilite: 7, valeur: 7.5, confiance: 8.5 },
       },
+    ],
+  },
+  {
+    categorie: "Design graphique",
+    outils: [
       {
         nom: "Canva",
         slug: "canva",
@@ -138,6 +147,11 @@ const SECTIONS: SectionCategorie[] = [
         prix: "freemium",
         notes: { fonctionnalites: 9, facilite: 7, valeur: 8, confiance: 8.5 },
       },
+    ],
+  },
+  {
+    categorie: "Base de données",
+    outils: [
       {
         nom: "Supabase",
         slug: "supabase",
@@ -175,6 +189,11 @@ const SECTIONS: SectionCategorie[] = [
         mcp: true,
         notes: { fonctionnalites: 8.5, facilite: 7.5, valeur: 8, confiance: 8.5 },
       },
+    ],
+  },
+  {
+    categorie: "Stockage & fichiers",
+    outils: [
       {
         nom: "Google Drive",
         slug: "google-drive",
@@ -184,6 +203,11 @@ const SECTIONS: SectionCategorie[] = [
         mcp: true,
         notes: { fonctionnalites: 7, facilite: 9, valeur: 9, confiance: 9 },
       },
+    ],
+  },
+  {
+    categorie: "E-mailing",
+    outils: [
       {
         nom: "Gmail",
         slug: "gmail",
@@ -262,6 +286,7 @@ export const Route = createFileRoute("/_authenticated/outils")({
 
 function OutilsPage() {
   const [recherche, setRecherche] = useState("");
+  const [categorieActive, setCategorieActive] = useState<string | null>(null);
   const [outilsAjoutes, setOutilsAjoutes] = useState<OutilAjoute[]>(() => chargerOutilsAjoutes());
 
   const sectionsCombinees = useMemo(() => {
@@ -305,7 +330,7 @@ function OutilsPage() {
   }, [recherche, sectionsCombinees]);
 
   const [nouveauNom, setNouveauNom] = useState("");
-  const [nouvelleCategorie, setNouvelleCategorie] = useState(CATEGORIES_LABELS[0]);
+  const [nouvelleCategorie, setNouvelleCategorie] = useState<string>(CATEGORIES_LABELS[0] ?? "");
   const [nouveauPrix, setNouveauPrix] = useState<Prix>("freemium");
   const [nouvelleDefinition, setNouvelleDefinition] = useState("");
 
@@ -322,6 +347,7 @@ function OutilsPage() {
     const nouveau: OutilAjoute = {
       id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
       nom,
+      slug: nom.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""),
       definition,
       prix: nouveauPrix,
       categorie: nouvelleCategorie,
@@ -347,6 +373,10 @@ function OutilsPage() {
     (somme, section) => somme + section.outils.length,
     0,
   );
+
+  const sectionsAffichees = categorieActive
+    ? sectionsFiltrees.filter((section) => section.categorie === categorieActive)
+    : sectionsFiltrees;
 
   const hautDePageRef = useRef<HTMLDivElement>(null);
   const [afficherRemonter, setAfficherRemonter] = useState(false);
@@ -451,15 +481,36 @@ function OutilsPage() {
           </div>
         </form>
 
-        <nav aria-label="Aller à une catégorie" className="mb-8 flex flex-wrap gap-1.5">
+        <nav aria-label="Filtrer par catégorie" className="mb-8 flex flex-wrap gap-1.5">
+          <button
+            type="button"
+            onClick={() => setCategorieActive(null)}
+            aria-pressed={categorieActive === null}
+            className={`inline-flex h-8 items-center gap-1.5 rounded-full border px-3 text-xs font-bold transition hover:-translate-y-0.5 ${
+              categorieActive === null
+                ? "border-transparent bg-primary text-primary-foreground"
+                : "border-border bg-card text-primary hover:border-[var(--coral)] hover:text-[var(--coral)]"
+            }`}
+          >
+            Tout
+            <span className="opacity-60">· {resultatsCount}</span>
+          </button>
           {CATEGORIES_LABELS.map((categorie, index) => {
-            const disponible = sectionsFiltrees.some((s) => s.categorie === categorie);
+            const section = sectionsFiltrees.find((s) => s.categorie === categorie);
+            if (!section) return null;
             const role = ROLES[index % ROLES.length];
-            return disponible ? (
-              <a
+            const actif = categorieActive === categorie;
+            return (
+              <button
                 key={categorie}
-                href={`#categorie-${index}`}
-                className="inline-flex h-8 items-center gap-1.5 rounded-full border border-border bg-card px-3 text-xs font-bold text-primary transition hover:-translate-y-0.5 hover:border-[var(--coral)] hover:text-[var(--coral)]"
+                type="button"
+                onClick={() => setCategorieActive(actif ? null : categorie)}
+                aria-pressed={actif}
+                className={`inline-flex h-8 items-center gap-1.5 rounded-full border px-3 text-xs font-bold transition hover:-translate-y-0.5 ${
+                  actif
+                    ? "border-transparent bg-primary text-primary-foreground"
+                    : "border-border bg-card text-primary hover:border-[var(--coral)] hover:text-[var(--coral)]"
+                }`}
               >
                 <span
                   className="h-1.5 w-1.5 rounded-full"
@@ -467,18 +518,20 @@ function OutilsPage() {
                   aria-hidden="true"
                 />
                 {categorie}
-              </a>
-            ) : null;
+                <span className="opacity-60">· {section.outils.length}</span>
+              </button>
+            );
           })}
         </nav>
 
-        {sectionsFiltrees.length === 0 ? (
+
+        {sectionsAffichees.length === 0 ? (
           <div className="cami-block-resume text-center text-sm text-muted-foreground">
             Aucun outil ne correspond à « {recherche} ».
           </div>
         ) : (
           <div className="space-y-8">
-            {sectionsFiltrees.map((section) => {
+            {sectionsAffichees.map((section) => {
               const roleIndex = CATEGORIES_LABELS.indexOf(section.categorie);
               const role = ROLES[roleIndex % ROLES.length];
               return (

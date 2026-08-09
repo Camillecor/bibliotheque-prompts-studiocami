@@ -2,7 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { ToolLogo } from "@/components/ToolLogos";
-import { getToolDetail } from "@/lib/toolDetails";
+import { getToolDetail, type ToolDetail } from "@/lib/toolDetails";
 import { CRITERES, formatNote, noteGlobale } from "@/lib/toolNotes";
 
 export const Route = createFileRoute("/_authenticated/outils/$slug")({
@@ -50,7 +50,7 @@ function StatCard({ label, value }: { label: string; value: string }) {
 }
 
 function OutilDetailPage() {
-  const o = Route.useLoaderData();
+  const o = Route.useLoaderData() as ToolDetail;
   const global = noteGlobale(o.notes);
 
   return (
