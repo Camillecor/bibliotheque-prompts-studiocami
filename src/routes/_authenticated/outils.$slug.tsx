@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { ArrowLeft, ChevronDown, ExternalLink } from "lucide-react";
+import { ArrowLeft, ArrowRight, ChevronDown, ExternalLink } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { ToolLogo } from "@/components/ToolLogos";
 import { getToolDetail, type ToolDetail } from "@/lib/toolDetails";
@@ -46,7 +46,13 @@ function SOMMAIRE(o: ToolDetail): { id: string; label: string }[] {
     { id: "quest-ce-que", label: `Qu'est-ce que ${o.nom} ?` },
     { id: "qui-est-derriere", label: `Qui est derrière ${o.nom} ?` },
     { id: "pour-qui", label: "Pour qui ?" },
+    ...(o.demarrage && o.demarrage.length > 0
+      ? [{ id: "demarrage", label: `Bien démarrer avec ${o.nom}` }]
+      : []),
     { id: "fonctionnalites", label: "Fonctionnalités clés" },
+    ...(o.workflows && o.workflows.length > 0
+      ? [{ id: "workflows", label: "Idées d'automatisations" }]
+      : []),
     { id: "limites", label: "Les limites, la partie honnête" },
     { id: "conformite", label: "Conformité & souveraineté" },
     { id: "mcp", label: "MCP (Model Context Protocol)" },
@@ -211,6 +217,31 @@ function OutilDetailPage() {
           </div>
         </section>
 
+        {/* Bien démarrer */}
+        {o.demarrage && o.demarrage.length > 0 ? (
+          <section id="demarrage" className="mt-10 scroll-mt-24">
+            <h2 className="text-xl font-bold text-primary">Bien démarrer avec {o.nom}</h2>
+            <p className="mt-1.5 text-sm text-muted-foreground">
+              Dans cet ordre, pour partir sur de bonnes bases.
+            </p>
+            <ol className="mt-4 space-y-5">
+              {o.demarrage.map((etape, i) => (
+                <li key={etape.titre} className="flex gap-4">
+                  <span className="font-chic shrink-0 text-2xl text-[var(--border)]">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <div className="min-w-0 flex-1 border-l border-border pb-1 pl-4">
+                    <p className="text-sm font-bold text-primary">{etape.titre}</p>
+                    <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                      {etape.description}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </section>
+        ) : null}
+
         {/* Fonctionnalités */}
         <section id="fonctionnalites" className="mt-10 scroll-mt-24">
           <h2 className="text-xl font-bold text-primary">
@@ -225,6 +256,62 @@ function OutilDetailPage() {
             ))}
           </div>
         </section>
+
+        {/* Idées d'automatisations */}
+        {o.workflows && o.workflows.length > 0 ? (
+          <section id="workflows" className="mt-10 scroll-mt-24">
+            <h2 className="text-xl font-bold text-primary">
+              Idées d'automatisations{" "}
+              <span className="text-muted-foreground">{o.workflows.length}</span>
+            </h2>
+            <p className="mt-1.5 text-sm text-muted-foreground">
+              Des workflows concrets à construire avec {o.nom}, du déclencheur au résultat.
+            </p>
+            <div className="mt-4 space-y-3">
+              {o.workflows.map((w, i) => (
+                <div
+                  key={w.declencheur}
+                  className="flex gap-3 rounded-2xl border p-4 sm:gap-4"
+                  style={{
+                    borderColor: "color-mix(in srgb, var(--coral) 28%, var(--border))",
+                    background: "color-mix(in srgb, var(--coral) 5%, var(--card))",
+                  }}
+                >
+                  <span
+                    className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
+                    style={{ background: "var(--coral)" }}
+                  >
+                    {i + 1}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm font-bold text-primary">
+                      <span>{w.declencheur}</span>
+                      <ArrowRight
+                        className="h-3.5 w-3.5 shrink-0"
+                        style={{ color: "var(--coral)" }}
+                        aria-hidden="true"
+                      />
+                      <span>{w.resultat}</span>
+                    </div>
+                    <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
+                      {w.description}
+                    </p>
+                    <div className="mt-2.5 flex flex-wrap gap-1.5">
+                      {w.outils.map((outil) => (
+                        <span
+                          key={outil}
+                          className="rounded-full border border-border bg-card px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.05em] text-muted-foreground"
+                        >
+                          {outil}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        ) : null}
 
         {/* Limites */}
         <section id="limites" className="mt-10 scroll-mt-24">

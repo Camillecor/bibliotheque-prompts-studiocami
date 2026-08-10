@@ -7,6 +7,8 @@ export type Tarif = { nom: string; prix: string; inclus: string };
 export type Feature = { titre: string; description: string };
 export type Limite = { titre: string; description: string };
 export type FAQItem = { question: string; reponse: string };
+export type Workflow = { declencheur: string; resultat: string; description: string; outils: string[] };
+export type PremierPas = { titre: string; description: string };
 
 export type ToolDetail = {
   slug: string;
@@ -22,7 +24,9 @@ export type ToolDetail = {
   quEstCe: string[];
   quiEstDerriere: string;
   pourQui: { idealPour: string; aEviterSi: string };
+  demarrage?: PremierPas[];
   fonctionnalites: Feature[];
+  workflows?: Workflow[];
   limites: Limite[];
   conformite: {
     hebergement: string;
@@ -64,6 +68,38 @@ export const TOOL_DETAILS: Record<string, ToolDetail> = {
       aEviterSi:
         "Tu cherches un usage 100 % gratuit et illimité, ou un outil pensé pour la génération d'images (Claude ne génère pas d'images nativement).",
     },
+    demarrage: [
+      {
+        titre: "Personnalise tes instructions",
+        description:
+          "Dans les réglages, les instructions personnalisées donnent un contexte permanent (métier, ton, contraintes) à chaque nouvelle conversation, sans avoir à le répéter à chaque fois.",
+      },
+      {
+        titre: "Crée un Project pour ton activité récurrente",
+        description:
+          "Regroupe les documents de référence et les instructions propres à un contexte de travail donné (un client, un produit, une méthodologie) dans un Project, plutôt que de tout redonner à chaque session.",
+      },
+      {
+        titre: "Ajoute un CLAUDE.md à tes projets de code",
+        description:
+          "Pour Claude Code : un fichier CLAUDE.md à la racine du repo documente les conventions du projet (stack, style, contraintes) et est lu automatiquement en début de session — l'équivalent d'un onboarding pour l'agent.",
+      },
+      {
+        titre: "Explore les Skills",
+        description:
+          "Les Skills sont des paquets d'instructions réutilisables (une checklist, un format de sortie, une procédure) que Claude peut charger à la demande — utile pour standardiser une tâche que tu refais souvent.",
+      },
+      {
+        titre: "Connecte les MCP utiles à ton usage",
+        description:
+          "Notion, Gmail, Google Drive, Figma, Zapier… chaque connecteur MCP ajoute une capacité concrète (voir la section MCP plus bas). Commence par un seul outil du quotidien plutôt que tout connecter d'un coup.",
+      },
+      {
+        titre: "Choisis le bon modèle selon la tâche",
+        description:
+          "Haiku pour la rapidité et le coût, Sonnet pour l'usage quotidien équilibré, Opus pour les tâches complexes qui demandent le plus de raisonnement.",
+      },
+    ],
     fonctionnalites: [
       {
         titre: "Fenêtre de contexte étendue",
@@ -95,35 +131,49 @@ export const TOOL_DETAILS: Record<string, ToolDetail> = {
         description:
           "Analyse des images, PDF, feuilles de calcul et captures d'écran directement dans la conversation, sans étape d'OCR séparée.",
       },
+    ],
+    workflows: [
       {
-        titre: "Workflow : de l'idée au déploiement, sans étape manuelle",
+        declencheur: "Une idée décrite en langage naturel",
+        resultat: "Un site à jour, en ligne",
         description:
-          "Claude Code peut écrire le code, committer, pousser sur GitHub et déclencher un redéploiement automatique (Lovable, Vercel, Netlify…) en une seule session — exactement comme cette fiche a été construite : décrite en langage naturel, codée, poussée sur le repo, republiée en ligne.",
+          "Claude Code écrit le code, committe, pousse sur GitHub et déclenche un redéploiement (Lovable, Vercel, Netlify…) dans la même session — sans étape manuelle entre l'idée et la mise en ligne. C'est exactement comme ça que cette fiche a été construite.",
+        outils: ["Claude Code", "GitHub", "Lovable"],
       },
       {
-        titre: "Workflow : Claude + Notion via MCP",
+        declencheur: "Une réunion ou un brainstorm",
+        resultat: "Des tâches structurées dans Notion",
         description:
-          "Connecté à Notion, Claude peut créer une page, remplir une base de données ou mettre à jour un statut directement depuis la conversation — utile pour transformer une réunion ou un brainstorm en tâches structurées sans repasser par l'interface Notion.",
+          "Connecté à Notion via MCP, Claude crée une page, remplit une base de données ou met à jour un statut directement depuis la conversation, sans repasser par l'interface Notion.",
+        outils: ["Notion"],
       },
       {
-        titre: "Workflow : tri et brouillons d'e-mails avec Gmail",
+        declencheur: "Une boîte Gmail qui déborde",
+        resultat: "Des brouillons de réponse prêts à valider",
         description:
-          "Via le MCP Gmail, Claude peut lire une boîte de réception, résumer les e-mails en attente et préparer des brouillons de réponse à valider — un premier passage automatisé sur le tri, pas un pilote automatique complet.",
+          "Via le MCP Gmail, Claude lit les e-mails en attente, les résume et prépare des brouillons — un premier passage automatisé sur le tri, pas un pilote automatique complet : tu valides avant envoi.",
+        outils: ["Gmail"],
       },
       {
-        titre: "Workflow : automatisations multi-apps avec Zapier",
+        declencheur: "Un nouveau prompt sauvegardé dans la bibliothèque",
+        resultat: "Une notification ou un suivi ailleurs",
         description:
-          "En combinant Claude (génération, classification, résumé) avec Zapier (déclencheurs et actions), on peut enchaîner plusieurs outils sans code : par exemple, un nouveau prompt sauvegardé dans la bibliothèque déclenche une notification Slack ou un ajout dans un tableau de suivi.",
+          "En combinant Claude (génération, classification) avec Zapier (déclencheurs et actions), plusieurs outils s'enchaînent sans code : par exemple un ajout automatique dans un tableau de suivi ou une alerte Slack.",
+        outils: ["Zapier"],
       },
       {
-        titre: "Workflow : synthèse de maquettes Figma",
+        declencheur: "Une maquette Figma",
+        resultat: "Des specs ou du code prêt à intégrer",
         description:
-          "Avec le MCP Figma, Claude peut lire une maquette (structure, textes, composants) et en extraire des spécifications, des textes d'interface ou une première implémentation en code — un pont direct entre design et développement sans ressaisie manuelle.",
+          "Avec le MCP Figma, Claude lit la structure, les textes et les composants d'une maquette pour en extraire des spécifications ou une première implémentation — un pont direct entre design et développement, sans ressaisie manuelle.",
+        outils: ["Figma"],
       },
       {
-        titre: "Workflow : revue de code automatisée",
+        declencheur: "Une pull request ouverte",
+        resultat: "Une revue de code avant merge",
         description:
           "Claude Code peut tourner hors session interactive — dans une pipeline CI/CD par exemple — pour relire une pull request, signaler les problèmes ou proposer des corrections avant qu'un humain ne valide le merge.",
+        outils: ["Claude Code", "GitHub"],
       },
     ],
     limites: [
