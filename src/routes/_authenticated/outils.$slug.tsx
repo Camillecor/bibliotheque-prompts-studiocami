@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { ArrowLeft, ExternalLink } from "lucide-react";
+import { ArrowLeft, ChevronDown, ExternalLink } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { ToolLogo } from "@/components/ToolLogos";
 import { getToolDetail, type ToolDetail } from "@/lib/toolDetails";
@@ -38,6 +38,22 @@ function FicheIntrouvable() {
       </div>
     </AppShell>
   );
+}
+
+function SOMMAIRE(o: ToolDetail): { id: string; label: string }[] {
+  return [
+    { id: "essentiel", label: "L'essentiel" },
+    { id: "quest-ce-que", label: `Qu'est-ce que ${o.nom} ?` },
+    { id: "qui-est-derriere", label: `Qui est derrière ${o.nom} ?` },
+    { id: "pour-qui", label: "Pour qui ?" },
+    { id: "fonctionnalites", label: "Fonctionnalités clés" },
+    { id: "limites", label: "Les limites, la partie honnête" },
+    { id: "conformite", label: "Conformité & souveraineté" },
+    { id: "mcp", label: "MCP (Model Context Protocol)" },
+    { id: "tarifs", label: "Tarifs" },
+    { id: "verdict", label: "Le verdict" },
+    { id: "faq", label: `FAQ ${o.nom}` },
+  ];
 }
 
 function StatCard({ label, value }: { label: string; value: string }) {
@@ -128,15 +144,38 @@ function OutilDetailPage() {
         </div>
 
         {/* Essentiel */}
-        <div className="cami-block-resume mt-8">
+        <div id="essentiel" className="cami-block-resume mt-8 scroll-mt-24">
           <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--info)]">
             ✦ L'essentiel
           </p>
           <p className="mt-2 text-sm leading-relaxed text-foreground">{o.essentiel}</p>
         </div>
 
+        {/* Sommaire */}
+        <details className="cami-card group mt-8" open>
+          <summary className="flex cursor-pointer list-none items-center justify-between text-sm font-bold text-primary">
+            Sommaire
+            <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform group-open:rotate-180" />
+          </summary>
+          <ol className="mt-3 space-y-2 text-sm">
+            {SOMMAIRE(o).map((item, i) => (
+              <li key={item.id}>
+                <a
+                  href={`#${item.id}`}
+                  className="flex items-baseline gap-2 text-muted-foreground transition hover:text-[var(--coral)]"
+                >
+                  <span className="font-chic text-xs text-muted-foreground/60">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  {item.label}
+                </a>
+              </li>
+            ))}
+          </ol>
+        </details>
+
         {/* Qu'est-ce que */}
-        <section className="mt-10">
+        <section id="quest-ce-que" className="mt-10 scroll-mt-24">
           <h2 className="text-xl font-bold text-primary">Qu'est-ce que {o.nom} ?</h2>
           <div className="mt-3 space-y-3">
             {o.quEstCe.map((p, i) => (
@@ -148,13 +187,13 @@ function OutilDetailPage() {
         </section>
 
         {/* Qui est derrière */}
-        <section className="mt-10">
+        <section id="qui-est-derriere" className="mt-10 scroll-mt-24">
           <h2 className="text-xl font-bold text-primary">Qui est derrière {o.nom} ?</h2>
           <p className="mt-3 text-sm leading-relaxed text-foreground">{o.quiEstDerriere}</p>
         </section>
 
         {/* Pour qui */}
-        <section className="mt-10">
+        <section id="pour-qui" className="mt-10 scroll-mt-24">
           <h2 className="text-xl font-bold text-primary">Pour qui ?</h2>
           <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="cami-block-positif">
@@ -173,7 +212,7 @@ function OutilDetailPage() {
         </section>
 
         {/* Fonctionnalités */}
-        <section className="mt-10">
+        <section id="fonctionnalites" className="mt-10 scroll-mt-24">
           <h2 className="text-xl font-bold text-primary">
             Fonctionnalités clés <span className="text-muted-foreground">{o.fonctionnalites.length}</span>
           </h2>
@@ -188,7 +227,7 @@ function OutilDetailPage() {
         </section>
 
         {/* Limites */}
-        <section className="mt-10">
+        <section id="limites" className="mt-10 scroll-mt-24">
           <h2 className="text-xl font-bold text-primary">
             Les limites, la partie honnête{" "}
             <span className="text-muted-foreground">{o.limites.length}</span>
@@ -204,7 +243,7 @@ function OutilDetailPage() {
         </section>
 
         {/* Conformité & souveraineté */}
-        <section className="mt-10">
+        <section id="conformite" className="mt-10 scroll-mt-24">
           <h2 className="text-xl font-bold text-primary">Conformité & souveraineté</h2>
           <div className="mt-3 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
             <StatCard label="Hébergement" value={o.conformite.hebergement} />
@@ -216,7 +255,7 @@ function OutilDetailPage() {
         </section>
 
         {/* MCP */}
-        <section className="mt-10">
+        <section id="mcp" className="mt-10 scroll-mt-24">
           <h2 className="text-xl font-bold text-primary">MCP (Model Context Protocol)</h2>
           <div className="cami-card mt-3">
             <span
@@ -245,7 +284,7 @@ function OutilDetailPage() {
         </section>
 
         {/* Tarifs */}
-        <section className="mt-10">
+        <section id="tarifs" className="mt-10 scroll-mt-24">
           <h2 className="text-xl font-bold text-primary">
             Tarifs <span className="text-muted-foreground">{o.tarifs.length} paliers</span>
           </h2>
@@ -264,13 +303,13 @@ function OutilDetailPage() {
         </section>
 
         {/* Verdict */}
-        <section className="mt-10">
+        <section id="verdict" className="mt-10 scroll-mt-24">
           <h2 className="text-xl font-bold text-primary">Le verdict</h2>
           <p className="mt-3 text-sm leading-relaxed text-foreground">{o.verdict}</p>
         </section>
 
         {/* FAQ */}
-        <section className="mt-10 border-t border-border pt-8">
+        <section id="faq" className="mt-10 scroll-mt-24 border-t border-border pt-8">
           <h2 className="text-xl font-bold text-primary">
             FAQ {o.nom} <span className="text-muted-foreground">{o.faq.length}</span>
           </h2>
