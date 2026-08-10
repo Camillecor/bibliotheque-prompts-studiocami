@@ -1,5 +1,7 @@
 import type { ToolLogoName } from "@/components/ToolLogos";
 import type { Notes } from "@/lib/toolNotes";
+import { AUTRES_TOOL_DETAILS } from "@/lib/toolDetailsData";
+
 
 export type Tarif = { nom: string; prix: string; inclus: string };
 export type Feature = { titre: string; description: string };
