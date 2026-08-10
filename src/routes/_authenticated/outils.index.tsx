@@ -37,6 +37,16 @@ const CATEGORIES_LABELS = [
   "Stockage & fichiers",
   "E-mailing",
   "Automatisation",
+  "SEO",
+  "Rédaction",
+  "Voix",
+  "Vidéo",
+  "Réunions",
+  "Slides",
+  "Traduction",
+  "Correction",
+  "Marketing",
+  "Agents",
 ];
 
 function chargerOutilsAjoutes(): OutilAjoute[] {
@@ -80,6 +90,14 @@ const SECTIONS: SectionCategorie[] = [
         souverain: true,
         notes: { fonctionnalites: 7, facilite: 7.5, valeur: 8.5, confiance: 8.5 },
       },
+      {
+        nom: "Google Gemini",
+        slug: "google-gemini",
+        logo: "GoogleGemini",
+        definition: "IA multimodale de Google, intégrée à tout l'écosystème Workspace.",
+        prix: "freemium",
+        notes: { fonctionnalites: 8.5, facilite: 8, valeur: 8, confiance: 8 },
+      },
     ],
   },
   {
@@ -92,6 +110,14 @@ const SECTIONS: SectionCategorie[] = [
         definition: "Moteur de réponse IA qui cite toujours ses sources.",
         prix: "freemium",
         notes: { fonctionnalites: 7.5, facilite: 8.5, valeur: 7, confiance: 7.5 },
+      },
+      {
+        nom: "NotebookLM",
+        slug: "notebooklm",
+        logo: "NotebookLM",
+        definition: "Transforme des documents en notes et podcasts interactifs sourcés.",
+        prix: "freemium",
+        notes: { fonctionnalites: 8, facilite: 8.5, valeur: 9, confiance: 8 },
       },
     ],
   },
@@ -121,6 +147,15 @@ const SECTIONS: SectionCategorie[] = [
         mcp: true,
         notes: { fonctionnalites: 8, facilite: 9.5, valeur: 8, confiance: 8 },
       },
+      {
+        nom: "Photoroom",
+        slug: "photoroom",
+        logo: "Photoroom",
+        definition: "Détoure et crée des visuels produits en un instant.",
+        prix: "freemium",
+        souverain: true,
+        notes: { fonctionnalites: 7.5, facilite: 9, valeur: 8, confiance: 8 },
+      },
     ],
   },
   {
@@ -146,6 +181,15 @@ const SECTIONS: SectionCategorie[] = [
         definition: "Agent IA en ligne de commande : code, débogue et gère les projets dans le terminal.",
         prix: "freemium",
         notes: { fonctionnalites: 9, facilite: 7, valeur: 8, confiance: 8.5 },
+      },
+      {
+        nom: "Cursor",
+        slug: "cursor",
+        logo: "Cursor",
+        definition: "L'éditeur de code qui code avec toi, pas juste pour toi.",
+        prix: "freemium",
+        mcp: true,
+        notes: { fonctionnalites: 9, facilite: 7.5, valeur: 7.5, confiance: 8.5 },
       },
     ],
   },
@@ -230,6 +274,149 @@ const SECTIONS: SectionCategorie[] = [
         prix: "freemium",
         mcp: true,
         notes: { fonctionnalites: 8.5, facilite: 7.5, valeur: 6.5, confiance: 8 },
+      },
+      {
+        nom: "n8n",
+        slug: "n8n",
+        logo: "N8n",
+        definition: "Automatisation open source, flexible et auto-hébergeable.",
+        prix: "freemium",
+        souverain: true,
+        mcp: true,
+        notes: { fonctionnalites: 9, facilite: 6.5, valeur: 9, confiance: 8 },
+      },
+    ],
+  },
+  {
+    categorie: "SEO",
+    outils: [
+      {
+        nom: "Semrush",
+        slug: "semrush",
+        logo: "Semrush",
+        definition: "La boîte à outils SEO ultime pour dominer Google.",
+        prix: "freemium",
+        notes: { fonctionnalites: 9, facilite: 6.5, valeur: 6.5, confiance: 8.5 },
+      },
+    ],
+  },
+  {
+    categorie: "Rédaction",
+    outils: [
+      {
+        nom: "Jasper AI",
+        slug: "jasper-ai",
+        logo: "JasperAI",
+        definition: "Plateforme de copywriting IA pensée pour les marques.",
+        prix: "payant",
+        notes: { fonctionnalites: 7.5, facilite: 8, valeur: 6, confiance: 7.5 },
+      },
+    ],
+  },
+  {
+    categorie: "Voix",
+    outils: [
+      {
+        nom: "ElevenLabs",
+        slug: "elevenlabs",
+        logo: "ElevenLabs",
+        definition: "Les voix IA les plus réalistes du marché.",
+        prix: "freemium",
+        mcp: true,
+        notes: { fonctionnalites: 9, facilite: 8, valeur: 7.5, confiance: 8.5 },
+      },
+    ],
+  },
+  {
+    categorie: "Vidéo",
+    outils: [
+      {
+        nom: "Synthesia",
+        slug: "synthesia",
+        logo: "Synthesia",
+        definition: "Transforme du texte en vidéos présentées par un avatar.",
+        prix: "freemium",
+        notes: { fonctionnalites: 8, facilite: 7.5, valeur: 6.5, confiance: 8 },
+      },
+    ],
+  },
+  {
+    categorie: "Réunions",
+    outils: [
+      {
+        nom: "Granola",
+        slug: "granola",
+        logo: "Granola",
+        definition: "Tu prends tes notes, l'IA écrit le compte-rendu, sans robot dans ta visio.",
+        prix: "freemium",
+        notes: { fonctionnalites: 7.5, facilite: 9, valeur: 7.5, confiance: 7.5 },
+      },
+    ],
+  },
+  {
+    categorie: "Slides",
+    outils: [
+      {
+        nom: "Gamma",
+        slug: "gamma",
+        logo: "Gamma",
+        definition: "Crée présentations et sites web en partant d'un prompt.",
+        prix: "freemium",
+        notes: { fonctionnalites: 8, facilite: 9, valeur: 8, confiance: 7.5 },
+      },
+    ],
+  },
+  {
+    categorie: "Traduction",
+    outils: [
+      {
+        nom: "DeepL",
+        slug: "deepl",
+        logo: "DeepL",
+        definition: "La traduction IA la plus naturelle, point.",
+        prix: "freemium",
+        souverain: true,
+        notes: { fonctionnalites: 8.5, facilite: 9, valeur: 8.5, confiance: 9 },
+      },
+    ],
+  },
+  {
+    categorie: "Correction",
+    outils: [
+      {
+        nom: "MerciApp",
+        slug: "merciapp",
+        logo: "MerciApp",
+        definition: "Le correcteur d'orthographe français dopé à l'IA.",
+        prix: "freemium",
+        souverain: true,
+        notes: { fonctionnalites: 7, facilite: 9, valeur: 8.5, confiance: 8 },
+      },
+    ],
+  },
+  {
+    categorie: "Marketing",
+    outils: [
+      {
+        nom: "Beehiiv",
+        slug: "beehiiv",
+        logo: "Beehiiv",
+        definition: "La plateforme de newsletter pensée pour grandir.",
+        prix: "freemium",
+        notes: { fonctionnalites: 8, facilite: 8, valeur: 7.5, confiance: 7.5 },
+      },
+    ],
+  },
+  {
+    categorie: "Agents",
+    outils: [
+      {
+        nom: "Lindy",
+        slug: "lindy",
+        logo: "Lindy",
+        definition: "Crée des assistants IA qui gèrent tes tâches en pilote automatique.",
+        prix: "freemium",
+        notes: { fonctionnalites: 7.5, facilite: 7, valeur: 7, confiance: 7 },
       },
     ],
   },

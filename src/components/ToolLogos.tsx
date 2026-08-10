@@ -14,6 +14,21 @@ export const TOOL_LOGO_NAMES = [
   "GoogleDrive",
   "Gmail",
   "Zapier",
+  "GoogleGemini",
+  "NotebookLM",
+  "Photoroom",
+  "Semrush",
+  "JasperAI",
+  "ElevenLabs",
+  "Synthesia",
+  "Granola",
+  "N8n",
+  "Cursor",
+  "Gamma",
+  "DeepL",
+  "MerciApp",
+  "Beehiiv",
+  "Lindy",
 ] as const;
 
 export type ToolLogoName = (typeof TOOL_LOGO_NAMES)[number];
@@ -33,6 +48,21 @@ const LOGO_FILES: Record<ToolLogoName, string> = {
   GoogleDrive: "google-drive",
   Gmail: "gmail",
   Zapier: "zapier",
+  GoogleGemini: "google-gemini",
+  NotebookLM: "notebooklm",
+  Photoroom: "photoroom",
+  Semrush: "semrush",
+  JasperAI: "jasper-ai",
+  ElevenLabs: "elevenlabs",
+  Synthesia: "synthesia",
+  Granola: "granola",
+  N8n: "n8n",
+  Cursor: "cursor",
+  Gamma: "gamma",
+  DeepL: "deepl",
+  MerciApp: "merciapp",
+  Beehiiv: "beehiiv",
+  Lindy: "lindy",
 };
 
 export function ToolLogo({ nom }: { nom: ToolLogoName }) {
