@@ -93,6 +93,36 @@ export const TOOL_DETAILS: Record<string, ToolDetail> = {
         description:
           "Analyse des images, PDF, feuilles de calcul et captures d'écran directement dans la conversation, sans étape d'OCR séparée.",
       },
+      {
+        titre: "Workflow : de l'idée au déploiement, sans étape manuelle",
+        description:
+          "Claude Code peut écrire le code, committer, pousser sur GitHub et déclencher un redéploiement automatique (Lovable, Vercel, Netlify…) en une seule session — exactement comme cette fiche a été construite : décrite en langage naturel, codée, poussée sur le repo, republiée en ligne.",
+      },
+      {
+        titre: "Workflow : Claude + Notion via MCP",
+        description:
+          "Connecté à Notion, Claude peut créer une page, remplir une base de données ou mettre à jour un statut directement depuis la conversation — utile pour transformer une réunion ou un brainstorm en tâches structurées sans repasser par l'interface Notion.",
+      },
+      {
+        titre: "Workflow : tri et brouillons d'e-mails avec Gmail",
+        description:
+          "Via le MCP Gmail, Claude peut lire une boîte de réception, résumer les e-mails en attente et préparer des brouillons de réponse à valider — un premier passage automatisé sur le tri, pas un pilote automatique complet.",
+      },
+      {
+        titre: "Workflow : automatisations multi-apps avec Zapier",
+        description:
+          "En combinant Claude (génération, classification, résumé) avec Zapier (déclencheurs et actions), on peut enchaîner plusieurs outils sans code : par exemple, un nouveau prompt sauvegardé dans la bibliothèque déclenche une notification Slack ou un ajout dans un tableau de suivi.",
+      },
+      {
+        titre: "Workflow : synthèse de maquettes Figma",
+        description:
+          "Avec le MCP Figma, Claude peut lire une maquette (structure, textes, composants) et en extraire des spécifications, des textes d'interface ou une première implémentation en code — un pont direct entre design et développement sans ressaisie manuelle.",
+      },
+      {
+        titre: "Workflow : revue de code automatisée",
+        description:
+          "Claude Code peut tourner hors session interactive — dans une pipeline CI/CD par exemple — pour relire une pull request, signaler les problèmes ou proposer des corrections avant qu'un humain ne valide le merge.",
+      },
     ],
     limites: [
       {
