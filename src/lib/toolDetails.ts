@@ -204,5 +204,6 @@ export const TOOL_DETAILS: Record<string, ToolDetail> = {
 };
 
 export function getToolDetail(slug: string): ToolDetail | undefined {
-  return TOOL_DETAILS[slug];
+  return TOOL_DETAILS[slug] ?? AUTRES_TOOL_DETAILS[slug];
 }
+
