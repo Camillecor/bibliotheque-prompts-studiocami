@@ -28,6 +28,38 @@ export const AUTRES_TOOL_DETAILS: Record<string, ToolDetail> = {
       aEviterSi:
         "Tu as besoin d'un hébergement européen strict, ou d'un modèle spécialisé sur une seule tâche (image artistique, code agentique long).",
     },
+    demarrage: [
+      {
+        titre: "Personnalise tes instructions",
+        description:
+          "Dans Réglages > Personnalisation, décris ton métier, ton ton attendu et tes contraintes une bonne fois pour toutes, plutôt que de les répéter à chaque conversation.",
+      },
+      {
+        titre: "Choisis ce que la mémoire retient",
+        description:
+          "Active ou désactive la mémoire entre conversations selon que tu veux un assistant qui se souvient de ton contexte ou des sessions cloisonnées.",
+      },
+      {
+        titre: "Crée un GPT pour une tâche récurrente",
+        description:
+          "Un GPT personnalisé avec instructions et fichiers de référence évite de tout redonner à chaque fois — utile pour une tâche que tu refais chaque semaine.",
+      },
+      {
+        titre: "Regroupe par Projects",
+        description:
+          "Range les conversations et fichiers d'un même sujet dans un Project pour garder le contexte au même endroit.",
+      },
+      {
+        titre: "Connecte les outils utiles",
+        description:
+          "Dans Réglages > Connecteurs, branche Google Drive, GitHub ou d'autres sources selon ton usage réel, plutôt que de tout activer.",
+      },
+      {
+        titre: "Choisis le bon mode selon la tâche",
+        description:
+          "Réponse rapide pour le quotidien, réflexion approfondie (o-series) pour les problèmes qui demandent un vrai raisonnement.",
+      },
+    ],
     fonctionnalites: [
       {
         titre: "Multimodal complet",
@@ -58,6 +90,50 @@ export const AUTRES_TOOL_DETAILS: Record<string, ToolDetail> = {
         titre: "Mémoire entre conversations",
         description:
           "Retient tes préférences et le contexte de tes projets d'une session à l'autre, désactivable dans les réglages.",
+      },
+    ],
+    workflows: [
+      {
+        declencheur: "Une question qui dépasse la date de coupure",
+        resultat: "Une réponse à jour, sourcée",
+        description:
+          "La recherche web intégrée va chercher l'info en direct et cite ses sources, sans changer d'outil.",
+        outils: ["Web"],
+      },
+      {
+        declencheur: "Un fichier PDF ou un tableur uploadé",
+        resultat: "Une analyse ou un graphique",
+        description:
+          "L'analyse de données exécute du code Python sur le fichier pour nettoyer, croiser ou visualiser les chiffres.",
+        outils: ["Python"],
+      },
+      {
+        declencheur: "Un brief marketing décrit en une phrase",
+        resultat: "Un visuel prêt à publier",
+        description:
+          "La génération d'images intégrée produit et retouche le visuel directement dans la conversation.",
+        outils: ["Images"],
+      },
+      {
+        declencheur: "Une tâche que ton équipe refait chaque semaine",
+        resultat: "Un GPT personnalisé partageable",
+        description:
+          "Instructions et fichiers de référence encapsulés dans un GPT dédié, réutilisable par toute l'équipe.",
+        outils: [],
+      },
+      {
+        declencheur: "Une réunion enregistrée en vocal",
+        resultat: "Un compte-rendu structuré",
+        description:
+          "Le mode vocal transcrit et la rédaction assistée structure directement le compte-rendu.",
+        outils: [],
+      },
+      {
+        declencheur: "Un fichier stocké sur Google Drive",
+        resultat: "Une réponse enrichie de son contenu",
+        description:
+          "Le connecteur Drive donne à ChatGPT accès direct au fichier sans le retélécharger.",
+        outils: ["Google Drive"],
       },
     ],
     limites: [
@@ -130,6 +206,38 @@ export const AUTRES_TOOL_DETAILS: Record<string, ToolDetail> = {
       aEviterSi:
         "Tu cherches le meilleur niveau absolu en raisonnement complexe ou l'écosystème le plus riche en intégrations tierces.",
     },
+    demarrage: [
+      {
+        titre: "Choisis ton point d'entrée",
+        description:
+          "Le Chat pour un usage conversationnel, l'API pour intégrer Mistral dans un produit — les deux donnent accès aux mêmes modèles.",
+      },
+      {
+        titre: "Active le mode Flash pour le quotidien",
+        description:
+          "Pour les questions courantes, le mode rapide donne des réponses quasi instantanées sans sacrifier l'essentiel.",
+      },
+      {
+        titre: "Teste Codestral dans ton éditeur",
+        description:
+          "L'extension IDE branche le modèle spécialisé code directement dans ton flux de développement, pour la complétion et la génération.",
+      },
+      {
+        titre: "Crée un agent avec des instructions persistantes",
+        description:
+          "Un agent personnalisé garde un rôle et des règles fixes d'une conversation à l'autre, sans les répéter.",
+      },
+      {
+        titre: "Vérifie si l'open weights te concerne",
+        description:
+          "Si la souveraineté est critique, certains modèles Mistral sont téléchargeables et exécutables sur ta propre infrastructure.",
+      },
+      {
+        titre: "Connecte un MCP si besoin de données externes",
+        description:
+          "Le Chat et l'API supportent les connecteurs MCP pour brancher une source de données tierce à l'agent.",
+      },
+    ],
     fonctionnalites: [
       { titre: "Hébergement européen", description: "Infrastructure et traitement des données en Europe, avec un cadre RGPD natif plutôt que par clauses de transfert." },
       { titre: "Modèles ouverts", description: "Plusieurs modèles sont publiés en open weights et peuvent être auto-hébergés, y compris en environnement isolé." },
@@ -137,6 +245,43 @@ export const AUTRES_TOOL_DETAILS: Record<string, ToolDetail> = {
       { titre: "Codestral", description: "Un modèle spécialisé code, intégrable dans les IDE pour la complétion et la génération." },
       { titre: "Agents et connecteurs", description: "Création d'agents personnalisés capables d'appeler des outils externes et de suivre des instructions persistantes." },
       { titre: "Analyse documentaire", description: "Lecture de PDF, images et tableurs, avec un moteur OCR maison pour les documents scannés." },
+    ],
+    workflows: [
+      {
+        declencheur: "Une question urgente en pleine journée de travail",
+        resultat: "Une réponse quasi instantanée",
+        description:
+          "Le mode Flash de Le Chat privilégie la vitesse sans sortir du raisonnable pour les questions courantes.",
+        outils: ["Le Chat"],
+      },
+      {
+        declencheur: "Un document scanné illisible par un moteur classique",
+        resultat: "Un texte exploitable",
+        description:
+          "L'OCR maison de Mistral extrait le texte des documents scannés directement dans la conversation.",
+        outils: ["Le Chat"],
+      },
+      {
+        declencheur: "Une fonction à écrire dans l'IDE",
+        resultat: "Une complétion pertinente",
+        description:
+          "Codestral s'intègre à l'éditeur pour proposer complétion et génération de code en contexte.",
+        outils: ["Codestral"],
+      },
+      {
+        declencheur: "Un besoin d'agent métier avec accès à des outils",
+        resultat: "Un agent Mistral autonome",
+        description:
+          "Les agents personnalisés peuvent appeler des outils externes et suivre des instructions persistantes.",
+        outils: ["Agents Mistral"],
+      },
+      {
+        declencheur: "Des données clients sensibles à traiter",
+        resultat: "Un traitement 100 % hébergé en UE",
+        description:
+          "L'infrastructure française de Mistral évite tout transfert hors Union européenne, sans montage contractuel.",
+        outils: ["Le Chat"],
+      },
     ],
     limites: [
       { titre: "Un cran en dessous sur le raisonnement", description: "Sur les tâches les plus complexes, les modèles restent en retrait par rapport aux meilleurs modèles américains." },
@@ -188,6 +333,38 @@ export const AUTRES_TOOL_DETAILS: Record<string, ToolDetail> = {
       idealPour: "La veille, la recherche factuelle, l'analyse concurrentielle et tout travail où l'on doit pouvoir remonter à la source.",
       aEviterSi: "Tu cherches un assistant de rédaction créative ou un partenaire de travail sur des documents longs.",
     },
+    demarrage: [
+      {
+        titre: "Pose ta première question factuelle",
+        description:
+          "Observe comment chaque affirmation renvoie à une source cliquable — c'est le réflexe à prendre avant de faire confiance à la réponse.",
+      },
+      {
+        titre: "Passe en Recherche approfondie pour un vrai sujet",
+        description:
+          "Quand la question mérite plus qu'une réponse courte, ce mode enchaîne les requêtes pour produire un rapport structuré.",
+      },
+      {
+        titre: "Crée un Space pour une veille récurrente",
+        description:
+          "Regroupe recherches, fichiers et instructions autour d'un sujet que tu suis dans la durée.",
+      },
+      {
+        titre: "Choisis le modèle sous-jacent en Pro",
+        description:
+          "Sélectionne Claude, GPT ou un autre modèle selon le type de question posée.",
+      },
+      {
+        titre: "Téléverse un document pour l'interroger",
+        description:
+          "Un PDF ou un tableur devient une source au même titre que le web, avec citations précises.",
+      },
+      {
+        titre: "Installe Comet si tu veux l'assistant partout",
+        description:
+          "Le navigateur maison intègre Perplexity directement dans la navigation quotidienne.",
+      },
+    ],
     fonctionnalites: [
       { titre: "Sources citées systématiquement", description: "Chaque affirmation renvoie à une page web identifiée, ce qui permet de vérifier au lieu de faire confiance." },
       { titre: "Recherche approfondie", description: "Enchaîne des dizaines de requêtes pour produire un rapport structuré sur un sujet, en quelques minutes." },
@@ -195,6 +372,43 @@ export const AUTRES_TOOL_DETAILS: Record<string, ToolDetail> = {
       { titre: "Choix du modèle", description: "En Pro, on choisit le modèle sous-jacent (Claude, GPT, Gemini…) selon le type de question." },
       { titre: "Recherche sur tes fichiers", description: "Téléverse des PDF ou tableurs pour les interroger au même titre que le web." },
       { titre: "Navigateur Comet", description: "Un navigateur maison qui intègre l'assistant directement dans la navigation." },
+    ],
+    workflows: [
+      {
+        declencheur: "Un sujet de veille à suivre dans la durée",
+        resultat: "Un Space centralisant recherches et fichiers",
+        description:
+          "Toutes les recherches sur un même sujet restent groupées, avec l'historique et les documents associés.",
+        outils: ["Spaces"],
+      },
+      {
+        declencheur: "Une question concurrentielle complexe",
+        resultat: "Un rapport structuré et sourcé",
+        description:
+          "La Recherche approfondie enchaîne les requêtes nécessaires et compose un vrai rapport, pas une réponse courte.",
+        outils: ["Recherche approfondie"],
+      },
+      {
+        declencheur: "Un PDF fournisseur ou un contrat",
+        resultat: "Une réponse vérifiable à partir du document",
+        description:
+          "Le fichier téléversé devient une source interrogeable au même titre qu'une page web.",
+        outils: ["Fichiers"],
+      },
+      {
+        declencheur: "Une actualité sectorielle à surveiller",
+        resultat: "Une synthèse envoyée automatiquement",
+        description:
+          "En combinant l'API Perplexity avec Zapier, une recherche programmée peut alimenter un canal Slack ou un e-mail.",
+        outils: ["API", "Zapier"],
+      },
+      {
+        declencheur: "Une question à trancher en réunion",
+        resultat: "Une réponse avec sources partageables en direct",
+        description:
+          "Le lien de la réponse, citations incluses, se partage tel quel pour trancher sans débat sur la fiabilité.",
+        outils: [],
+      },
     ],
     limites: [
       { titre: "Dépendant de la qualité des sources", description: "Si les pages trouvées sont médiocres, la synthèse l'est aussi : les citations rassurent mais ne valident pas le fond." },
@@ -245,6 +459,38 @@ export const AUTRES_TOOL_DETAILS: Record<string, ToolDetail> = {
       idealPour: "Concevoir une interface à plusieurs, maintenir un design system, et transmettre proprement des maquettes au développement.",
       aEviterSi: "Tu as juste besoin de visuels marketing rapides — Canva est plus direct — ou d'un outil de retouche photo.",
     },
+    demarrage: [
+      {
+        titre: "Explore Auto Layout avant de dessiner",
+        description:
+          "Comprendre comment les cadres se réagencent comme du CSS Flexbox évite de tout refaire une fois les premières maquettes posées.",
+      },
+      {
+        titre: "Construis 3 ou 4 composants réutilisables",
+        description:
+          "Poser les bases d'un design system dès le départ, même minimal, structure tout ce qui suit.",
+      },
+      {
+        titre: "Relie tes écrans en prototype",
+        description:
+          "Enchaîne quelques transitions pour tester un parcours avant d'écrire la moindre ligne de code.",
+      },
+      {
+        titre: "Ouvre Dev Mode et regarde ce qu'il expose",
+        description:
+          "Mesures, variables et extraits de code : comprendre ce que récupère un développeur change la façon de nommer et structurer tes calques.",
+      },
+      {
+        titre: "Connecte le serveur MCP officiel",
+        description:
+          "Une fois branché, un agent comme Claude Code peut lire directement une maquette pour en produire le code.",
+      },
+      {
+        titre: "Essaie FigJam pour un atelier",
+        description:
+          "Utile dès qu'il s'agit de brainstormer ou cadrer un projet à plusieurs avant de passer aux maquettes.",
+      },
+    ],
     fonctionnalites: [
       { titre: "Collaboration temps réel", description: "Plusieurs curseurs sur le même fichier, commentaires ancrés et historique de versions : la revue de design se fait dans l'outil." },
       { titre: "Composants et variantes", description: "Un design system vivant : les composants se propagent à toutes les maquettes qui les utilisent." },
@@ -252,6 +498,43 @@ export const AUTRES_TOOL_DETAILS: Record<string, ToolDetail> = {
       { titre: "Prototypage interactif", description: "Enchaîne les écrans avec transitions et états pour tester un parcours avant d'écrire une ligne de code." },
       { titre: "Dev Mode", description: "Vue dédiée aux développeurs : mesures, variables, tokens et extraits de code prêts à reprendre." },
       { titre: "Figma Make et IA", description: "Génération de maquettes et de premières versions d'interface à partir d'une description." },
+    ],
+    workflows: [
+      {
+        declencheur: "Une maquette validée en revue",
+        resultat: "Une première implémentation en code",
+        description:
+          "Le serveur MCP Figma donne à Claude Code accès direct à la structure de la maquette pour générer l'interface correspondante.",
+        outils: ["MCP Figma", "Claude Code"],
+      },
+      {
+        declencheur: "Un brief client décrit en quelques lignes",
+        resultat: "Un prototype cliquable en une session",
+        description:
+          "Figma Make génère une première version d'interface à partir d'une description, à affiner ensuite à la main.",
+        outils: ["Figma Make"],
+      },
+      {
+        declencheur: "Un composant modifié dans la bibliothèque",
+        resultat: "Toutes les maquettes qui l'utilisent mises à jour",
+        description:
+          "Les variantes et composants se propagent automatiquement partout où ils sont utilisés.",
+        outils: [],
+      },
+      {
+        declencheur: "Une session de brainstorm en équipe",
+        resultat: "Des idées organisées en tableau visuel",
+        description:
+          "FigJam capture le brut d'un atelier avant qu'il ne devienne des maquettes structurées.",
+        outils: ["FigJam"],
+      },
+      {
+        declencheur: "Une maquette figée pour développement",
+        resultat: "Des specs et tokens prêts pour le développeur",
+        description:
+          "Dev Mode expose mesures, variables et extraits de code directement exploitables.",
+        outils: ["Dev Mode"],
+      },
     ],
     limites: [
       { titre: "Courbe d'apprentissage réelle", description: "Auto Layout, contraintes et variables demandent plusieurs semaines pour être maîtrisés." },
@@ -302,6 +585,38 @@ export const AUTRES_TOOL_DETAILS: Record<string, ToolDetail> = {
       idealPour: "Les indépendants, TPE et équipes marketing qui doivent produire beaucoup de visuels cohérents sans passer par un designer.",
       aEviterSi: "Tu conçois des interfaces produit ou tu as besoin d'un contrôle typographique fin : Figma ou la suite Adobe sont plus adaptés.",
     },
+    demarrage: [
+      {
+        titre: "Configure ton Brand Kit avant tout",
+        description:
+          "Logo, couleurs et polices centralisés une fois pour éviter la dérive graphique sur chaque nouveau visuel.",
+      },
+      {
+        titre: "Pars d'un modèle proche de ton besoin",
+        description:
+          "Adapter un modèle existant va toujours plus vite qu'une page blanche, à condition de le personnaliser vraiment.",
+      },
+      {
+        titre: "Teste Magic Studio sur un visuel existant",
+        description:
+          "Suppression de fond ou génération d'image : une façon rapide de voir ce que la couche IA apporte concrètement.",
+      },
+      {
+        titre: "Programme tes publications",
+        description:
+          "Planifie la sortie d'un visuel directement vers les réseaux sociaux depuis Canva.",
+      },
+      {
+        titre: "Mets en place un circuit de validation",
+        description:
+          "Dès que plusieurs personnes produisent, les commentaires et l'approbation évitent les allers-retours par e-mail.",
+      },
+      {
+        titre: "Connecte le MCP Canva si tu utilises un agent IA",
+        description:
+          "Un assistant comme Claude peut alors créer ou modifier un design à partir d'une instruction.",
+      },
+    ],
     fonctionnalites: [
       { titre: "Bibliothèque de modèles", description: "Des centaines de milliers de mises en page prêtes à l'emploi, dimensionnées pour chaque support." },
       { titre: "Brand Kit", description: "Centralise logos, couleurs et polices de la marque pour garder une cohérence sur tous les visuels." },
@@ -309,6 +624,43 @@ export const AUTRES_TOOL_DETAILS: Record<string, ToolDetail> = {
       { titre: "Vidéo et animation", description: "Montage simple, transitions et animations de texte, suffisants pour les réseaux sociaux." },
       { titre: "Collaboration et validation", description: "Commentaires, partage et circuits d'approbation pour valider un visuel en équipe." },
       { titre: "Export et planification", description: "Export multi-formats et publication programmée directement vers les réseaux sociaux." },
+    ],
+    workflows: [
+      {
+        declencheur: "Un brief visuel décrit à Claude",
+        resultat: "Un visuel généré dans Canva",
+        description:
+          "Le connecteur MCP Canva permet à l'agent de créer directement le design à partir de l'instruction.",
+        outils: ["MCP Canva"],
+      },
+      {
+        declencheur: "Une photo produit brute",
+        resultat: "Un visuel prêt pour les réseaux",
+        description:
+          "Magic Studio retire le fond et redimensionne automatiquement pour chaque format social.",
+        outils: ["Magic Studio"],
+      },
+      {
+        declencheur: "Un post à décliner sur 5 formats",
+        resultat: "Un seul design, redimensionné partout",
+        description:
+          "Le redimensionnement magique adapte automatiquement la mise en page à chaque plateforme.",
+        outils: [],
+      },
+      {
+        declencheur: "Un visuel à valider avant publication",
+        resultat: "Un circuit d'approbation tracé",
+        description:
+          "Commentaires et validation intégrés évitent de faire circuler des fichiers par e-mail.",
+        outils: [],
+      },
+      {
+        declencheur: "Une campagne qui revient chaque mois",
+        resultat: "Un calendrier de publication automatisé",
+        description:
+          "La publication programmée diffuse les visuels aux dates prévues sans intervention manuelle.",
+        outils: [],
+      },
     ],
     limites: [
       { titre: "Effet « déjà vu »", description: "Les modèles étant très utilisés, un visuel peu retravaillé ressemble à des milliers d'autres." },
@@ -359,6 +711,38 @@ export const AUTRES_TOOL_DETAILS: Record<string, ToolDetail> = {
       idealPour: "L'illustration, les moodboards, les univers visuels de marque et tout ce qui demande une image avec du caractère.",
       aEviterSi: "Tu as besoin de texte lisible dans l'image, de rendus strictement fidèles à un brief technique, ou d'un usage gratuit.",
     },
+    demarrage: [
+      {
+        titre: "Lance ta première génération simple",
+        description:
+          "Pas de formule gratuite : choisis un plan, puis commence par un prompt court pour comprendre le style par défaut.",
+      },
+      {
+        titre: "Apprends 3 ou 4 paramètres clés",
+        description:
+          "--ar pour le ratio, --stylize pour l'intensité artistique, --chaos pour la variété : ça suffit pour commencer à diriger le résultat.",
+      },
+      {
+        titre: "Crée une référence de style",
+        description:
+          "Fixe une direction artistique cohérente que tu pourras réutiliser sur plusieurs images.",
+      },
+      {
+        titre: "Utilise l'éditeur intégré pour retoucher",
+        description:
+          "Corriger une zone coûte moins cher et va plus vite que régénérer l'image entière.",
+      },
+      {
+        titre: "Passe en mode privé si nécessaire",
+        description:
+          "Sur les formules Pro et supérieures, tes générations ne sont plus visibles dans la galerie publique.",
+      },
+      {
+        titre: "Prévois un second outil pour le texte",
+        description:
+          "Midjourney reste peu fiable sur le texte dans l'image : ajoute-le ensuite dans Canva ou Figma.",
+      },
+    ],
     fonctionnalites: [
       { titre: "Qualité esthétique", description: "Le rendu de lumière, de matière et de composition reste la meilleure référence du marché sur l'image artistique." },
       { titre: "Références de style et de personnage", description: "Les paramètres de référence permettent de garder un style ou un personnage cohérent d'une image à l'autre." },
@@ -366,6 +750,43 @@ export const AUTRES_TOOL_DETAILS: Record<string, ToolDetail> = {
       { titre: "Paramètres fins", description: "Ratio, niveau de stylisation, chaos, poids d'image : un contrôle précis pour qui prend le temps de l'apprendre." },
       { titre: "Moodboards", description: "Regroupe des références visuelles pour orienter le modèle vers une direction artistique donnée." },
       { titre: "Génération vidéo", description: "Animation courte à partir d'une image générée, pour des usages sociaux." },
+    ],
+    workflows: [
+      {
+        declencheur: "Une direction artistique à définir",
+        resultat: "Un moodboard de références cohérentes",
+        description:
+          "Les références de style regroupées orientent le modèle vers une identité visuelle stable.",
+        outils: [],
+      },
+      {
+        declencheur: "Une image générée à finaliser",
+        resultat: "Un visuel complet avec texte lisible",
+        description:
+          "L'image sert de base, le texte final s'ajoute ensuite dans un outil dédié.",
+        outils: ["Canva"],
+      },
+      {
+        declencheur: "Un personnage à réutiliser sur plusieurs visuels",
+        resultat: "Une cohérence de personnage maintenue",
+        description:
+          "La référence de personnage garde les traits identiques d'une génération à l'autre.",
+        outils: [],
+      },
+      {
+        declencheur: "Un visuel à décliner en variations",
+        resultat: "Plusieurs versions ciblées",
+        description:
+          "Les variations localisées modifient une zone précise sans regénérer l'ensemble.",
+        outils: [],
+      },
+      {
+        declencheur: "Une image statique qui doit vivre",
+        resultat: "Une courte animation",
+        description:
+          "La génération vidéo transforme l'image fixe en clip court pour les usages sociaux.",
+        outils: [],
+      },
     ],
     limites: [
       { titre: "Aucune offre gratuite", description: "Il faut payer dès la première image, sans période d'essai réelle." },
@@ -417,6 +838,38 @@ export const AUTRES_TOOL_DETAILS: Record<string, ToolDetail> = {
       idealPour: "Les développeurs qui veulent déléguer des tâches complètes (refactoring, migration, correction de bugs) plutôt que de la complétion ligne à ligne.",
       aEviterSi: "Tu débutes en programmation : sans savoir relire le code produit, le risque d'accumuler de la dette technique est réel.",
     },
+    demarrage: [
+      {
+        titre: "Installe l'agent à la racine d'un projet existant",
+        description:
+          "Claude Code explore l'arborescence et les conventions déjà en place dès la première session.",
+      },
+      {
+        titre: "Écris un fichier d'instructions projet",
+        description:
+          "Stack, conventions, scripts de test : ce fichier est lu automatiquement au démarrage de chaque session.",
+      },
+      {
+        titre: "Commence par une tâche encadrée",
+        description:
+          "Un fix de bug ou un petit refactor calibre la confiance avant de déléguer des tâches plus larges.",
+      },
+      {
+        titre: "Travaille toujours sur une branche dédiée",
+        description:
+          "Jamais directement sur main : chaque diff doit pouvoir être relu et écarté sans risque.",
+      },
+      {
+        titre: "Connecte les serveurs MCP utiles au projet",
+        description:
+          "GitHub, une base de données, Figma : chaque connecteur ajoute une source de contexte que l'agent peut interroger.",
+      },
+      {
+        titre: "Explore les sous-agents sur les grosses tâches",
+        description:
+          "Utile pour paralléliser l'exploration d'une base de code ou comparer plusieurs approches.",
+      },
+    ],
     fonctionnalites: [
       { titre: "Accès direct au projet", description: "Lit et modifie les fichiers, lance les commandes et les tests : l'agent travaille sur le vrai dépôt, pas sur des extraits collés." },
       { titre: "Modifications multi-fichiers", description: "Gère des changements cohérents traversant plusieurs modules, ce qu'un assistant de complétion ne sait pas faire." },
@@ -424,6 +877,50 @@ export const AUTRES_TOOL_DETAILS: Record<string, ToolDetail> = {
       { titre: "Support MCP natif", description: "Se connecte à Figma, Notion, une base de données ou tout serveur MCP pour aller chercher le contexte manquant." },
       { titre: "Sous-agents et tâches parallèles", description: "Délègue des sous-tâches à des agents séparés pour explorer plusieurs pistes en parallèle." },
       { titre: "Intégration Git et GitHub", description: "Crée des branches, rédige les messages de commit et ouvre des pull requests." },
+    ],
+    workflows: [
+      {
+        declencheur: "Une idée décrite en langage naturel",
+        resultat: "Un site codé, poussé et déployé",
+        description:
+          "L'agent écrit le code, committe, pousse sur GitHub et déclenche le redéploiement dans la même session.",
+        outils: ["GitHub", "Lovable"],
+      },
+      {
+        declencheur: "Une pull request ouverte",
+        resultat: "Une revue de code avant merge",
+        description:
+          "Exécuté hors session interactive dans une CI, l'agent relit, signale ou corrige avant validation humaine.",
+        outils: ["GitHub", "CI/CD"],
+      },
+      {
+        declencheur: "Un test qui échoue en CI",
+        resultat: "Un correctif proposé et vérifié",
+        description:
+          "L'agent identifie la cause, applique un correctif et relance les tests jusqu'à ce qu'ils passent.",
+        outils: ["CI/CD"],
+      },
+      {
+        declencheur: "Une migration de librairie à mener",
+        resultat: "Les fichiers concernés mis à jour en masse",
+        description:
+          "Les modifications multi-fichiers cohérentes remplacent le remplacement manuel fichier par fichier.",
+        outils: [],
+      },
+      {
+        declencheur: "Un schéma de base à faire évoluer",
+        resultat: "Une migration SQL écrite et appliquée",
+        description:
+          "Le MCP Supabase donne à l'agent accès direct au schéma pour écrire la migration correspondante.",
+        outils: ["MCP Supabase"],
+      },
+      {
+        declencheur: "Une maquette Figma prête",
+        resultat: "Une implémentation UI cohérente",
+        description:
+          "Le MCP Figma permet à l'agent de lire la structure de la maquette pour produire l'interface.",
+        outils: ["MCP Figma"],
+      },
     ],
     limites: [
       { titre: "Consommation de quota rapide", description: "Les sessions longues épuisent vite les plafonds d'usage, y compris sur les formules Max." },
@@ -475,6 +972,38 @@ export const AUTRES_TOOL_DETAILS: Record<string, ToolDetail> = {
       idealPour: "Les projets web et mobiles qui veulent un back-end complet sans l'administrer, tout en gardant une vraie base SQL et la possibilité de partir ailleurs.",
       aEviterSi: "Ton besoin est un simple formulaire ou un site vitrine : la mise en place d'un back-end serait disproportionnée.",
     },
+    demarrage: [
+      {
+        titre: "Crée un projet et choisis la région",
+        description:
+          "Une région européenne à la création évite d'avoir à migrer plus tard pour des raisons de souveraineté.",
+      },
+      {
+        titre: "Modélise ton schéma avant de coder l'app",
+        description:
+          "L'éditeur de table visuel ou le SQL direct — le temps passé ici évite une dette de modélisation.",
+      },
+      {
+        titre: "Active Row Level Security sur chaque table",
+        description:
+          "Non négociable avant la mise en production : une table sans politique est soit inaccessible, soit ouverte à tous.",
+      },
+      {
+        titre: "Configure l'authentification",
+        description:
+          "E-mail, magic link ou OAuth (Google, GitHub) se règlent en quelques clics dans l'interface.",
+      },
+      {
+        titre: "Connecte le serveur MCP officiel",
+        description:
+          "Un agent IA peut alors inspecter le schéma et écrire des migrations directement.",
+      },
+      {
+        titre: "Regarde du côté des Edge Functions",
+        description:
+          "Pour toute logique serveur qui ne rentre pas dans une simple requête à la base.",
+      },
+    ],
     fonctionnalites: [
       { titre: "PostgreSQL complet", description: "Une vraie base relationnelle avec extensions, vues, triggers et fonctions SQL — pas une abstraction propriétaire." },
       { titre: "API générée automatiquement", description: "Chaque table est immédiatement accessible en REST, avec des bibliothèques clientes typées." },
@@ -482,6 +1011,43 @@ export const AUTRES_TOOL_DETAILS: Record<string, ToolDetail> = {
       { titre: "Row Level Security", description: "Les règles d'accès s'écrivent en SQL au niveau de la ligne : la sécurité reste dans la base, pas dans le code client." },
       { titre: "Stockage de fichiers", description: "Buckets publics ou privés avec politiques d'accès et transformation d'images." },
       { titre: "Temps réel", description: "Abonnement aux changements de la base pour synchroniser une interface sans rafraîchissement." },
+    ],
+    workflows: [
+      {
+        declencheur: "Un besoin de backend décrit à un agent",
+        resultat: "Un schéma et des migrations écrits automatiquement",
+        description:
+          "Le MCP Supabase donne à l'agent accès direct pour inspecter et faire évoluer la base.",
+        outils: ["MCP Supabase", "Claude Code"],
+      },
+      {
+        declencheur: "Un nouvel utilisateur qui s'inscrit",
+        resultat: "Une ligne de profil créée automatiquement",
+        description:
+          "Un trigger SQL déclenché à l'inscription crée les enregistrements associés sans code applicatif.",
+        outils: [],
+      },
+      {
+        declencheur: "Un fichier uploadé par un utilisateur",
+        resultat: "Une image transformée automatiquement",
+        description:
+          "Le Storage applique des transformations (redimensionnement, format) à la volée.",
+        outils: [],
+      },
+      {
+        declencheur: "Un changement de données en base",
+        resultat: "Une interface synchronisée sans rafraîchissement",
+        description:
+          "L'abonnement en temps réel pousse les changements directement à l'interface connectée.",
+        outils: [],
+      },
+      {
+        declencheur: "Une requête API qui revient souvent",
+        resultat: "Une Edge Function qui l'encapsule",
+        description:
+          "La logique se centralise côté serveur plutôt que d'être dupliquée côté client.",
+        outils: [],
+      },
     ],
     limites: [
       { titre: "RLS à maîtriser absolument", description: "Une table sans politique correcte est soit inaccessible, soit ouverte : c'est la principale source d'erreurs de sécurité." },
@@ -532,6 +1098,38 @@ export const AUTRES_TOOL_DETAILS: Record<string, ToolDetail> = {
       idealPour: "Prototyper une idée en quelques heures, lancer un outil interne ou un MVP, sans monter une équipe technique.",
       aEviterSi: "Tu construis un produit à forte complexité métier ou avec des contraintes d'architecture très spécifiques.",
     },
+    demarrage: [
+      {
+        titre: "Décris ton idée en une phrase claire",
+        description:
+          "Une consigne précise pour la première génération vaut mieux qu'un roman : tu affines ensuite par itérations.",
+      },
+      {
+        titre: "Active Lovable Cloud dès que tu as des données",
+        description:
+          "Base de données, authentification et stockage s'activent sans configuration manuelle.",
+      },
+      {
+        titre: "Synchronise le projet avec GitHub tôt",
+        description:
+          "Avant que le code ne devienne trop volumineux pour être relu d'un coup, connecte le dépôt.",
+      },
+      {
+        titre: "Groupe tes demandes plutôt que les multiplier",
+        description:
+          "Chaque échange consomme des crédits : une consigne précise et complète coûte moins cher que cinq petites.",
+      },
+      {
+        titre: "Publie une version imparfaite tôt",
+        description:
+          "Tester en public accélère les retours, bien plus qu'un projet peaufiné en interne pendant des semaines.",
+      },
+      {
+        titre: "Connecte un MCP externe si besoin",
+        description:
+          "Pour que l'app générée puisse dialoguer avec un outil tiers pendant sa construction.",
+      },
+    ],
     fonctionnalites: [
       { titre: "Application complète en conversation", description: "Interface, routes, base de données et logique serveur générées à partir de descriptions en langage naturel." },
       { titre: "Aperçu en direct", description: "Chaque modification est visible immédiatement dans un aperçu fonctionnel, pas dans une maquette." },
@@ -539,6 +1137,43 @@ export const AUTRES_TOOL_DETAILS: Record<string, ToolDetail> = {
       { titre: "Synchronisation GitHub", description: "Le code reste du React/TypeScript standard, synchronisable avec un dépôt et reprenable par un développeur." },
       { titre: "Publication en un clic", description: "Mise en ligne immédiate avec une URL publique, et branchement d'un domaine personnalisé." },
       { titre: "IA intégrée", description: "Passerelle vers des modèles de génération de texte et d'images utilisables dans l'app sans gérer de clés API." },
+    ],
+    workflows: [
+      {
+        declencheur: "Une idée décrite en langage naturel",
+        resultat: "Une app fonctionnelle en ligne",
+        description:
+          "Interface, back-end et base de données générés et déployés dans la même conversation.",
+        outils: ["Lovable Cloud"],
+      },
+      {
+        declencheur: "Un projet Lovable qui grossit",
+        resultat: "Du code repris par un développeur",
+        description:
+          "La synchronisation GitHub expose du React/TypeScript standard, sans verrouillage propriétaire.",
+        outils: ["GitHub"],
+      },
+      {
+        declencheur: "Un besoin de données persistantes",
+        resultat: "Une base et une authentification actives",
+        description:
+          "Lovable Cloud active base de données, auth et stockage sans configuration manuelle.",
+        outils: [],
+      },
+      {
+        declencheur: "Un bug signalé après publication",
+        resultat: "Un correctif appliqué dans la foulée",
+        description:
+          "Le bug se décrit en langage naturel dans la même session, sans repartir de zéro.",
+        outils: [],
+      },
+      {
+        declencheur: "Un outil tiers à intégrer à l'app",
+        resultat: "Une connexion fonctionnelle",
+        description:
+          "Un serveur MCP externe donne à l'agent l'accès nécessaire pendant la construction.",
+        outils: ["MCP"],
+      },
     ],
     limites: [
       { titre: "Consommation de crédits", description: "Chaque échange consomme des crédits : un projet nourri d'allers-retours coûte vite plus cher que prévu." },
@@ -589,6 +1224,38 @@ export const AUTRES_TOOL_DETAILS: Record<string, ToolDetail> = {
       idealPour: "Centraliser la documentation, les process et le suivi de projets d'une petite équipe ou d'une activité indépendante.",
       aEviterSi: "Tu veux un outil prêt à l'emploi sans configuration, ou une gestion de projet très structurée avec dépendances et charge : un outil dédié sera plus direct.",
     },
+    demarrage: [
+      {
+        titre: "Duplique un modèle proche de ton besoin",
+        description:
+          "Partir d'une base existante va plus vite qu'une page vide, quitte à la simplifier ensuite.",
+      },
+      {
+        titre: "Construis une base de données avant les pages",
+        description:
+          "C'est le vrai moteur de l'outil : les pages viennent après, pas l'inverse.",
+      },
+      {
+        titre: "Relie deux bases avec une relation et un rollup",
+        description:
+          "Le premier vrai système apparaît quand deux bases se répondent, pas avant.",
+      },
+      {
+        titre: "Configure les permissions avant d'inviter des externes",
+        description:
+          "Les droits page par page évitent les mauvaises surprises une fois l'espace partagé.",
+      },
+      {
+        titre: "Active Notion AI si utile à ton usage",
+        description:
+          "Rédaction, résumé et recherche sémantique sur l'ensemble de l'espace, en supplément payant.",
+      },
+      {
+        titre: "Connecte le serveur MCP officiel",
+        description:
+          "Un agent comme Claude peut alors lire, créer et mettre à jour tes pages directement.",
+      },
+    ],
     fonctionnalites: [
       { titre: "Bases de données multi-vues", description: "Une même collection s'affiche en table, kanban, calendrier, timeline ou galerie selon le besoin du moment." },
       { titre: "Relations et rollups", description: "Relie deux bases entre elles et agrège les données liées, ce qui permet de construire de vrais systèmes." },
@@ -596,6 +1263,43 @@ export const AUTRES_TOOL_DETAILS: Record<string, ToolDetail> = {
       { titre: "Notion AI", description: "Rédaction, résumé et recherche sémantique sur l'ensemble de l'espace de travail." },
       { titre: "Collaboration et permissions", description: "Commentaires, mentions et droits fins page par page, y compris pour des invités externes." },
       { titre: "Publication web", description: "Publie une page en site public, utile pour une documentation ou une base de connaissances." },
+    ],
+    workflows: [
+      {
+        declencheur: "Une réunion ou un brainstorm",
+        resultat: "Des tâches structurées créées dans Notion",
+        description:
+          "Le MCP Notion permet à Claude de créer des pages ou remplir une base directement depuis la conversation.",
+        outils: ["MCP Notion", "Claude"],
+      },
+      {
+        declencheur: "Une nouvelle ligne ajoutée dans une base",
+        resultat: "Une notification déclenchée ailleurs",
+        description:
+          "Zapier surveille les changements et déclenche une action dans un autre outil.",
+        outils: ["Zapier"],
+      },
+      {
+        declencheur: "Un document à rendre accessible en externe",
+        resultat: "Une page publiée en site public",
+        description:
+          "La publication web transforme une page Notion en documentation accessible sans compte.",
+        outils: [],
+      },
+      {
+        declencheur: "Un projet à suivre au quotidien",
+        resultat: "Une vue kanban générée depuis les mêmes données",
+        description:
+          "La même base de données s'affiche en table, calendrier ou kanban selon le besoin du moment.",
+        outils: [],
+      },
+      {
+        declencheur: "Une question sur le contenu de l'espace",
+        resultat: "Une réponse sourcée depuis tes propres pages",
+        description:
+          "Notion AI cherche et synthétise à partir du contenu réellement présent dans l'espace de travail.",
+        outils: ["Notion AI"],
+      },
     ],
     limites: [
       { titre: "Temps de configuration", description: "La liberté a un prix : construire un espace vraiment utile demande plusieurs heures de mise en place." },
@@ -647,6 +1351,38 @@ export const AUTRES_TOOL_DETAILS: Record<string, ToolDetail> = {
       idealPour: "Toute personne déjà dans l'écosystème Google, pour partager des fichiers et travailler à plusieurs sur des documents.",
       aEviterSi: "Tu as des exigences de souveraineté strictes ou tu manipules des données très sensibles sans chiffrement de bout en bout.",
     },
+    demarrage: [
+      {
+        titre: "Pose une structure de dossiers simple",
+        description:
+          "Quelques dossiers de haut niveau suffisent : la recherche par contenu fait le reste.",
+      },
+      {
+        titre: "Configure les droits de partage par défaut",
+        description:
+          "Avant d'inviter des externes, décide qui peut éditer, commenter ou seulement voir.",
+      },
+      {
+        titre: "Installe Drive pour ordinateur",
+        description:
+          "Avec les fichiers à la demande, l'accès local ne sature pas le disque.",
+      },
+      {
+        titre: "Compte sur l'historique de versions comme filet",
+        description:
+          "Un retour en arrière est toujours possible sans manipulation complexe.",
+      },
+      {
+        titre: "Connecte le MCP si tu utilises un agent IA",
+        description:
+          "Claude peut alors chercher et lire tes fichiers pour s'en servir comme source de contexte.",
+      },
+      {
+        titre: "Passe sur Workspace pour un usage pro",
+        description:
+          "Domaine personnalisé et garanties contractuelles sur les données, dès qu'il s'agit d'un usage professionnel.",
+      },
+    ],
     fonctionnalites: [
       { titre: "Recherche par contenu", description: "Indexation du texte des documents, PDF et images : on retrouve un fichier par son contenu, pas seulement par son nom." },
       { titre: "Collaboration temps réel", description: "Docs, Sheets et Slides s'éditent à plusieurs simultanément, avec commentaires et suggestions." },
@@ -654,6 +1390,43 @@ export const AUTRES_TOOL_DETAILS: Record<string, ToolDetail> = {
       { titre: "Historique de versions", description: "Retour à n'importe quel état antérieur d'un document, sans manipulation complexe." },
       { titre: "Drive pour ordinateur", description: "Synchronisation locale avec fichiers à la demande, sans occuper tout le disque." },
       { titre: "Intégration Gemini", description: "Résumé et interrogation des documents stockés depuis l'assistant intégré à Workspace." },
+    ],
+    workflows: [
+      {
+        declencheur: "Une question sur un document existant",
+        resultat: "Une réponse sourcée depuis le contenu réel",
+        description:
+          "Le connecteur MCP donne à Claude accès direct aux fichiers du Drive pour répondre à partir de leur contenu.",
+        outils: ["MCP", "Claude"],
+      },
+      {
+        declencheur: "Un PDF scanné égaré dans les dossiers",
+        resultat: "Retrouvé par son contenu",
+        description:
+          "La recherche indexe le texte des documents et des images, pas seulement les noms de fichiers.",
+        outils: [],
+      },
+      {
+        declencheur: "Un document à faire avancer à plusieurs",
+        resultat: "Une collaboration en temps réel",
+        description:
+          "Docs, Sheets et Slides s'éditent simultanément avec commentaires et suggestions.",
+        outils: [],
+      },
+      {
+        declencheur: "Un nouveau fichier déposé dans un dossier surveillé",
+        resultat: "Une action déclenchée ailleurs",
+        description:
+          "Zapier peut réagir à l'ajout d'un fichier pour notifier ou classer automatiquement.",
+        outils: ["Zapier"],
+      },
+      {
+        declencheur: "Un dossier de projet actif",
+        resultat: "Une sauvegarde et un historique automatiques",
+        description:
+          "Chaque modification est tracée, avec retour possible à un état antérieur sans effort.",
+        outils: [],
+      },
     ],
     limites: [
       { titre: "Quota partagé", description: "Les 15 Go gratuits sont mutualisés entre Drive, Gmail et Photos : la saturation arrive plus vite qu'on ne croit." },
@@ -705,6 +1478,38 @@ export const AUTRES_TOOL_DETAILS: Record<string, ToolDetail> = {
       idealPour: "Les indépendants et petites structures qui veulent une messagerie professionnelle fiable, sans administrer de serveur mail.",
       aEviterSi: "Tu as besoin d'une messagerie chiffrée de bout en bout ou hébergée en Europe par principe.",
     },
+    demarrage: [
+      {
+        titre: "Crée tes premiers filtres",
+        description:
+          "Étiquetage et archivage automatiques dès la réception, plutôt qu'un tri manuel répété.",
+      },
+      {
+        titre: "Passe sur Workspace pour une adresse pro",
+        description:
+          "Un domaine personnalisé et des garanties contractuelles, à partir de quelques euros par mois.",
+      },
+      {
+        titre: "Configure des alias utiles",
+        description:
+          "Sépare les inscriptions et newsletters de la correspondance importante sans changer d'adresse.",
+      },
+      {
+        titre: "Active les réponses assistées si tu es sur Workspace",
+        description:
+          "Les suggestions de réponse accélèrent le traitement des messages courants.",
+      },
+      {
+        titre: "Connecte le MCP Gmail",
+        description:
+          "Un agent comme Claude peut alors lire, trier et préparer des brouillons avec ton autorisation explicite.",
+      },
+      {
+        titre: "Vérifie les réglages de confidentialité",
+        description:
+          "Surtout en compte gratuit, où les garanties contractuelles sont moins étendues qu'en Workspace.",
+      },
+    ],
     fonctionnalites: [
       { titre: "Antispam et sécurité", description: "Filtrage réputé pour sa précision, avec détection du phishing et alertes sur les expéditeurs suspects." },
       { titre: "Recherche puissante", description: "Opérateurs de recherche avancés pour retrouver un message précis dans des années d'archives." },
@@ -712,6 +1517,43 @@ export const AUTRES_TOOL_DETAILS: Record<string, ToolDetail> = {
       { titre: "Réponses assistées", description: "Suggestions de réponse et rédaction assistée par Gemini dans les offres Workspace." },
       { titre: "Alias et domaine personnalisé", description: "Envoi depuis une adresse professionnelle sur ton propre nom de domaine avec Workspace." },
       { titre: "Intégration Agenda et Meet", description: "Création de rendez-vous et de visioconférences directement depuis un message." },
+    ],
+    workflows: [
+      {
+        declencheur: "Une boîte de réception qui déborde",
+        resultat: "Des brouillons de réponse prêts à valider",
+        description:
+          "Le MCP Gmail permet à Claude de lire, résumer et préparer des réponses que tu valides avant envoi.",
+        outils: ["MCP Gmail", "Claude"],
+      },
+      {
+        declencheur: "Un e-mail avec pièce jointe importante",
+        resultat: "Un fichier classé automatiquement dans Drive",
+        description:
+          "Zapier peut extraire et ranger les pièces jointes sans intervention manuelle.",
+        outils: ["Zapier", "Google Drive"],
+      },
+      {
+        declencheur: "Un message d'un expéditeur récurrent",
+        resultat: "Un libellé et un archivage automatiques",
+        description:
+          "Les filtres appliquent la règle dès la réception, sans repasser derrière.",
+        outils: [],
+      },
+      {
+        declencheur: "Une demande client qui revient souvent",
+        resultat: "Un modèle de réponse réutilisable",
+        description:
+          "Un brouillon type, adapté à chaque cas plutôt que réécrit à chaque fois.",
+        outils: [],
+      },
+      {
+        declencheur: "Un nouveau lead qui écrit par e-mail",
+        resultat: "Une ligne créée dans un tableur ou un CRM",
+        description:
+          "Zapier capture les informations du message pour alimenter le suivi commercial.",
+        outils: ["Zapier"],
+      },
     ],
     limites: [
       { titre: "Pas de chiffrement de bout en bout par défaut", description: "Le chiffrement côté client existe seulement sur certaines offres entreprise." },
@@ -762,6 +1604,38 @@ export const AUTRES_TOOL_DETAILS: Record<string, ToolDetail> = {
       idealPour: "Automatiser des tâches administratives récurrentes entre des outils SaaS, sans équipe technique.",
       aEviterSi: "Ton volume d'automatisations est élevé et ton budget serré : une alternative auto-hébergée sera nettement moins chère.",
     },
+    demarrage: [
+      {
+        titre: "Choisis un premier Zap simple à deux étapes",
+        description:
+          "Un déclencheur, une action : le temps de comprendre la mécanique avant de complexifier.",
+      },
+      {
+        titre: "Teste chaque étape avant d'activer",
+        description:
+          "Le test unitaire par étape évite de découvrir un problème une fois le Zap en production.",
+      },
+      {
+        titre: "Ajoute de la logique conditionnelle ensuite",
+        description:
+          "Filtres et chemins conditionnels une fois que l'automatisation simple fonctionne, pas avant.",
+      },
+      {
+        titre: "Surveille l'historique d'exécution",
+        description:
+          "Repérer une erreur tôt évite qu'elle passe inaperçue pendant des semaines.",
+      },
+      {
+        titre: "Regarde Tables et Interfaces pour les petits besoins",
+        description:
+          "Une base légère et un formulaire interne, sans ajouter un outil de plus.",
+      },
+      {
+        titre: "Connecte le MCP Zapier si tu utilises un agent IA",
+        description:
+          "L'agent accède alors à plus de 7 000 actions applicatives comme à une télécommande universelle.",
+      },
+    ],
     fonctionnalites: [
       { titre: "Plus de 7 000 intégrations", description: "Le catalogue le plus large du marché : la quasi-totalité des outils SaaS courants sont pris en charge." },
       { titre: "Constructeur visuel", description: "Enchaînement d'étapes en glisser-déposer, avec test unitaire de chaque étape avant activation." },
@@ -769,6 +1643,43 @@ export const AUTRES_TOOL_DETAILS: Record<string, ToolDetail> = {
       { titre: "Tables et Interfaces", description: "Bases de données légères et formulaires internes pour construire un petit outil sans autre logiciel." },
       { titre: "Étapes de code", description: "Insertion de JavaScript ou Python quand une transformation n'est pas prévue par les connecteurs." },
       { titre: "Agents IA", description: "Automatisations où un modèle décide de l'action à déclencher en fonction du contenu reçu." },
+    ],
+    workflows: [
+      {
+        declencheur: "Un formulaire rempli par un prospect",
+        resultat: "Une ligne créée et une notification envoyée",
+        description:
+          "Un Zap simple ajoute la donnée dans un tableur et prévient l'équipe sur Slack.",
+        outils: [],
+      },
+      {
+        declencheur: "Un nouveau prompt sauvegardé dans la bibliothèque",
+        resultat: "Un ajout dans un tableau de suivi",
+        description:
+          "Zapier détecte l'événement et met à jour un tableau de bord externe sans code.",
+        outils: [],
+      },
+      {
+        declencheur: "Un événement dans un outil du quotidien",
+        resultat: "Une action déclenchée dans un autre",
+        description:
+          "Le principe de base : un déclencheur ici, une action là, sans écrire une ligne de code.",
+        outils: [],
+      },
+      {
+        declencheur: "Un contenu à trier selon son intention",
+        resultat: "Une décision prise automatiquement",
+        description:
+          "Les agents IA de Zapier choisissent l'action à déclencher en fonction du contenu reçu.",
+        outils: ["Agents Zapier"],
+      },
+      {
+        declencheur: "Une tâche manuelle répétée chaque semaine",
+        resultat: "Un Zap qui l'élimine définitivement",
+        description:
+          "Une fois identifiée et modélisée, la tâche répétitive n'a plus besoin d'intervention humaine.",
+        outils: [],
+      },
     ],
     limites: [
       { titre: "Coût par tâche", description: "La facturation à la tâche exécutée devient rapidement lourde sur des volumes importants." },
