@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedBibliothequeRouteImport } from './routes/_authenticated/bibliotheque'
 import { Route as AuthenticatedGlossaireRouteImport } from './routes/_authenticated/glossaire'
 import { Route as AuthenticatedOutilsRouteImport } from './routes/_authenticated/outils'
+import { Route as AuthenticatedOutilsIndexRouteImport } from './routes/_authenticated/outils.index'
 import { Route as AuthenticatedOutilsSlugRouteImport } from './routes/_authenticated/outils.$slug'
 
 const IndexRoute = IndexRouteImport.update({
@@ -47,6 +48,12 @@ const AuthenticatedOutilsRoute = AuthenticatedOutilsRouteImport.update({
   path: '/outils',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedOutilsIndexRoute =
+  AuthenticatedOutilsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedOutilsRoute,
+  } as any)
 const AuthenticatedOutilsSlugRoute = AuthenticatedOutilsSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
@@ -60,14 +67,15 @@ export interface FileRoutesByFullPath {
   '/glossaire': typeof AuthenticatedGlossaireRoute
   '/outils': typeof AuthenticatedOutilsRouteWithChildren
   '/outils/$slug': typeof AuthenticatedOutilsSlugRoute
+  '/outils/': typeof AuthenticatedOutilsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/bibliotheque': typeof AuthenticatedBibliothequeRoute
   '/glossaire': typeof AuthenticatedGlossaireRoute
-  '/outils': typeof AuthenticatedOutilsRouteWithChildren
   '/outils/$slug': typeof AuthenticatedOutilsSlugRoute
+  '/outils': typeof AuthenticatedOutilsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -78,14 +86,21 @@ export interface FileRoutesById {
   '/_authenticated/glossaire': typeof AuthenticatedGlossaireRoute
   '/_authenticated/outils': typeof AuthenticatedOutilsRouteWithChildren
   '/_authenticated/outils/$slug': typeof AuthenticatedOutilsSlugRoute
+  '/_authenticated/outils/': typeof AuthenticatedOutilsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/auth' | '/bibliotheque' | '/glossaire' | '/outils' | '/outils/$slug'
+    | '/'
+    | '/auth'
+    | '/bibliotheque'
+    | '/glossaire'
+    | '/outils'
+    | '/outils/$slug'
+    | '/outils/'
   fileRoutesByTo: FileRoutesByTo
   to:
-    '/' | '/auth' | '/bibliotheque' | '/glossaire' | '/outils' | '/outils/$slug'
+    '/' | '/auth' | '/bibliotheque' | '/glossaire' | '/outils/$slug' | '/outils'
   id:
     | '__root__'
     | '/'
@@ -95,6 +110,7 @@ export interface FileRouteTypes {
     | '/_authenticated/glossaire'
     | '/_authenticated/outils'
     | '/_authenticated/outils/$slug'
+    | '/_authenticated/outils/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -147,6 +163,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOutilsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/outils/': {
+      id: '/_authenticated/outils/'
+      path: '/'
+      fullPath: '/outils/'
+      preLoaderRoute: typeof AuthenticatedOutilsIndexRouteImport
+      parentRoute: typeof AuthenticatedOutilsRoute
+    }
     '/_authenticated/outils/$slug': {
       id: '/_authenticated/outils/$slug'
       path: '/$slug'
@@ -159,10 +182,12 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedOutilsRouteChildren {
   AuthenticatedOutilsSlugRoute: typeof AuthenticatedOutilsSlugRoute
+  AuthenticatedOutilsIndexRoute: typeof AuthenticatedOutilsIndexRoute
 }
 
 const AuthenticatedOutilsRouteChildren: AuthenticatedOutilsRouteChildren = {
   AuthenticatedOutilsSlugRoute: AuthenticatedOutilsSlugRoute,
+  AuthenticatedOutilsIndexRoute: AuthenticatedOutilsIndexRoute,
 }
 
 const AuthenticatedOutilsRouteWithChildren =
@@ -191,3 +216,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
