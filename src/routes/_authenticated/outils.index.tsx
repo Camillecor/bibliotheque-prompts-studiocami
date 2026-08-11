@@ -1,27 +1,32 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowUp, Plus, Search } from "lucide-react";
+import { ArrowUp, Plus, Search, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { ToolLogo, type ToolLogoName } from "@/components/ToolLogos";
 import { formatNote, noteGlobale, type Notes } from "@/lib/toolNotes";
+import { saveOutilPerso, listOutilsPersos, deleteOutilPerso } from "@/lib/outilsPersos.functions";
 
 type Prix = "gratuit" | "freemium" | "payant";
 type Outil = {
   nom: string;
   slug: string;
-  logo: ToolLogoName;
+  // Absent pour les outils ajoutés par l'utilisatrice (perso: true) — ils
+  // n'ont pas de vrai logo de marque, un avatar générique est affiché à la place.
+  logo?: ToolLogoName;
   definition: string;
   prix: Prix;
   souverain?: boolean;
   mcp?: boolean;
   notes?: Notes;
+  perso?: boolean;
+  id?: string;
 };
-type OutilAjoute = Omit<Outil, "logo"> & { id: string; categorie: string };
 type SectionCategorie = { categorie: string; outils: Outil[] };
 type FAQ = { question: string; reponse: string };
 
-const CLE_OUTILS_AJOUTES = "outils_ia_ajoutes";
 // Taxonomie fine, alignée sur la nomenclature du marché (promptfacile.fr/outils/) —
 // seules les catégories où j'ai vraiment un outil sont affichées.
 const CATEGORIES_LABELS = [
@@ -49,15 +54,21 @@ const CATEGORIES_LABELS = [
   "Agents",
 ];
 
-function chargerOutilsAjoutes(): OutilAjoute[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const brut = window.localStorage.getItem(CLE_OUTILS_AJOUTES);
-    const parsed = brut ? JSON.parse(brut) : [];
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
+// Avatar générique pour un outil ajouté par l'utilisatrice, en l'absence de
+// vrai logo de marque — cercle de couleur avec l'initiale du nom.
+function AvatarOutilPerso({ nom, role }: { nom: string; role: string }) {
+  return (
+    <span
+      aria-hidden="true"
+      className="flex h-full w-full items-center justify-center text-xs font-bold"
+      style={{
+        background: `color-mix(in srgb, var(${role}) 16%, white)`,
+        color: `var(${role})`,
+      }}
+    >
+      {nom.trim().charAt(0).toUpperCase() || "?"}
+    </span>
+  );
 }
 
 // Outils IA utilisés au quotidien chez Studio Cami, classés par usage.
@@ -474,16 +485,44 @@ export const Route = createFileRoute("/_authenticated/outils/")({
 function OutilsPage() {
   const [recherche, setRecherche] = useState("");
   const [categorieActive, setCategorieActive] = useState<string | null>(null);
-  const [outilsAjoutes, setOutilsAjoutes] = useState<OutilAjoute[]>(() => chargerOutilsAjoutes());
+
+  const fetchOutilsPersos = useServerFn(listOutilsPersos);
+  const addOutilPerso = useServerFn(saveOutilPerso);
+  const removeOutilPerso = useServerFn(deleteOutilPerso);
+  const queryClient = useQueryClient();
+
+  const { data: outilsAjoutes = [] } = useQuery({
+    queryKey: ["outils_persos"],
+    queryFn: () => fetchOutilsPersos(),
+  });
+
+  const ajout = useMutation({
+    mutationFn: (input: { nom: string; slug: string; definition: string; prix: Prix; categorie: string }) =>
+      addOutilPerso({ data: input }),
+    onSuccess: (row) => {
+      toast.success(`« ${row.nom} » ajouté aux outils.`);
+      queryClient.invalidateQueries({ queryKey: ["outils_persos"] });
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+
+  const suppressionOutil = useMutation({
+    mutationFn: (id: string) => removeOutilPerso({ data: { id } }),
+    onSuccess: () => {
+      toast.success("Outil supprimé.");
+      queryClient.invalidateQueries({ queryKey: ["outils_persos"] });
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
 
   const sectionsCombinees = useMemo(() => {
     if (outilsAjoutes.length === 0) return SECTIONS;
     const parCategorie = new Map<string, Outil[]>();
     for (const section of SECTIONS) parCategorie.set(section.categorie, [...section.outils]);
-    for (const { id, categorie, ...reste } of outilsAjoutes) {
-      const liste = parCategorie.get(categorie) ?? [];
-      liste.push({ ...reste, slug: id, logo: "Claude" });
-      parCategorie.set(categorie, liste);
+    for (const op of outilsAjoutes) {
+      const liste = parCategorie.get(op.categorie) ?? [];
+      liste.push({ nom: op.nom, slug: op.slug, definition: op.definition, prix: op.prix, id: op.id, perso: true });
+      parCategorie.set(op.categorie, liste);
     }
     return CATEGORIES_LABELS.map((categorie) => ({
       categorie,
@@ -531,29 +570,14 @@ function OutilsPage() {
       return;
     }
 
-    const nouveau: OutilAjoute = {
-      id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-      nom,
-      slug: nom.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""),
-      definition,
-      prix: nouveauPrix,
-      categorie: nouvelleCategorie,
-    };
+    const slugBase = nom.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    const slug = `perso-${slugBase || "outil"}-${Date.now().toString(36)}`;
 
-    setOutilsAjoutes((precedent) => {
-      const suivant = [...precedent, nouveau];
-      try {
-        window.localStorage.setItem(CLE_OUTILS_AJOUTES, JSON.stringify(suivant));
-      } catch {
-        // stockage indisponible (navigation privée…) — l'outil reste ajouté pour la session en cours
-      }
-      return suivant;
-    });
+    ajout.mutate({ nom, slug, definition, prix: nouveauPrix, categorie: nouvelleCategorie });
 
     setNouveauNom("");
     setNouvelleDefinition("");
     setNouveauPrix("freemium");
-    toast.success(`« ${nom} » ajouté aux outils.`);
   }
 
   const resultatsCount = sectionsFiltrees.reduce(
@@ -742,76 +766,110 @@ function OutilsPage() {
                     </p>
                   </div>
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                    {section.outils.map((o, index) => (
-                      <Link
-                        key={o.nom}
-                        to="/outils/$slug"
-                        params={{ slug: o.slug }}
-                        className="cami-card block transition hover:-translate-y-0.5 hover:border-[var(--coral)]"
-                      >
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="flex min-w-0 items-center gap-2.5">
-                            <span className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border bg-card">
-                              <ToolLogo nom={o.logo} />
-                            </span>
-                            <p className="truncate text-sm font-bold text-primary">{o.nom}</p>
+                    {section.outils.map((o, index) => {
+                      const contenu = (
+                        <>
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex min-w-0 items-center gap-2.5">
+                              <span className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border bg-card">
+                                {o.logo ? (
+                                  <ToolLogo nom={o.logo} />
+                                ) : (
+                                  <AvatarOutilPerso nom={o.nom} role={role} />
+                                )}
+                              </span>
+                              <p className="truncate text-sm font-bold text-primary">{o.nom}</p>
+                            </div>
+                            {o.notes ? (
+                              <span className="shrink-0 rounded-full bg-primary px-2 py-0.5 text-[11px] font-bold text-primary-foreground">
+                                {formatNote(noteGlobale(o.notes))}
+                                <span className="opacity-60">/10</span>
+                              </span>
+                            ) : null}
                           </div>
-                          {o.notes ? (
-                            <span className="shrink-0 rounded-full bg-primary px-2 py-0.5 text-[11px] font-bold text-primary-foreground">
-                              {formatNote(noteGlobale(o.notes))}
-                              <span className="opacity-60">/10</span>
-                            </span>
-                          ) : null}
-                        </div>
-                        <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
-                          {o.definition}
-                        </p>
-                        <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
-                          {index === 0 && o.notes ? (
+                          <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
+                            {o.definition}
+                          </p>
+                          <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
+                            {index === 0 && o.notes ? (
+                              <span
+                                className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.05em]"
+                                style={{
+                                  background: `color-mix(in srgb, var(${role}) 16%, white)`,
+                                  color: `var(${role})`,
+                                }}
+                              >
+                                ★ Top {section.categorie}
+                              </span>
+                            ) : null}
                             <span
                               className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.05em]"
                               style={{
-                                background: `color-mix(in srgb, var(${role}) 16%, white)`,
-                                color: `var(${role})`,
+                                background: `color-mix(in srgb, var(${PRIX_ROLE[o.prix]}) 14%, white)`,
+                                color: `var(${PRIX_ROLE[o.prix]})`,
                               }}
                             >
-                              ★ Top {section.categorie}
+                              {PRIX_LABEL[o.prix]}
                             </span>
-                          ) : null}
-                          <span
-                            className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.05em]"
-                            style={{
-                              background: `color-mix(in srgb, var(${PRIX_ROLE[o.prix]}) 14%, white)`,
-                              color: `var(${PRIX_ROLE[o.prix]})`,
-                            }}
-                          >
-                            {PRIX_LABEL[o.prix]}
-                          </span>
-                          {o.souverain ? (
-                            <span
-                              className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.05em]"
-                              style={{
-                                background: "color-mix(in srgb, var(--violet) 14%, white)",
-                                color: "var(--violet)",
-                              }}
+                            {o.souverain ? (
+                              <span
+                                className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.05em]"
+                                style={{
+                                  background: "color-mix(in srgb, var(--violet) 14%, white)",
+                                  color: "var(--violet)",
+                                }}
+                              >
+                                Souverain
+                              </span>
+                            ) : null}
+                            {o.mcp ? (
+                              <span
+                                className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.05em]"
+                                style={{
+                                  background: "color-mix(in srgb, var(--primary) 14%, white)",
+                                  color: "var(--primary)",
+                                }}
+                              >
+                                MCP
+                              </span>
+                            ) : null}
+                            {o.perso ? (
+                              <span className="rounded-full border border-border px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.05em] text-muted-foreground">
+                                Ajouté par moi
+                              </span>
+                            ) : null}
+                          </div>
+                        </>
+                      );
+
+                      if (o.perso) {
+                        return (
+                          <div key={o.id ?? o.nom} className="cami-card group relative block">
+                            {contenu}
+                            <button
+                              type="button"
+                              onClick={() => o.id && suppressionOutil.mutate(o.id)}
+                              aria-label={`Supprimer ${o.nom}`}
+                              title="Supprimer"
+                              className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full border border-border bg-card text-muted-foreground opacity-0 transition hover:border-[var(--coral)] hover:text-[var(--coral)] focus-visible:opacity-100 group-hover:opacity-100"
                             >
-                              Souverain
-                            </span>
-                          ) : null}
-                          {o.mcp ? (
-                            <span
-                              className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.05em]"
-                              style={{
-                                background: "color-mix(in srgb, var(--primary) 14%, white)",
-                                color: "var(--primary)",
-                              }}
-                            >
-                              MCP
-                            </span>
-                          ) : null}
-                        </div>
-                      </Link>
-                    ))}
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
+                          </div>
+                        );
+                      }
+
+                      return (
+                        <Link
+                          key={o.nom}
+                          to="/outils/$slug"
+                          params={{ slug: o.slug }}
+                          className="cami-card block transition hover:-translate-y-0.5 hover:border-[var(--coral)]"
+                        >
+                          {contenu}
+                        </Link>
+                      );
+                    })}
                   </div>
                 </section>
               );

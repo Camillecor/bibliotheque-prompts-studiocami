@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      outils_persos: {
+        Row: {
+          categorie: string
+          created_at: string
+          definition: string
+          id: string
+          nom: string
+          prix: string
+          slug: string
+          user_id: string
+        }
+        Insert: {
+          categorie: string
+          created_at?: string
+          definition: string
+          id?: string
+          nom: string
+          prix?: string
+          slug: string
+          user_id: string
+        }
+        Update: {
+          categorie?: string
+          created_at?: string
+          definition?: string
+          id?: string
+          nom?: string
+          prix?: string
+          slug?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       prompts: {
         Row: {
           alerte_pii: boolean
