@@ -125,6 +125,13 @@ export function AppShell({ children, panel }: { children: ReactNode; panel?: Rea
             labelClassName="w-16"
           />
           <RailButton
+            to="/fiches"
+            icon={FileText}
+            label="Fiches"
+            active={pathname.startsWith("/fiches")}
+          />
+          <RailButton
+
             to="/bibliotheque"
             icon={Library}
             label="Bibliothèque"
