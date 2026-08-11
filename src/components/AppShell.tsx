@@ -2,7 +2,7 @@ import { useState, type ReactNode } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { BookOpen, Library, Menu, Plus, SlidersHorizontal, Wrench, X } from "lucide-react";
+import { BookOpen, FileText, Library, Menu, Plus, SlidersHorizontal, Wrench, X } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -15,10 +15,12 @@ import logoAsset from "@/assets/studio-cami-logo.svg.asset.json";
 
 const NAV_ITEMS = [
   { to: "/", icon: Plus, label: "Générateur de prompt" },
+  { to: "/fiches", icon: FileText, label: "Fiches" },
   { to: "/bibliotheque", icon: Library, label: "Bibliothèque" },
   { to: "/glossaire", icon: BookOpen, label: "Glossaire" },
   { to: "/outils", icon: Wrench, label: "Outils" },
 ];
+
 
 
 // Précharge silencieusement la bibliothèque dès qu'on est sur l'app (peu importe l'écran),
