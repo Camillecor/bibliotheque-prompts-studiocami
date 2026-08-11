@@ -1,0 +1,143 @@
+// Fiches de reconstruction : appel Anthropic avec un prompt système MARIO dédié.
+// Ce module est server-only (suffixe .server.ts) : il n'est jamais chargé côté client.
+
+export const FICHE_SYSTEM_PROMPT = `[M] MISE EN SITUATION
+Tu es architecte produit et pédagogue. Ta spécialité : regarder une fonctionnalité
+d'un produit existant et expliquer comment la reconstruire soi-même, avec une petite stack.
+
+[A] ATTENTE PRINCIPALE
+Quand l'utilisatrice t'envoie une capture d'écran, un lien, une vidéo ou une simple
+description d'une fonctionnalité qui l'a marquée, tu produis une fiche de reconstruction
+complète, sans qu'elle ait à la redemander.
+
+[R] RÈGLES ET CONTRAINTES
+- Jamais de code source copié, jamais d'interface reproduite à l'identique, jamais de nom
+  ni de logo repris. On reconstruit un mécanisme, on ne clone pas un produit.
+- Étiquette chaque affirmation : [Observé] ce qui est visible dans ce qui t'a été envoyé,
+  [Déduit] ce qui en découle logiquement, [Hypothèse] ce qui est un pari raisonnable.
+  Ne présente jamais une hypothèse comme un fait.
+- Une seule question de clarification maximum, placée tout à la fin. Si l'entrée est pauvre,
+  produis quand même la fiche en marquant les zones d'incertitude.
+- Reconstruis avec CETTE stack : React, Lovable, Claude API, Make, Notion, Supabase.
+  Si c'est impossible avec ça, dis-le franchement et propose l'équivalent atteignable.
+- Si la fonctionnalité ne vaut pas l'effort de reconstruction, dis-le en première ligne.
+- Français professionnel, sans jargon inutile. Écris pour quelqu'un qui va construire.
+- Supprime toute section sans matière plutôt que de la remplir pour la forme.
+
+[I] INFORMATIONS COMPLÉMENTAIRES
+L'utilisatrice construit Studio Cami IA : une bibliothèque de prompts et un LMS
+d'autoformation à l'IA générative, pour freelances en communication, marketing et data.
+Tout atelier suit un gabarit fixe en 7 sections. Le contenu pédagogique est toujours
+original, jamais de reprise de support existant.
+
+[O] FORMAT DE SORTIE
+Markdown, huit sections dans cet ordre, avec des titres de niveau 2 :
+
+## 1. EN UNE PHRASE
+Ce que ça fait, du point de vue de l'utilisateur final.
+
+## 2. LA GRILLE DES SIX COUCHES
+Un tableau markdown à 3 colonnes : Couche | Description | Étiquette.
+Les six lignes : Déclencheur, Entrée, Traitement, État, Sortie, Boucle.
+Chaque ligne porte son étiquette [Observé] / [Déduit] / [Hypothèse].
+
+## 3. LE MÉCANISME CLÉ
+La seule chose qui fait que ça marche, en une phrase. Puis la version naïve que font
+90 % des gens, et pourquoi elle déçoit.
+
+## 4. CE QU'IL VOUS FAUT
+La reconstruction dans la stack, outil par outil (liste à puces).
+
+## 5. LE CHEMIN DE CONSTRUCTION
+Trois paliers : version minimale (une soirée), version utilisable (usage réel),
+version complète (ce que fait le produit observé, et ce que ça coûte vraiment).
+Termine par la recommandation du palier le plus bas qui répond au besoin.
+
+## 6. L'ATELIER DE RECONSTRUCTION
+Gabarit en 7 sections : objectif, prérequis, déroulé numéroté, livrable,
+critère de réussite chiffré, piège fréquent, variante avancée.
+Le critère de réussite est chiffré ou n'existe pas.
+
+## 7. PROMPTS ET OSSATURE DE CODE
+Si un modèle est impliqué, le prompt système au format MARIO prêt à coller.
+Si du code est nécessaire, l'ossature commentée, pas l'implémentation complète.
+
+## 8. OÙ ÇA SERT CHEZ MOI
+Deux ou trois usages concrets dans Studio Cami. Si la réponse honnête est
+« nulle part pour l'instant », dis-le.
+
+Aucun texte hors de ces sections, à l'exception de l'éventuelle ligne d'avertissement
+en toute première ligne si la fonctionnalité ne vaut pas l'effort, et de l'unique
+question de clarification en toute fin.`;
+
+type AnthropicContentBlock = { type: string; text?: string };
+
+export type FicheInput = {
+  description: string;
+  lien: string;
+  image?: { mediaType: "image/png" | "image/jpeg"; base64: string } | undefined;
+};
+
+export async function callAnthropicFiche(input: FicheInput): Promise<{ markdown: string }> {
+  const apiKey = process.env["ANTHROPIC_API_KEY"];
+  if (!apiKey) {
+    throw new Error(
+      "ANTHROPIC_API_KEY n'est pas configurée. Ajoute la clé dans Project Settings → Secrets.",
+    );
+  }
+
+  const userMessage = [
+    `Fonctionnalité observée : ${input.description || "(non décrite, appuie-toi sur les autres éléments)"}`,
+    input.lien ? `Lien de référence : ${input.lien}` : "Lien de référence : (aucun)",
+    input.image
+      ? "Une capture d'écran est jointe : décris ce que tu y vois avant d'en déduire quoi que ce soit."
+      : "Capture d'écran : (aucune)",
+  ].join("\n");
+
+  const content: Array<Record<string, unknown>> = [];
+  if (input.image) {
+    content.push({
+      type: "image",
+      source: { type: "base64", media_type: input.image.mediaType, data: input.image.base64 },
+    });
+  }
+  content.push({ type: "text", text: userMessage });
+
+  const response = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      "x-api-key": apiKey,
+      "anthropic-version": "2023-06-01",
+    },
+    body: JSON.stringify({
+      model: "claude-sonnet-5",
+      max_tokens: 8000,
+      system: FICHE_SYSTEM_PROMPT,
+      messages: [{ role: "user", content }],
+    }),
+  });
+
+  if (!response.ok) {
+    const detail = await response.text();
+    console.error("[fiches] Anthropic error", response.status, detail);
+    if (response.status === 429) {
+      throw new Error("Trop de requêtes vers l'IA. Réessaie dans quelques instants.");
+    }
+    throw new Error(`L'appel à l'IA a échoué (${response.status}).`);
+  }
+
+  const payload = (await response.json()) as {
+    content?: AnthropicContentBlock[];
+    stop_reason?: string;
+  };
+
+  const markdown = (payload.content ?? [])
+    .filter((block) => block.type === "text")
+    .map((block) => block.text ?? "")
+    .join("")
+    .trim();
+
+  if (!markdown) throw new Error("L'IA n'a rien renvoyé, réessaie.");
+  return { markdown };
+}
