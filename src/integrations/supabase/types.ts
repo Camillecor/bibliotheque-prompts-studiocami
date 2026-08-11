@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      fiches: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          lien: string
+          markdown: string
+          titre: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string
+          id?: string
+          lien?: string
+          markdown: string
+          titre: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          lien?: string
+          markdown?: string
+          titre?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       outils_persos: {
         Row: {
           categorie: string

@@ -1,12 +1,22 @@
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useMutation } from "@tanstack/react-query";
-import { FileText, ImagePlus, Loader2, Sparkles, X } from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  Bookmark,
+  BookmarkCheck,
+  FileText,
+  ImagePlus,
+  Loader2,
+  Plus,
+  Sparkles,
+  Trash2,
+  X,
+} from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { CopyButton } from "@/components/CopyButton";
-import { genererFiche } from "@/lib/fiches.functions";
+import { genererFiche, saveFiche, listFiches, deleteFiche, type FicheRow } from "@/lib/fiches.functions";
 
 export const Route = createFileRoute("/_authenticated/fiches")({
   head: () => ({
@@ -227,14 +237,72 @@ function FichesPage() {
   const [lien, setLien] = useState("");
   const [image, setImage] = useState<ImageJointe | null>(null);
   const [markdown, setMarkdown] = useState("");
+  const [ficheEnregistreeId, setFicheEnregistreeId] = useState<string | null>(null);
   const inputFichier = useRef<HTMLInputElement>(null);
+  const queryClient = useQueryClient();
 
   const appelFiche = useServerFn(genererFiche);
   const mutation = useMutation({
     mutationFn: (payload: Parameters<typeof genererFiche>[0]) => appelFiche(payload),
-    onSuccess: (res) => setMarkdown(res.markdown),
+    onSuccess: (res) => {
+      setMarkdown(res.markdown);
+      setFicheEnregistreeId(null);
+    },
     onError: (err: Error) => toast.error(err.message),
   });
+
+  const fetchFiches = useServerFn(listFiches);
+  const { data: fiches = [] } = useQuery({
+    queryKey: ["fiches"],
+    queryFn: () => fetchFiches(),
+  });
+
+  const enregistrerServeur = useServerFn(saveFiche);
+  const enregistrement = useMutation({
+    mutationFn: (input: { titre: string; description: string; lien: string; markdown: string }) =>
+      enregistrerServeur({ data: input }),
+    onSuccess: (row) => {
+      toast.success("Fiche enregistrée.");
+      setFicheEnregistreeId(row.id);
+      queryClient.invalidateQueries({ queryKey: ["fiches"] });
+    },
+    onError: (err: Error) => toast.error(err.message),
+  });
+
+  const suppressionServeur = useServerFn(deleteFiche);
+  const suppression = useMutation({
+    mutationFn: (id: string) => suppressionServeur({ data: { id } }),
+    onSuccess: (_res, id) => {
+      toast.success("Fiche supprimée.");
+      if (ficheEnregistreeId === id) setFicheEnregistreeId(null);
+      queryClient.invalidateQueries({ queryKey: ["fiches"] });
+    },
+    onError: (err: Error) => toast.error(err.message),
+  });
+
+  function enregistrerFiche() {
+    const titre =
+      description.trim().slice(0, 80) || lien.trim() || "Fiche sans titre";
+    enregistrement.mutate({ titre, description: description.trim(), lien: lien.trim(), markdown });
+  }
+
+  function chargerFiche(fiche: FicheRow) {
+    setDescription(fiche.description);
+    setLien(fiche.lien);
+    setImage(null);
+    setMarkdown(fiche.markdown);
+    setFicheEnregistreeId(fiche.id);
+  }
+
+  function nouvelleFiche() {
+    setDescription("");
+    setLien("");
+    setImage(null);
+    setMarkdown("");
+    setFicheEnregistreeId(null);
+  }
+
+  const fichesRecentes = useMemo(() => fiches.slice(0, 20), [fiches]);
 
   async function joindreImage(file: File | undefined) {
     if (!file) return;
@@ -301,6 +369,37 @@ function FichesPage() {
           à vérifier.
         </p>
       </div>
+
+      {fichesRecentes.length > 0 ? (
+        <div className="space-y-1.5">
+          <p className="text-xs font-semibold uppercase tracking-wide text-[var(--primary)]">
+            Mes fiches
+          </p>
+          <ul className="space-y-0.5">
+            {fichesRecentes.map((fiche) => (
+              <li key={fiche.id} className="group flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => chargerFiche(fiche)}
+                  className="min-w-0 flex-1 truncate rounded-lg px-2 py-1.5 text-left text-xs text-primary transition hover:bg-secondary"
+                  title={fiche.titre}
+                >
+                  {fiche.titre}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => suppression.mutate(fiche.id)}
+                  aria-label={`Supprimer « ${fiche.titre} »`}
+                  title="Supprimer"
+                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-muted-foreground opacity-0 transition hover:text-[var(--coral)] focus-visible:opacity-100 group-hover:opacity-100"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
     </div>
   );
 
@@ -319,6 +418,10 @@ function FichesPage() {
               </p>
             </div>
           </div>
+          <button type="button" onClick={nouvelleFiche} className="cami-btn min-h-11">
+            <Plus className="h-4 w-4" />
+            Nouvelle fiche
+          </button>
         </header>
 
         <section className="cami-card mt-6 space-y-4 p-4 lg:p-5">
@@ -416,7 +519,27 @@ function FichesPage() {
           <section className="cami-card mt-6 p-4 lg:p-6">
             <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
               <h2 className="text-base font-bold text-[var(--primary)]">Ta fiche</h2>
-              <CopyButton value={markdown} label="Copier la fiche" />
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  onClick={enregistrerFiche}
+                  disabled={enregistrement.isPending || ficheEnregistreeId !== null}
+                  className="cami-btn min-h-9 disabled:opacity-60"
+                >
+                  {ficheEnregistreeId ? (
+                    <>
+                      <BookmarkCheck className="h-4 w-4" />
+                      Enregistrée
+                    </>
+                  ) : (
+                    <>
+                      <Bookmark className="h-4 w-4" />
+                      {enregistrement.isPending ? "Enregistrement…" : "Enregistrer"}
+                    </>
+                  )}
+                </button>
+                <CopyButton value={markdown} label="Copier la fiche" />
+              </div>
             </div>
             <FicheMarkdown markdown={markdown} />
           </section>
