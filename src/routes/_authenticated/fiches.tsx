@@ -492,13 +492,27 @@ function FichesPage() {
         </p>
       </div>
 
-      {fichesRecentes.length > 0 ? (
-        <div className="space-y-1.5">
-          <p className="text-xs font-semibold uppercase tracking-wide text-[var(--primary)]">
-            Mes fiches
+      <div className="space-y-1.5">
+        <p className="text-xs font-semibold uppercase tracking-wide text-[var(--primary)]">
+          Mes fiches ({fiches.length})
+        </p>
+        <div className="relative">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[var(--primary)]" />
+          <input
+            value={recherche}
+            onChange={(e) => setRecherche(e.target.value)}
+            placeholder="Rechercher une fiche…"
+            aria-label="Rechercher une fiche"
+            className="min-h-10 w-full rounded-2xl border border-border bg-card pl-9 pr-3 text-xs text-[var(--primary)] outline-none focus:border-[var(--info)]"
+          />
+        </div>
+        {fichesFiltrees.length === 0 ? (
+          <p className="px-1 pt-1 text-xs text-muted-foreground">
+            {fiches.length === 0 ? "Aucune fiche enregistrée." : "Aucun résultat."}
           </p>
+        ) : (
           <ul className="space-y-0.5">
-            {fichesRecentes.map((fiche) => (
+            {fichesFiltrees.map((fiche) => (
               <li key={fiche.id} className="group flex items-center gap-1">
                 <button
                   type="button"
@@ -520,8 +534,9 @@ function FichesPage() {
               </li>
             ))}
           </ul>
-        </div>
-      ) : null}
+        )}
+      </div>
+
     </div>
   );
 
