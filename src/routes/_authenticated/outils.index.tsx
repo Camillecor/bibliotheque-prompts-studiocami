@@ -744,7 +744,7 @@ function OutilsPage() {
           <div className="space-y-8">
             {sectionsAffichees.map((section) => {
               const roleIndex = CATEGORIES_LABELS.indexOf(section.categorie);
-              const role = ROLES[roleIndex % ROLES.length];
+              const role = ROLES[roleIndex % ROLES.length] ?? ROLES[0]!;
               return (
                 <section
                   key={section.categorie}
