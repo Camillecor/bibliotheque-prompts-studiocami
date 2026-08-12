@@ -238,6 +238,8 @@ function FicheMarkdown({ markdown }: { markdown: string }) {
     if (titre) {
       const niveau = (titre[1] ?? "#").length;
       const texte = titre[2] ?? "";
+      sectionCourante = texte;
+
       blocs.push(
         niveau <= 2 ? (
           <h2 key={cle++} className="mt-2 text-xl font-bold text-[var(--primary)]">
