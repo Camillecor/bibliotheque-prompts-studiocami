@@ -682,7 +682,27 @@ function FichesPage() {
                     </>
                   )}
                 </button>
+                <button
+                  type="button"
+                  onClick={optimiser}
+                  disabled={amelioration.isPending}
+                  className="cami-btn min-h-9 disabled:opacity-60"
+                  title="Réécrire la fiche en plus précise et plus optimisée"
+                >
+                  {amelioration.isPending ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Optimisation…
+                    </>
+                  ) : (
+                    <>
+                      <Wand2 className="h-4 w-4" />
+                      Améliorer
+                    </>
+                  )}
+                </button>
                 <CopyButton value={markdown} label="Copier la fiche" />
+
               </div>
             </div>
             <FicheMarkdown markdown={markdown} />
