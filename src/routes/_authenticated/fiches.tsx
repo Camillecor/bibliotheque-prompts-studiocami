@@ -263,7 +263,12 @@ function FicheMarkdown({ markdown }: { markdown: string }) {
         items.push((lignes[i] ?? "").replace(/^\s*([-*]|\d+\.)\s+/, ""));
         i += 1;
       }
+      if (ordonnee && /SCH[ÉE]MA DES [ÉE]TAPES/i.test(sectionCourante)) {
+        blocs.push(<SchemaEtapes key={cle++} items={items} />);
+        continue;
+      }
       const Liste = ordonnee ? "ol" : "ul";
+
       blocs.push(
         <Liste
           key={cle++}
