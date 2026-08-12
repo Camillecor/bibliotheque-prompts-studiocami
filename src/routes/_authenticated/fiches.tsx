@@ -100,11 +100,72 @@ function cellules(ligne: string) {
     .map((c) => c.trim());
 }
 
+const COULEURS_ETAPES = ["var(--coral)", "var(--info)", "var(--primary)", "var(--violet)"];
+
+/** Rendu visuel du schéma des étapes : « Titre | Outil | Action | Durée » */
+function SchemaEtapes({ items }: { items: string[] }) {
+  return (
+    <ol className="relative space-y-3">
+      <span
+        aria-hidden="true"
+        className="absolute left-[15px] top-3 bottom-3 hidden w-px bg-border sm:block"
+      />
+      {items.map((item, index) => {
+        const parts = item.split("|").map((p) => p.trim());
+        const titre = parts[0] ?? item;
+        const outil = parts[1] ?? "";
+        const action = parts[2] ?? "";
+        const duree = parts[3] ?? "";
+        const couleur = COULEURS_ETAPES[index % COULEURS_ETAPES.length] ?? "var(--primary)";
+        return (
+          <li key={index} className="relative flex gap-3">
+            <span
+              className="z-10 mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold"
+              style={{
+                color: couleur,
+                backgroundColor: `color-mix(in srgb, ${couleur} 14%, white)`,
+                border: `1px solid color-mix(in srgb, ${couleur} 30%, transparent)`,
+              }}
+            >
+              {index + 1}
+            </span>
+            <div className="min-w-0 flex-1 rounded-2xl border border-border bg-card p-3">
+              <div className="flex flex-wrap items-center gap-2">
+                <p className="text-sm font-semibold text-[var(--primary)]">
+                  <Inline texte={titre} />
+                </p>
+                {outil ? (
+                  <span
+                    className="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide"
+                    style={{ color: couleur, backgroundColor: `color-mix(in srgb, ${couleur} 12%, transparent)` }}
+                  >
+                    {outil}
+                  </span>
+                ) : null}
+                {duree ? (
+                  <span className="ml-auto text-[11px] text-muted-foreground">{duree}</span>
+                ) : null}
+              </div>
+              {action ? (
+                <p className="mt-1 text-sm leading-relaxed text-foreground/90">
+                  <Inline texte={action} />
+                </p>
+              ) : null}
+            </div>
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
+
 function FicheMarkdown({ markdown }: { markdown: string }) {
   const lignes = markdown.split("\n");
   const blocs: React.ReactNode[] = [];
   let i = 0;
   let cle = 0;
+  let sectionCourante = "";
+
 
   while (i < lignes.length) {
     const ligne = lignes[i] ?? "";
