@@ -9,14 +9,24 @@ import {
   ImagePlus,
   Loader2,
   Plus,
+  Search,
   Sparkles,
   Trash2,
+  Wand2,
   X,
 } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { CopyButton } from "@/components/CopyButton";
-import { genererFiche, saveFiche, listFiches, deleteFiche, type FicheRow } from "@/lib/fiches.functions";
+import {
+  genererFiche,
+  ameliorerFiche,
+  saveFiche,
+  listFiches,
+  deleteFiche,
+  type FicheRow,
+} from "@/lib/fiches.functions";
+
 
 export const Route = createFileRoute("/_authenticated/fiches")({
   head: () => ({
@@ -40,6 +50,8 @@ export const Route = createFileRoute("/_authenticated/fiches")({
 });
 
 type ImageJointe = { mediaType: "image/png" | "image/jpeg"; base64: string; previewUrl: string; name: string };
+const MAX_IMAGES = 4;
+
 
 /* ------------------------------------------------------------------ */
 /* Rendu markdown minimal (titres, tableaux, listes, gras, code)       */
@@ -88,11 +100,72 @@ function cellules(ligne: string) {
     .map((c) => c.trim());
 }
 
+const COULEURS_ETAPES = ["var(--coral)", "var(--info)", "var(--primary)", "var(--violet)"];
+
+/** Rendu visuel du schéma des étapes : « Titre | Outil | Action | Durée » */
+function SchemaEtapes({ items }: { items: string[] }) {
+  return (
+    <ol className="relative space-y-3">
+      <span
+        aria-hidden="true"
+        className="absolute left-[15px] top-3 bottom-3 hidden w-px bg-border sm:block"
+      />
+      {items.map((item, index) => {
+        const parts = item.split("|").map((p) => p.trim());
+        const titre = parts[0] ?? item;
+        const outil = parts[1] ?? "";
+        const action = parts[2] ?? "";
+        const duree = parts[3] ?? "";
+        const couleur = COULEURS_ETAPES[index % COULEURS_ETAPES.length] ?? "var(--primary)";
+        return (
+          <li key={index} className="relative flex gap-3">
+            <span
+              className="z-10 mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold"
+              style={{
+                color: couleur,
+                backgroundColor: `color-mix(in srgb, ${couleur} 14%, white)`,
+                border: `1px solid color-mix(in srgb, ${couleur} 30%, transparent)`,
+              }}
+            >
+              {index + 1}
+            </span>
+            <div className="min-w-0 flex-1 rounded-2xl border border-border bg-card p-3">
+              <div className="flex flex-wrap items-center gap-2">
+                <p className="text-sm font-semibold text-[var(--primary)]">
+                  <Inline texte={titre} />
+                </p>
+                {outil ? (
+                  <span
+                    className="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide"
+                    style={{ color: couleur, backgroundColor: `color-mix(in srgb, ${couleur} 12%, transparent)` }}
+                  >
+                    {outil}
+                  </span>
+                ) : null}
+                {duree ? (
+                  <span className="ml-auto text-[11px] text-muted-foreground">{duree}</span>
+                ) : null}
+              </div>
+              {action ? (
+                <p className="mt-1 text-sm leading-relaxed text-foreground/90">
+                  <Inline texte={action} />
+                </p>
+              ) : null}
+            </div>
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
+
 function FicheMarkdown({ markdown }: { markdown: string }) {
   const lignes = markdown.split("\n");
   const blocs: React.ReactNode[] = [];
   let i = 0;
   let cle = 0;
+  let sectionCourante = "";
+
 
   while (i < lignes.length) {
     const ligne = lignes[i] ?? "";
@@ -165,6 +238,8 @@ function FicheMarkdown({ markdown }: { markdown: string }) {
     if (titre) {
       const niveau = (titre[1] ?? "#").length;
       const texte = titre[2] ?? "";
+      sectionCourante = texte;
+
       blocs.push(
         niveau <= 2 ? (
           <h2 key={cle++} className="mt-2 text-xl font-bold text-[var(--primary)]">
@@ -188,7 +263,12 @@ function FicheMarkdown({ markdown }: { markdown: string }) {
         items.push((lignes[i] ?? "").replace(/^\s*([-*]|\d+\.)\s+/, ""));
         i += 1;
       }
+      if (ordonnee && /SCH[ÉE]MA DES [ÉE]TAPES/i.test(sectionCourante)) {
+        blocs.push(<SchemaEtapes key={cle++} items={items} />);
+        continue;
+      }
       const Liste = ordonnee ? "ol" : "ul";
+
       blocs.push(
         <Liste
           key={cle++}
@@ -235,9 +315,10 @@ function FicheMarkdown({ markdown }: { markdown: string }) {
 function FichesPage() {
   const [description, setDescription] = useState("");
   const [lien, setLien] = useState("");
-  const [image, setImage] = useState<ImageJointe | null>(null);
+  const [images, setImages] = useState<ImageJointe[]>([]);
   const [markdown, setMarkdown] = useState("");
   const [ficheEnregistreeId, setFicheEnregistreeId] = useState<string | null>(null);
+  const [recherche, setRecherche] = useState("");
   const inputFichier = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
 
@@ -247,6 +328,17 @@ function FichesPage() {
     onSuccess: (res) => {
       setMarkdown(res.markdown);
       setFicheEnregistreeId(null);
+    },
+    onError: (err: Error) => toast.error(err.message),
+  });
+
+  const appelAmelioration = useServerFn(ameliorerFiche);
+  const amelioration = useMutation({
+    mutationFn: (payload: Parameters<typeof ameliorerFiche>[0]) => appelAmelioration(payload),
+    onSuccess: (res) => {
+      setMarkdown(res.markdown);
+      setFicheEnregistreeId(null);
+      toast.success("Fiche améliorée. Enregistre-la pour garder la nouvelle version.");
     },
     onError: (err: Error) => toast.error(err.message),
   });
@@ -289,7 +381,7 @@ function FichesPage() {
   function chargerFiche(fiche: FicheRow) {
     setDescription(fiche.description);
     setLien(fiche.lien);
-    setImage(null);
+    setImages([]);
     setMarkdown(fiche.markdown);
     setFicheEnregistreeId(fiche.id);
   }
@@ -297,39 +389,57 @@ function FichesPage() {
   function nouvelleFiche() {
     setDescription("");
     setLien("");
-    setImage(null);
+    setImages([]);
     setMarkdown("");
     setFicheEnregistreeId(null);
   }
 
-  const fichesRecentes = useMemo(() => fiches.slice(0, 20), [fiches]);
+  const fichesFiltrees = useMemo(() => {
+    const q = recherche.trim().toLowerCase();
+    const base = q
+      ? fiches.filter((f) =>
+          [f.titre, f.description, f.lien, f.markdown].join(" ").toLowerCase().includes(q),
+        )
+      : fiches;
+    return base.slice(0, 30);
+  }, [fiches, recherche]);
 
-  async function joindreImage(file: File | undefined) {
-    if (!file) return;
-    if (file.type !== "image/png" && file.type !== "image/jpeg") {
-      toast.error("Formats acceptés : PNG ou JPG.");
+  async function joindreImages(files: FileList | null) {
+    if (!files || files.length === 0) return;
+    const restants = MAX_IMAGES - images.length;
+    if (restants <= 0) {
+      toast.error(`${MAX_IMAGES} images maximum.`);
       return;
     }
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("Image trop lourde (5 Mo maximum).");
-      return;
+    const nouvelles: ImageJointe[] = [];
+    for (const file of Array.from(files).slice(0, restants)) {
+      if (file.type !== "image/png" && file.type !== "image/jpeg") {
+        toast.error(`« ${file.name} » ignorée : PNG ou JPG uniquement.`);
+        continue;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error(`« ${file.name} » ignorée : 5 Mo maximum.`);
+        continue;
+      }
+      const dataUrl = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result));
+        reader.onerror = () => reject(new Error("Lecture du fichier impossible."));
+        reader.readAsDataURL(file);
+      });
+      nouvelles.push({
+        mediaType: file.type as "image/png" | "image/jpeg",
+        base64: dataUrl.split(",")[1] ?? "",
+        previewUrl: dataUrl,
+        name: file.name,
+      });
     }
-    const dataUrl = await new Promise<string>((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(String(reader.result));
-      reader.onerror = () => reject(new Error("Lecture du fichier impossible."));
-      reader.readAsDataURL(file);
-    });
-    setImage({
-      mediaType: file.type as "image/png" | "image/jpeg",
-      base64: dataUrl.split(",")[1] ?? "",
-      previewUrl: dataUrl,
-      name: file.name,
-    });
+    if (files.length > restants) toast.info(`${MAX_IMAGES} images maximum.`);
+    if (nouvelles.length) setImages((prec) => [...prec, ...nouvelles]);
   }
 
   function lancer() {
-    if (!description.trim() && !lien.trim() && !image) {
+    if (!description.trim() && !lien.trim() && images.length === 0) {
       toast.error("Ajoute au moins une description, un lien ou une capture.");
       return;
     }
@@ -337,10 +447,22 @@ function FichesPage() {
       data: {
         description: description.trim(),
         lien: lien.trim(),
-        ...(image ? { image: { mediaType: image.mediaType, base64: image.base64 } } : {}),
+        images: images.map((im) => ({ mediaType: im.mediaType, base64: im.base64 })),
       },
     } as Parameters<typeof genererFiche>[0]);
   }
+
+  function optimiser() {
+    if (!markdown) return;
+    amelioration.mutate({
+      data: {
+        markdown,
+        consigne:
+          "Rends chaque étape du schéma plus concrète, ajoute des critères chiffrés et enrichis la section 10 (qualité, coût et performance, pièges).",
+      },
+    } as Parameters<typeof ameliorerFiche>[0]);
+  }
+
 
   const panneau = (
     <div className="space-y-4 p-4">
@@ -370,13 +492,27 @@ function FichesPage() {
         </p>
       </div>
 
-      {fichesRecentes.length > 0 ? (
-        <div className="space-y-1.5">
-          <p className="text-xs font-semibold uppercase tracking-wide text-[var(--primary)]">
-            Mes fiches
+      <div className="space-y-1.5">
+        <p className="text-xs font-semibold uppercase tracking-wide text-[var(--primary)]">
+          Mes fiches ({fiches.length})
+        </p>
+        <div className="relative">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[var(--primary)]" />
+          <input
+            value={recherche}
+            onChange={(e) => setRecherche(e.target.value)}
+            placeholder="Rechercher une fiche…"
+            aria-label="Rechercher une fiche"
+            className="min-h-10 w-full rounded-2xl border border-border bg-card pl-9 pr-3 text-xs text-[var(--primary)] outline-none focus:border-[var(--info)]"
+          />
+        </div>
+        {fichesFiltrees.length === 0 ? (
+          <p className="px-1 pt-1 text-xs text-muted-foreground">
+            {fiches.length === 0 ? "Aucune fiche enregistrée." : "Aucun résultat."}
           </p>
+        ) : (
           <ul className="space-y-0.5">
-            {fichesRecentes.map((fiche) => (
+            {fichesFiltrees.map((fiche) => (
               <li key={fiche.id} className="group flex items-center gap-1">
                 <button
                   type="button"
@@ -398,8 +534,9 @@ function FichesPage() {
               </li>
             ))}
           </ul>
-        </div>
-      ) : null}
+        )}
+      </div>
+
     </div>
   );
 
@@ -455,44 +592,51 @@ function FichesPage() {
 
             <div className="space-y-1.5">
               <span className="text-xs font-semibold uppercase tracking-wide text-[var(--primary)]">
-                Capture d'écran (optionnelle)
+                Captures d'écran ({images.length}/{MAX_IMAGES})
               </span>
               <input
                 ref={inputFichier}
                 type="file"
+                multiple
                 accept="image/png,image/jpeg"
                 className="hidden"
                 onChange={(e) => {
-                  void joindreImage(e.target.files?.[0]);
+                  void joindreImages(e.target.files);
                   e.target.value = "";
                 }}
               />
-              {image ? (
-                <div className="flex min-h-11 items-center gap-2 rounded-2xl border border-border bg-card px-3">
-                  <img src={image.previewUrl} alt="" className="h-7 w-7 rounded-lg object-cover" />
-                  <span className="min-w-0 flex-1 truncate text-xs text-muted-foreground">
-                    {image.name}
-                  </span>
-                  <button
-                    type="button"
-                    aria-label="Retirer la capture"
-                    onClick={() => setImage(null)}
-                    className="inline-flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-secondary"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                </div>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => inputFichier.current?.click()}
-                  className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-border bg-card px-3 text-sm font-medium text-[var(--primary)] hover:bg-secondary"
-                >
-                  <ImagePlus className="h-4 w-4" />
-                  Joindre une capture
-                </button>
-              )}
+              <button
+                type="button"
+                onClick={() => inputFichier.current?.click()}
+                disabled={images.length >= MAX_IMAGES}
+                className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-border bg-card px-3 text-sm font-medium text-[var(--primary)] hover:bg-secondary disabled:opacity-50"
+              >
+                <ImagePlus className="h-4 w-4" />
+                {images.length ? "Ajouter une capture" : "Joindre des captures"}
+              </button>
+              {images.length > 0 ? (
+                <ul className="flex flex-wrap gap-2 pt-1">
+                  {images.map((im, index) => (
+                    <li key={index} className="relative">
+                      <img
+                        src={im.previewUrl}
+                        alt={im.name}
+                        className="h-14 w-14 rounded-xl border border-border object-cover"
+                      />
+                      <button
+                        type="button"
+                        aria-label={`Retirer ${im.name}`}
+                        onClick={() => setImages((prec) => prec.filter((_, j) => j !== index))}
+                        className="absolute -right-1.5 -top-1.5 inline-flex h-5 w-5 items-center justify-center rounded-full border border-border bg-card text-muted-foreground hover:text-[var(--coral)]"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
             </div>
+
           </div>
 
           <button
@@ -538,7 +682,27 @@ function FichesPage() {
                     </>
                   )}
                 </button>
+                <button
+                  type="button"
+                  onClick={optimiser}
+                  disabled={amelioration.isPending}
+                  className="cami-btn min-h-9 disabled:opacity-60"
+                  title="Réécrire la fiche en plus précise et plus optimisée"
+                >
+                  {amelioration.isPending ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Optimisation…
+                    </>
+                  ) : (
+                    <>
+                      <Wand2 className="h-4 w-4" />
+                      Améliorer
+                    </>
+                  )}
+                </button>
                 <CopyButton value={markdown} label="Copier la fiche" />
+
               </div>
             </div>
             <FicheMarkdown markdown={markdown} />

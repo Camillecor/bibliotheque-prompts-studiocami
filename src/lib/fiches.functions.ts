@@ -1,15 +1,15 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
+const ImageSchema = z.object({
+  mediaType: z.enum(["image/png", "image/jpeg"]),
+  base64: z.string().max(7_000_000),
+});
+
 const FicheInputSchema = z.object({
   description: z.string().default(""),
   lien: z.string().default(""),
-  image: z
-    .object({
-      mediaType: z.enum(["image/png", "image/jpeg"]),
-      base64: z.string().max(7_000_000),
-    })
-    .optional(),
+  images: z.array(ImageSchema).max(4).default([]),
 });
 
 export const genererFiche = createServerFn({ method: "POST" })
@@ -18,6 +18,19 @@ export const genererFiche = createServerFn({ method: "POST" })
     const { callAnthropicFiche } = await import("@/lib/fiches.server");
     return callAnthropicFiche(data);
   });
+
+const AmeliorerInput = z.object({
+  markdown: z.string().min(1),
+  consigne: z.string().default(""),
+});
+
+export const ameliorerFiche = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => AmeliorerInput.parse(input))
+  .handler(async ({ data }): Promise<{ markdown: string }> => {
+    const { callAnthropicAmelioration } = await import("@/lib/fiches.server");
+    return callAnthropicAmelioration(data);
+  });
+
 
 // Sauvegarde/historique des fiches générées. Même schéma d'auth temporaire
 // que mario.functions.ts et outilsPersos.functions.ts (TEST_USER_ID) — à

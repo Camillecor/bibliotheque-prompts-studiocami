@@ -66,42 +66,42 @@ Si du code est nécessaire, l'ossature commentée, pas l'implémentation complè
 Deux ou trois usages concrets dans Studio Cami. Si la réponse honnête est
 « nulle part pour l'instant », dis-le.
 
+## 9. SCHÉMA DES ÉTAPES
+Le pas à pas de reconstruction, sous forme de liste numérotée de 5 à 9 étapes.
+Chaque étape tient sur UNE seule ligne, au format strict :
+N. Titre court | Outil | Ce que tu fais concrètement | Durée estimée
+Aucune sous-liste, aucun paragraphe dans cette section.
+
+## 10. AMÉLIORER ET OPTIMISER
+Trois sous-parties en listes à puces courtes :
+- Qualité : ce qui rend le résultat nettement meilleur.
+- Coût et performance : ce qui réduit les appels modèle, la latence, la facture.
+- Pièges à éviter : ce qui casse en usage réel et comment s'en prémunir.
+
 Aucun texte hors de ces sections, à l'exception de l'éventuelle ligne d'avertissement
 en toute première ligne si la fonctionnalité ne vaut pas l'effort, et de l'unique
 question de clarification en toute fin.`;
 
 type AnthropicContentBlock = { type: string; text?: string };
 
+export type FicheImage = { mediaType: "image/png" | "image/jpeg"; base64: string };
+
 export type FicheInput = {
   description: string;
   lien: string;
-  image?: { mediaType: "image/png" | "image/jpeg"; base64: string } | undefined;
+  images?: FicheImage[] | undefined;
 };
 
-export async function callAnthropicFiche(input: FicheInput): Promise<{ markdown: string }> {
+async function appelAnthropic(
+  system: string,
+  content: Array<Record<string, unknown>>,
+): Promise<{ markdown: string }> {
   const apiKey = process.env["ANTHROPIC_API_KEY"];
   if (!apiKey) {
     throw new Error(
       "ANTHROPIC_API_KEY n'est pas configurée. Ajoute la clé dans Project Settings → Secrets.",
     );
   }
-
-  const userMessage = [
-    `Fonctionnalité observée : ${input.description || "(non décrite, appuie-toi sur les autres éléments)"}`,
-    input.lien ? `Lien de référence : ${input.lien}` : "Lien de référence : (aucun)",
-    input.image
-      ? "Une capture d'écran est jointe : décris ce que tu y vois avant d'en déduire quoi que ce soit."
-      : "Capture d'écran : (aucune)",
-  ].join("\n");
-
-  const content: Array<Record<string, unknown>> = [];
-  if (input.image) {
-    content.push({
-      type: "image",
-      source: { type: "base64", media_type: input.image.mediaType, data: input.image.base64 },
-    });
-  }
-  content.push({ type: "text", text: userMessage });
 
   const response = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
@@ -113,7 +113,7 @@ export async function callAnthropicFiche(input: FicheInput): Promise<{ markdown:
     body: JSON.stringify({
       model: "claude-sonnet-5",
       max_tokens: 8000,
-      system: FICHE_SYSTEM_PROMPT,
+      system,
       messages: [{ role: "user", content }],
     }),
   });
@@ -141,3 +141,48 @@ export async function callAnthropicFiche(input: FicheInput): Promise<{ markdown:
   if (!markdown) throw new Error("L'IA n'a rien renvoyé, réessaie.");
   return { markdown };
 }
+
+export async function callAnthropicFiche(input: FicheInput): Promise<{ markdown: string }> {
+  const images = input.images ?? [];
+  const userMessage = [
+    `Fonctionnalité observée : ${input.description || "(non décrite, appuie-toi sur les autres éléments)"}`,
+    input.lien ? `Lien de référence : ${input.lien}` : "Lien de référence : (aucun)",
+    images.length
+      ? `${images.length} capture(s) d'écran jointe(s) : décris ce que tu y vois avant d'en déduire quoi que ce soit, et croise les captures entre elles.`
+      : "Capture d'écran : (aucune)",
+  ].join("\n");
+
+  const content: Array<Record<string, unknown>> = [];
+  for (const image of images) {
+    content.push({
+      type: "image",
+      source: { type: "base64", media_type: image.mediaType, data: image.base64 },
+    });
+  }
+  content.push({ type: "text", text: userMessage });
+
+  return appelAnthropic(FICHE_SYSTEM_PROMPT, content);
+}
+
+export async function callAnthropicAmelioration(input: {
+  markdown: string;
+  consigne: string;
+}): Promise<{ markdown: string }> {
+  const system = `${FICHE_SYSTEM_PROMPT}
+
+[CONSIGNE SUPPLÉMENTAIRE]
+On te donne une fiche déjà produite. Tu la réécris en entier, dans le même format
+(dix sections, mêmes titres, mêmes étiquettes), en la rendant plus précise, plus
+actionnable et plus économe : étapes plus concrètes, critères chiffrés, sections
+10 enrichie. Ne supprime aucune section. Ne commente pas ton travail.`;
+
+  return appelAnthropic(system, [
+    {
+      type: "text",
+      text: `Fiche existante à améliorer :\n\n${input.markdown}\n\nAxe demandé : ${
+        input.consigne || "améliore globalement la précision et l'optimisation"
+      }`,
+    },
+  ]);
+}
+
