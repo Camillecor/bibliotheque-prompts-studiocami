@@ -9,14 +9,24 @@ import {
   ImagePlus,
   Loader2,
   Plus,
+  Search,
   Sparkles,
   Trash2,
+  Wand2,
   X,
 } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { CopyButton } from "@/components/CopyButton";
-import { genererFiche, saveFiche, listFiches, deleteFiche, type FicheRow } from "@/lib/fiches.functions";
+import {
+  genererFiche,
+  ameliorerFiche,
+  saveFiche,
+  listFiches,
+  deleteFiche,
+  type FicheRow,
+} from "@/lib/fiches.functions";
+
 
 export const Route = createFileRoute("/_authenticated/fiches")({
   head: () => ({
