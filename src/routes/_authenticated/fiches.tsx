@@ -592,44 +592,51 @@ function FichesPage() {
 
             <div className="space-y-1.5">
               <span className="text-xs font-semibold uppercase tracking-wide text-[var(--primary)]">
-                Capture d'écran (optionnelle)
+                Captures d'écran ({images.length}/{MAX_IMAGES})
               </span>
               <input
                 ref={inputFichier}
                 type="file"
+                multiple
                 accept="image/png,image/jpeg"
                 className="hidden"
                 onChange={(e) => {
-                  void joindreImage(e.target.files?.[0]);
+                  void joindreImages(e.target.files);
                   e.target.value = "";
                 }}
               />
-              {image ? (
-                <div className="flex min-h-11 items-center gap-2 rounded-2xl border border-border bg-card px-3">
-                  <img src={image.previewUrl} alt="" className="h-7 w-7 rounded-lg object-cover" />
-                  <span className="min-w-0 flex-1 truncate text-xs text-muted-foreground">
-                    {image.name}
-                  </span>
-                  <button
-                    type="button"
-                    aria-label="Retirer la capture"
-                    onClick={() => setImage(null)}
-                    className="inline-flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-secondary"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                </div>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => inputFichier.current?.click()}
-                  className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-border bg-card px-3 text-sm font-medium text-[var(--primary)] hover:bg-secondary"
-                >
-                  <ImagePlus className="h-4 w-4" />
-                  Joindre une capture
-                </button>
-              )}
+              <button
+                type="button"
+                onClick={() => inputFichier.current?.click()}
+                disabled={images.length >= MAX_IMAGES}
+                className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-border bg-card px-3 text-sm font-medium text-[var(--primary)] hover:bg-secondary disabled:opacity-50"
+              >
+                <ImagePlus className="h-4 w-4" />
+                {images.length ? "Ajouter une capture" : "Joindre des captures"}
+              </button>
+              {images.length > 0 ? (
+                <ul className="flex flex-wrap gap-2 pt-1">
+                  {images.map((im, index) => (
+                    <li key={index} className="relative">
+                      <img
+                        src={im.previewUrl}
+                        alt={im.name}
+                        className="h-14 w-14 rounded-xl border border-border object-cover"
+                      />
+                      <button
+                        type="button"
+                        aria-label={`Retirer ${im.name}`}
+                        onClick={() => setImages((prec) => prec.filter((_, j) => j !== index))}
+                        className="absolute -right-1.5 -top-1.5 inline-flex h-5 w-5 items-center justify-center rounded-full border border-border bg-card text-muted-foreground hover:text-[var(--coral)]"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
             </div>
+
           </div>
 
           <button
