@@ -315,9 +315,10 @@ function FicheMarkdown({ markdown }: { markdown: string }) {
 function FichesPage() {
   const [description, setDescription] = useState("");
   const [lien, setLien] = useState("");
-  const [image, setImage] = useState<ImageJointe | null>(null);
+  const [images, setImages] = useState<ImageJointe[]>([]);
   const [markdown, setMarkdown] = useState("");
   const [ficheEnregistreeId, setFicheEnregistreeId] = useState<string | null>(null);
+  const [recherche, setRecherche] = useState("");
   const inputFichier = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
 
@@ -327,6 +328,17 @@ function FichesPage() {
     onSuccess: (res) => {
       setMarkdown(res.markdown);
       setFicheEnregistreeId(null);
+    },
+    onError: (err: Error) => toast.error(err.message),
+  });
+
+  const appelAmelioration = useServerFn(ameliorerFiche);
+  const amelioration = useMutation({
+    mutationFn: (payload: Parameters<typeof ameliorerFiche>[0]) => appelAmelioration(payload),
+    onSuccess: (res) => {
+      setMarkdown(res.markdown);
+      setFicheEnregistreeId(null);
+      toast.success("Fiche améliorée. Enregistre-la pour garder la nouvelle version.");
     },
     onError: (err: Error) => toast.error(err.message),
   });
@@ -369,7 +381,7 @@ function FichesPage() {
   function chargerFiche(fiche: FicheRow) {
     setDescription(fiche.description);
     setLien(fiche.lien);
-    setImage(null);
+    setImages([]);
     setMarkdown(fiche.markdown);
     setFicheEnregistreeId(fiche.id);
   }
@@ -377,39 +389,57 @@ function FichesPage() {
   function nouvelleFiche() {
     setDescription("");
     setLien("");
-    setImage(null);
+    setImages([]);
     setMarkdown("");
     setFicheEnregistreeId(null);
   }
 
-  const fichesRecentes = useMemo(() => fiches.slice(0, 20), [fiches]);
+  const fichesFiltrees = useMemo(() => {
+    const q = recherche.trim().toLowerCase();
+    const base = q
+      ? fiches.filter((f) =>
+          [f.titre, f.description, f.lien, f.markdown].join(" ").toLowerCase().includes(q),
+        )
+      : fiches;
+    return base.slice(0, 30);
+  }, [fiches, recherche]);
 
-  async function joindreImage(file: File | undefined) {
-    if (!file) return;
-    if (file.type !== "image/png" && file.type !== "image/jpeg") {
-      toast.error("Formats acceptés : PNG ou JPG.");
+  async function joindreImages(files: FileList | null) {
+    if (!files || files.length === 0) return;
+    const restants = MAX_IMAGES - images.length;
+    if (restants <= 0) {
+      toast.error(`${MAX_IMAGES} images maximum.`);
       return;
     }
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("Image trop lourde (5 Mo maximum).");
-      return;
+    const nouvelles: ImageJointe[] = [];
+    for (const file of Array.from(files).slice(0, restants)) {
+      if (file.type !== "image/png" && file.type !== "image/jpeg") {
+        toast.error(`« ${file.name} » ignorée : PNG ou JPG uniquement.`);
+        continue;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error(`« ${file.name} » ignorée : 5 Mo maximum.`);
+        continue;
+      }
+      const dataUrl = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result));
+        reader.onerror = () => reject(new Error("Lecture du fichier impossible."));
+        reader.readAsDataURL(file);
+      });
+      nouvelles.push({
+        mediaType: file.type as "image/png" | "image/jpeg",
+        base64: dataUrl.split(",")[1] ?? "",
+        previewUrl: dataUrl,
+        name: file.name,
+      });
     }
-    const dataUrl = await new Promise<string>((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(String(reader.result));
-      reader.onerror = () => reject(new Error("Lecture du fichier impossible."));
-      reader.readAsDataURL(file);
-    });
-    setImage({
-      mediaType: file.type as "image/png" | "image/jpeg",
-      base64: dataUrl.split(",")[1] ?? "",
-      previewUrl: dataUrl,
-      name: file.name,
-    });
+    if (files.length > restants) toast.info(`${MAX_IMAGES} images maximum.`);
+    if (nouvelles.length) setImages((prec) => [...prec, ...nouvelles]);
   }
 
   function lancer() {
-    if (!description.trim() && !lien.trim() && !image) {
+    if (!description.trim() && !lien.trim() && images.length === 0) {
       toast.error("Ajoute au moins une description, un lien ou une capture.");
       return;
     }
@@ -417,10 +447,22 @@ function FichesPage() {
       data: {
         description: description.trim(),
         lien: lien.trim(),
-        ...(image ? { image: { mediaType: image.mediaType, base64: image.base64 } } : {}),
+        images: images.map((im) => ({ mediaType: im.mediaType, base64: im.base64 })),
       },
     } as Parameters<typeof genererFiche>[0]);
   }
+
+  function optimiser() {
+    if (!markdown) return;
+    amelioration.mutate({
+      data: {
+        markdown,
+        consigne:
+          "Rends chaque étape du schéma plus concrète, ajoute des critères chiffrés et enrichis la section 10 (qualité, coût et performance, pièges).",
+      },
+    } as Parameters<typeof ameliorerFiche>[0]);
+  }
+
 
   const panneau = (
     <div className="space-y-4 p-4">
