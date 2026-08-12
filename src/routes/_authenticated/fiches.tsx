@@ -50,6 +50,8 @@ export const Route = createFileRoute("/_authenticated/fiches")({
 });
 
 type ImageJointe = { mediaType: "image/png" | "image/jpeg"; base64: string; previewUrl: string; name: string };
+const MAX_IMAGES = 4;
+
 
 /* ------------------------------------------------------------------ */
 /* Rendu markdown minimal (titres, tableaux, listes, gras, code)       */
