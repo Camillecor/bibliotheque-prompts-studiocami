@@ -52,7 +52,10 @@ La seule chose qui fait que ça marche, en une phrase. Puis la version naïve qu
 90 % des gens, et pourquoi elle déçoit.
 
 ## 4. CE QU'IL VOUS FAUT
-La reconstruction dans la stack, outil par outil (liste à puces).
+Liste à puces, un outil par ligne, au format : **Outil** — rôle précis dans le montage —
+pourquoi lui plutôt que l'alternative évidente — ordre de coût. Choisis les outils réellement
+adaptés à CETTE fonctionnalité (vidéo → Seedance/Veo/Runway, voix → ElevenLabs, recherche →
+Perplexity/Exa, etc.), jamais une stack générique recopiée.
 
 ## 5. LE CHEMIN DE CONSTRUCTION
 Trois paliers : version minimale (une soirée), version utilisable (usage réel),
@@ -65,8 +68,26 @@ critère de réussite chiffré, piège fréquent, variante avancée.
 Le critère de réussite est chiffré ou n'existe pas.
 
 ## 7. PROMPTS ET OSSATURE DE CODE
-Si un modèle est impliqué, le prompt système au format MARIO prêt à coller.
-Si du code est nécessaire, l'ossature commentée, pas l'implémentation complète.
+Section obligatoirement complète, avec ces quatre sous-titres de niveau 3 :
+
+### 7.1 Prompt système (format MARIO)
+Le prompt système complet, prêt à coller, dans un bloc de code, avec les cinq balises
+[M] [A] [R] [I] [O]. Pas de résumé : le texte intégral. Si plusieurs appels modèle sont
+nécessaires, un bloc par appel, chacun précédé d'une ligne indiquant à quoi il sert.
+
+### 7.2 Entrées et sortie attendue
+Le format d'entrée envoyé au modèle et le schéma JSON exact attendu en sortie,
+dans un bloc de code. Ajoute la règle de repli si le modèle renvoie du texte non conforme.
+
+### 7.3 Ossature de code
+Une ossature commentée par brique (appel modèle côté serveur, stockage, affichage),
+30 lignes maximum par bloc, lignes courtes (moins de 80 caractères) pour rester lisible
+sur mobile. Commentaires en français, pas d'implémentation complète.
+
+### 7.4 Réglages et tests
+Modèle conseillé, température, max_tokens, coût approximatif par appel, et deux ou trois
+cas de test avec le résultat attendu.
+
 
 ## 8. OÙ ÇA SERT CHEZ MOI
 Deux ou trois usages concrets dans Studio Cami. Si la réponse honnête est
