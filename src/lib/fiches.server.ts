@@ -119,17 +119,13 @@ export type FicheInput = {
   images?: FicheImage[] | undefined;
 };
 
-async function appelAnthropic(
-  system: string,
-  content: Array<Record<string, unknown>>,
-): Promise<{ markdown: string }> {
-  const apiKey = process.env["ANTHROPIC_API_KEY"];
-  if (!apiKey) {
-    throw new Error(
-      "ANTHROPIC_API_KEY n'est pas configurée. Ajoute la clé dans Project Settings → Secrets.",
-    );
-  }
+type AnthropicMessage = { role: "user" | "assistant"; content: unknown };
 
+async function unAppel(
+  apiKey: string,
+  system: string,
+  messages: AnthropicMessage[],
+): Promise<{ texte: string; coupe: boolean }> {
   const response = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: {
@@ -139,9 +135,9 @@ async function appelAnthropic(
     },
     body: JSON.stringify({
       model: "claude-sonnet-5",
-      max_tokens: 8000,
+      max_tokens: 16000,
       system,
-      messages: [{ role: "user", content }],
+      messages,
     }),
   });
 
@@ -159,12 +155,44 @@ async function appelAnthropic(
     stop_reason?: string;
   };
 
-  const markdown = (payload.content ?? [])
+  const texte = (payload.content ?? [])
     .filter((block) => block.type === "text")
     .map((block) => block.text ?? "")
-    .join("")
-    .trim();
+    .join("");
 
+  return { texte, coupe: payload.stop_reason === "max_tokens" };
+}
+
+async function appelAnthropic(
+  system: string,
+  content: Array<Record<string, unknown>>,
+): Promise<{ markdown: string }> {
+  const apiKey = process.env["ANTHROPIC_API_KEY"];
+  if (!apiKey) {
+    throw new Error(
+      "ANTHROPIC_API_KEY n'est pas configurée. Ajoute la clé dans Project Settings → Secrets.",
+    );
+  }
+
+  const messages: AnthropicMessage[] = [{ role: "user", content }];
+  let markdown = "";
+
+  // Jusqu'à 2 reprises : si la réponse est coupée, on demande la suite exacte
+  // pour que les dix sections soient toujours complètes.
+  for (let tentative = 0; tentative < 3; tentative += 1) {
+    const { texte, coupe } = await unAppel(apiKey, system, messages);
+    markdown += texte;
+    if (!coupe) break;
+    messages.push({ role: "assistant", content: texte });
+    messages.push({
+      role: "user",
+      content:
+        "Continue exactement où tu t'es arrêté, sans répéter ce qui précède, " +
+        "sans phrase d'introduction, jusqu'à la fin de la section 10.",
+    });
+  }
+
+  markdown = markdown.trim();
   if (!markdown) throw new Error("L'IA n'a rien renvoyé, réessaie.");
   return { markdown };
 }
