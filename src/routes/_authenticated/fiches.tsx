@@ -187,9 +187,11 @@ function FicheMarkdown({ markdown }: { markdown: string }) {
       blocs.push(
         <pre
           key={cle++}
-          className="overflow-x-auto rounded-2xl bg-[#030873] p-4 text-xs leading-relaxed text-white/90"
+          className="max-w-full overflow-x-auto rounded-2xl bg-[#030873] p-3 text-[11px] leading-relaxed text-white/90 sm:p-4 sm:text-xs"
         >
-          <code>{contenu.join("\n")}</code>
+          <code className="block whitespace-pre-wrap break-words sm:whitespace-pre">
+            {contenu.join("\n")}
+          </code>
         </pre>,
       );
       continue;
