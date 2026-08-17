@@ -2,7 +2,7 @@ import { useState, type ReactNode } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { BookOpen, FileText, Library, Menu, Plus, SlidersHorizontal, Wrench, X } from "lucide-react";
+import { BookOpen, FileText, FolderOpen, Library, Menu, Plus, SlidersHorizontal, Wrench, X } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -130,7 +130,13 @@ export function AppShell({ children, panel }: { children: ReactNode; panel?: Rea
             to="/fiches"
             icon={FileText}
             label="Fiches"
-            active={pathname.startsWith("/fiches")}
+            active={pathname === "/fiches"}
+          />
+          <RailButton
+            to="/mes-fiches"
+            icon={FolderOpen}
+            label="Mes fiches"
+            active={pathname.startsWith("/mes-fiches")}
           />
           <RailButton
 
