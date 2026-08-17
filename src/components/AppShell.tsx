@@ -16,10 +16,12 @@ import logoAsset from "@/assets/studio-cami-logo.svg.asset.json";
 const NAV_ITEMS = [
   { to: "/", icon: Plus, label: "Générateur de prompt" },
   { to: "/fiches", icon: FileText, label: "Fiches" },
+  { to: "/mes-fiches", icon: FolderOpen, label: "Mes fiches" },
   { to: "/bibliotheque", icon: Library, label: "Bibliothèque" },
   { to: "/glossaire", icon: BookOpen, label: "Glossaire" },
   { to: "/outils", icon: Wrench, label: "Outils" },
 ];
+
 
 
 
