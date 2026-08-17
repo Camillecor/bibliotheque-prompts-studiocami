@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -29,6 +29,11 @@ import {
 
 
 export const Route = createFileRoute("/_authenticated/fiches")({
+  validateSearch: (search: Record<string, unknown>): { fiche?: string } => {
+    const id = typeof search['fiche'] === "string" ? search['fiche'] : "";
+    const estUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+    return estUuid ? { fiche: id } : {};
+  },
   head: () => ({
     meta: [
       { title: "Fiches de reconstruction — Studio Cami IA" },
@@ -315,6 +320,8 @@ function FicheMarkdown({ markdown }: { markdown: string }) {
 /* ------------------------------------------------------------------ */
 
 function FichesPage() {
+  const { fiche: ficheParam } = Route.useSearch();
+  const [titre, setTitre] = useState("");
   const [description, setDescription] = useState("");
   const [lien, setLien] = useState("");
   const [images, setImages] = useState<ImageJointe[]>([]);
@@ -353,10 +360,18 @@ function FichesPage() {
 
   const enregistrerServeur = useServerFn(saveFiche);
   const enregistrement = useMutation({
-    mutationFn: (input: { titre: string; description: string; lien: string; markdown: string }) =>
-      enregistrerServeur({ data: input }),
+    mutationFn: (input: {
+      id?: string;
+      titre: string;
+      description: string;
+      lien: string;
+      markdown: string;
+    }) => enregistrerServeur({ data: input }),
     onSuccess: (row) => {
-      toast.success("Fiche enregistrée.");
+      toast.success(
+        ficheEnregistreeId ? "Fiche mise à jour." : "Fiche enregistrée dans ta bibliothèque.",
+      );
+      setTitre(row.titre);
       setFicheEnregistreeId(row.id);
       queryClient.invalidateQueries({ queryKey: ["fiches"] });
     },
@@ -374,13 +389,37 @@ function FichesPage() {
     onError: (err: Error) => toast.error(err.message),
   });
 
+  function lienValide(valeur: string) {
+    return valeur === "" || /^https?:\/\/[^\s]+$/i.test(valeur);
+  }
+
   function enregistrerFiche() {
-    const titre =
-      description.trim().slice(0, 80) || lien.trim() || "Fiche sans titre";
-    enregistrement.mutate({ titre, description: description.trim(), lien: lien.trim(), markdown });
+    if (!markdown.trim()) {
+      toast.error("Génère d'abord une fiche.");
+      return;
+    }
+    const titreFinal = (
+      titre.trim() ||
+      premiereLigneTitre(markdown) ||
+      description.trim().slice(0, 80) ||
+      lien.trim() ||
+      "Fiche sans titre"
+    ).slice(0, 120);
+    if (!lienValide(lien.trim())) {
+      toast.error("Le lien doit commencer par http:// ou https://.");
+      return;
+    }
+    enregistrement.mutate({
+      ...(ficheEnregistreeId ? { id: ficheEnregistreeId } : {}),
+      titre: titreFinal,
+      description: description.trim().slice(0, 8000),
+      lien: lien.trim(),
+      markdown,
+    });
   }
 
   function chargerFiche(fiche: FicheRow) {
+    setTitre(fiche.titre);
     setDescription(fiche.description);
     setLien(fiche.lien);
     setImages([]);
@@ -389,6 +428,7 @@ function FichesPage() {
   }
 
   function nouvelleFiche() {
+    setTitre("");
     setDescription("");
     setLien("");
     setImages([]);
