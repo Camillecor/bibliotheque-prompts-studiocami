@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedBibliothequeRouteImport } from './routes/_authenticated/bibliotheque'
 import { Route as AuthenticatedFichesRouteImport } from './routes/_authenticated/fiches'
 import { Route as AuthenticatedGlossaireRouteImport } from './routes/_authenticated/glossaire'
+import { Route as AuthenticatedMesFichesRouteImport } from './routes/_authenticated/mes-fiches'
 import { Route as AuthenticatedOutilsRouteImport } from './routes/_authenticated/outils'
 import { Route as AuthenticatedOutilsIndexRouteImport } from './routes/_authenticated/outils.index'
 import { Route as AuthenticatedOutilsSlugRouteImport } from './routes/_authenticated/outils.$slug'
@@ -49,6 +50,11 @@ const AuthenticatedGlossaireRoute = AuthenticatedGlossaireRouteImport.update({
   path: '/glossaire',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedMesFichesRoute = AuthenticatedMesFichesRouteImport.update({
+  id: '/mes-fiches',
+  path: '/mes-fiches',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedOutilsRoute = AuthenticatedOutilsRouteImport.update({
   id: '/outils',
   path: '/outils',
@@ -72,6 +78,7 @@ export interface FileRoutesByFullPath {
   '/bibliotheque': typeof AuthenticatedBibliothequeRoute
   '/fiches': typeof AuthenticatedFichesRoute
   '/glossaire': typeof AuthenticatedGlossaireRoute
+  '/mes-fiches': typeof AuthenticatedMesFichesRoute
   '/outils': typeof AuthenticatedOutilsRouteWithChildren
   '/outils/$slug': typeof AuthenticatedOutilsSlugRoute
   '/outils/': typeof AuthenticatedOutilsIndexRoute
@@ -82,6 +89,7 @@ export interface FileRoutesByTo {
   '/bibliotheque': typeof AuthenticatedBibliothequeRoute
   '/fiches': typeof AuthenticatedFichesRoute
   '/glossaire': typeof AuthenticatedGlossaireRoute
+  '/mes-fiches': typeof AuthenticatedMesFichesRoute
   '/outils/$slug': typeof AuthenticatedOutilsSlugRoute
   '/outils': typeof AuthenticatedOutilsIndexRoute
 }
@@ -93,6 +101,7 @@ export interface FileRoutesById {
   '/_authenticated/bibliotheque': typeof AuthenticatedBibliothequeRoute
   '/_authenticated/fiches': typeof AuthenticatedFichesRoute
   '/_authenticated/glossaire': typeof AuthenticatedGlossaireRoute
+  '/_authenticated/mes-fiches': typeof AuthenticatedMesFichesRoute
   '/_authenticated/outils': typeof AuthenticatedOutilsRouteWithChildren
   '/_authenticated/outils/$slug': typeof AuthenticatedOutilsSlugRoute
   '/_authenticated/outils/': typeof AuthenticatedOutilsIndexRoute
@@ -105,6 +114,7 @@ export interface FileRouteTypes {
     | '/bibliotheque'
     | '/fiches'
     | '/glossaire'
+    | '/mes-fiches'
     | '/outils'
     | '/outils/$slug'
     | '/outils/'
@@ -115,6 +125,7 @@ export interface FileRouteTypes {
     | '/bibliotheque'
     | '/fiches'
     | '/glossaire'
+    | '/mes-fiches'
     | '/outils/$slug'
     | '/outils'
   id:
@@ -125,6 +136,7 @@ export interface FileRouteTypes {
     | '/_authenticated/bibliotheque'
     | '/_authenticated/fiches'
     | '/_authenticated/glossaire'
+    | '/_authenticated/mes-fiches'
     | '/_authenticated/outils'
     | '/_authenticated/outils/$slug'
     | '/_authenticated/outils/'
@@ -180,6 +192,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedGlossaireRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/mes-fiches': {
+      id: '/_authenticated/mes-fiches'
+      path: '/mes-fiches'
+      fullPath: '/mes-fiches'
+      preLoaderRoute: typeof AuthenticatedMesFichesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/outils': {
       id: '/_authenticated/outils'
       path: '/outils'
@@ -221,6 +240,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedBibliothequeRoute: typeof AuthenticatedBibliothequeRoute
   AuthenticatedFichesRoute: typeof AuthenticatedFichesRoute
   AuthenticatedGlossaireRoute: typeof AuthenticatedGlossaireRoute
+  AuthenticatedMesFichesRoute: typeof AuthenticatedMesFichesRoute
   AuthenticatedOutilsRoute: typeof AuthenticatedOutilsRouteWithChildren
 }
 
@@ -228,6 +248,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedBibliothequeRoute: AuthenticatedBibliothequeRoute,
   AuthenticatedFichesRoute: AuthenticatedFichesRoute,
   AuthenticatedGlossaireRoute: AuthenticatedGlossaireRoute,
+  AuthenticatedMesFichesRoute: AuthenticatedMesFichesRoute,
   AuthenticatedOutilsRoute: AuthenticatedOutilsRouteWithChildren,
 }
 

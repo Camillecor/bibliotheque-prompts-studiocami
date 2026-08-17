@@ -1,5 +1,5 @@
-import { useMemo, useRef, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -29,6 +29,11 @@ import {
 
 
 export const Route = createFileRoute("/_authenticated/fiches")({
+  validateSearch: (search: Record<string, unknown>): { fiche?: string } => {
+    const id = typeof search['fiche'] === "string" ? search['fiche'] : "";
+    const estUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+    return estUuid ? { fiche: id } : {};
+  },
   head: () => ({
     meta: [
       { title: "Fiches de reconstruction — Studio Cami IA" },
@@ -48,6 +53,16 @@ export const Route = createFileRoute("/_authenticated/fiches")({
   }),
   component: FichesPage,
 });
+
+function premiereLigneTitre(markdown: string) {
+  for (const ligne of markdown.split("\n")) {
+    const l = ligne.trim();
+    if (!l) continue;
+    if (l.startsWith("#")) return l.replace(/^#+\s*/, "").slice(0, 120);
+    return l.replace(/\*\*|`/g, "").slice(0, 120);
+  }
+  return "";
+}
 
 type ImageJointe = { mediaType: "image/png" | "image/jpeg"; base64: string; previewUrl: string; name: string };
 const MAX_IMAGES = 4;
@@ -315,6 +330,8 @@ function FicheMarkdown({ markdown }: { markdown: string }) {
 /* ------------------------------------------------------------------ */
 
 function FichesPage() {
+  const { fiche: ficheParam } = Route.useSearch();
+  const [titre, setTitre] = useState("");
   const [description, setDescription] = useState("");
   const [lien, setLien] = useState("");
   const [images, setImages] = useState<ImageJointe[]>([]);
@@ -339,7 +356,6 @@ function FichesPage() {
     mutationFn: (payload: Parameters<typeof ameliorerFiche>[0]) => appelAmelioration(payload),
     onSuccess: (res) => {
       setMarkdown(res.markdown);
-      setFicheEnregistreeId(null);
       toast.success("Fiche améliorée. Enregistre-la pour garder la nouvelle version.");
     },
     onError: (err: Error) => toast.error(err.message),
@@ -353,10 +369,18 @@ function FichesPage() {
 
   const enregistrerServeur = useServerFn(saveFiche);
   const enregistrement = useMutation({
-    mutationFn: (input: { titre: string; description: string; lien: string; markdown: string }) =>
-      enregistrerServeur({ data: input }),
+    mutationFn: (input: {
+      id?: string;
+      titre: string;
+      description: string;
+      lien: string;
+      markdown: string;
+    }) => enregistrerServeur({ data: input }),
     onSuccess: (row) => {
-      toast.success("Fiche enregistrée.");
+      toast.success(
+        ficheEnregistreeId ? "Fiche mise à jour." : "Fiche enregistrée dans ta bibliothèque.",
+      );
+      setTitre(row.titre);
       setFicheEnregistreeId(row.id);
       queryClient.invalidateQueries({ queryKey: ["fiches"] });
     },
@@ -374,13 +398,37 @@ function FichesPage() {
     onError: (err: Error) => toast.error(err.message),
   });
 
+  function lienValide(valeur: string) {
+    return valeur === "" || /^https?:\/\/[^\s]+$/i.test(valeur);
+  }
+
   function enregistrerFiche() {
-    const titre =
-      description.trim().slice(0, 80) || lien.trim() || "Fiche sans titre";
-    enregistrement.mutate({ titre, description: description.trim(), lien: lien.trim(), markdown });
+    if (!markdown.trim()) {
+      toast.error("Génère d'abord une fiche.");
+      return;
+    }
+    const titreFinal = (
+      titre.trim() ||
+      premiereLigneTitre(markdown) ||
+      description.trim().slice(0, 80) ||
+      lien.trim() ||
+      "Fiche sans titre"
+    ).slice(0, 120);
+    if (!lienValide(lien.trim())) {
+      toast.error("Le lien doit commencer par http:// ou https://.");
+      return;
+    }
+    enregistrement.mutate({
+      ...(ficheEnregistreeId ? { id: ficheEnregistreeId } : {}),
+      titre: titreFinal,
+      description: description.trim().slice(0, 8000),
+      lien: lien.trim(),
+      markdown,
+    });
   }
 
   function chargerFiche(fiche: FicheRow) {
+    setTitre(fiche.titre);
     setDescription(fiche.description);
     setLien(fiche.lien);
     setImages([]);
@@ -389,6 +437,7 @@ function FichesPage() {
   }
 
   function nouvelleFiche() {
+    setTitre("");
     setDescription("");
     setLien("");
     setImages([]);
@@ -405,6 +454,13 @@ function FichesPage() {
       : fiches;
     return base.slice(0, 30);
   }, [fiches, recherche]);
+
+  useEffect(() => {
+    if (!ficheParam || ficheEnregistreeId === ficheParam) return;
+    const trouvee = fiches.find((f) => f.id === ficheParam);
+    if (trouvee) chargerFiche(trouvee);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ficheParam, fiches]);
 
   async function joindreImages(files: FileList | null) {
     if (!files || files.length === 0) return;
@@ -495,9 +551,14 @@ function FichesPage() {
       </div>
 
       <div className="space-y-1.5">
-        <p className="text-xs font-semibold uppercase tracking-wide text-[var(--primary)]">
-          Mes fiches ({fiches.length})
-        </p>
+        <div className="flex items-center justify-between gap-2">
+          <p className="text-xs font-semibold uppercase tracking-wide text-[var(--primary)]">
+            Mes fiches ({fiches.length})
+          </p>
+          <Link to="/mes-fiches" className="text-xs font-semibold text-[var(--info)] hover:underline">
+            Tout voir
+          </Link>
+        </div>
         <div className="relative">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[var(--primary)]" />
           <input
@@ -579,6 +640,20 @@ function FichesPage() {
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <label htmlFor="fiche-titre" className="text-xs font-semibold uppercase tracking-wide text-[var(--primary)]">
+                Titre de la fiche
+              </label>
+              <input
+                id="fiche-titre"
+                value={titre}
+                maxLength={120}
+                onChange={(e) => setTitre(e.target.value)}
+                placeholder="Ex : Pré-remplissage automatique depuis une URL"
+                className="min-h-11 w-full rounded-2xl border border-border bg-card px-3 text-sm text-foreground outline-none focus:border-[var(--info)]"
+              />
+            </div>
+
             <div className="space-y-1.5">
               <label htmlFor="fiche-lien" className="text-xs font-semibold uppercase tracking-wide text-[var(--primary)]">
                 Lien (optionnel)
@@ -669,18 +744,18 @@ function FichesPage() {
                 <button
                   type="button"
                   onClick={enregistrerFiche}
-                  disabled={enregistrement.isPending || ficheEnregistreeId !== null}
+                  disabled={enregistrement.isPending}
                   className="cami-btn min-h-9 disabled:opacity-60"
                 >
                   {ficheEnregistreeId ? (
                     <>
                       <BookmarkCheck className="h-4 w-4" />
-                      Enregistrée
+                      {enregistrement.isPending ? "Mise à jour…" : "Mettre à jour la fiche"}
                     </>
                   ) : (
                     <>
                       <Bookmark className="h-4 w-4" />
-                      {enregistrement.isPending ? "Enregistrement…" : "Enregistrer"}
+                      {enregistrement.isPending ? "Enregistrement…" : "Enregistrer la fiche générée"}
                     </>
                   )}
                 </button>
