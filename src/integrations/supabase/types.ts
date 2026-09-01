@@ -14,6 +14,101 @@ export type Database = {
   }
   public: {
     Tables: {
+      contenu_medias: {
+        Row: {
+          contenu_id: string
+          created_at: string
+          id: string
+          media_id: string
+          ordre: number
+          user_id: string
+        }
+        Insert: {
+          contenu_id: string
+          created_at?: string
+          id?: string
+          media_id: string
+          ordre?: number
+          user_id: string
+        }
+        Update: {
+          contenu_id?: string
+          created_at?: string
+          id?: string
+          media_id?: string
+          ordre?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contenu_medias_contenu_id_fkey"
+            columns: ["contenu_id"]
+            isOneToOne: false
+            referencedRelation: "contenus"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contenu_medias_media_id_fkey"
+            columns: ["media_id"]
+            isOneToOne: false
+            referencedRelation: "medias"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contenus: {
+        Row: {
+          created_at: string
+          date_planifiee: string | null
+          date_publication: string | null
+          id: string
+          prompt_id: string | null
+          reseau: string
+          statut: string
+          tags: string[]
+          texte: string
+          titre: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          date_planifiee?: string | null
+          date_publication?: string | null
+          id?: string
+          prompt_id?: string | null
+          reseau?: string
+          statut?: string
+          tags?: string[]
+          texte?: string
+          titre?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          date_planifiee?: string | null
+          date_publication?: string | null
+          id?: string
+          prompt_id?: string | null
+          reseau?: string
+          statut?: string
+          tags?: string[]
+          texte?: string
+          titre?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contenus_prompt_id_fkey"
+            columns: ["prompt_id"]
+            isOneToOne: false
+            referencedRelation: "prompts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       fiches: {
         Row: {
           created_at: string
@@ -43,6 +138,53 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      medias: {
+        Row: {
+          chemin: string
+          created_at: string
+          hauteur: number
+          id: string
+          largeur: number
+          media_parent_id: string | null
+          origine: string
+          tags: string[]
+          titre: string
+          user_id: string
+        }
+        Insert: {
+          chemin: string
+          created_at?: string
+          hauteur?: number
+          id?: string
+          largeur?: number
+          media_parent_id?: string | null
+          origine?: string
+          tags?: string[]
+          titre?: string
+          user_id: string
+        }
+        Update: {
+          chemin?: string
+          created_at?: string
+          hauteur?: number
+          id?: string
+          largeur?: number
+          media_parent_id?: string | null
+          origine?: string
+          tags?: string[]
+          titre?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medias_media_parent_id_fkey"
+            columns: ["media_parent_id"]
+            isOneToOne: false
+            referencedRelation: "medias"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       outils_persos: {
         Row: {
