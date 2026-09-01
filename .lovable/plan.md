@@ -1,31 +1,68 @@
-# Tester un prompt directement dans l'app
+# Nouvel onglet « Studio » — communication de bout en bout
 
-Ajouter un bouton « Tester ce prompt » qui remplit les variables manquantes, lance Claude, affiche le résultat et permet de le garder comme exemple attaché au prompt.
+Un onglet inspiré d'Auguste : on crée le contenu, on prépare le visuel, on le place dans un calendrier éditorial, on le marque comme publié, et on suit ses statistiques d'activité. Tout reste dans l'esprit actuel de l'app (Mario, cartes arrondies, navy / coral / info, Bricolage Grotesque pour les titres).
 
-## Ce que ça donne pour toi
+## Structure
 
-1. Depuis un prompt (juste après génération sur l'accueil, ou depuis le détail dans la bibliothèque), tu cliques sur **Tester ce prompt**.
-2. Mario repère les trous du prompt — les `[À PRÉCISER]` et autres champs entre crochets — et affiche un mini-formulaire avec un champ par variable (rien à remplir s'il n'y en a pas).
-3. Tu choisis le modèle (Haiku rapide / Sonnet équilibré, comme ailleurs dans l'app) et tu lances.
-4. Le résultat s'affiche dessous : copiable, exportable, avec le prompt exact qui a été envoyé (variables remplacées) visible en repli.
-5. Bouton **Garder comme exemple** : l'essai est enregistré et rattaché au prompt. Le détail d'un prompt dans la bibliothèque affiche alors ses essais (date, modèle, extrait), avec suppression possible.
+Un onglet **Studio** dans le rail de gauche, avec quatre sous-parties reliées entre elles :
 
-Les essais servent aussi de preuve de qualité : sur une carte de la bibliothèque, une petite pastille indique qu'un prompt a déjà été testé.
+```text
+Studio
+├── Contenus     produire le texte du post (Mario)
+├── Médias       bibliothèque d'images + retouches + visuels IA
+├── Calendrier   planifier les contenus, vue mois et semaine
+└── Statistiques activité : produit / planifié / publié
+```
+
+Le fil rouge : un **contenu** est l'objet central. Il porte un texte, un réseau cible, un statut (brouillon / planifié / publié), une date planifiée et un ou plusieurs médias attachés. Le calendrier, la liste des contenus et les statistiques regardent tous cette même donnée — donc tout est lié par construction.
+
+## 1. Contenus
+
+- Liste des contenus avec filtres (réseau, statut, période) et recherche.
+- Éditeur d'un contenu : réseau cible (LinkedIn, Instagram, Facebook, X, newsletter), texte avec compteur de caractères adapté au réseau, hashtags, médias attachés, date planifiée.
+- **Génération par Mario** : à partir d'une idée courte, du réseau visé et du ton, Mario propose le texte (mêmes appels Claude que le générateur de prompts, avec un prompt système dédié « post réseau social »). Boutons « Régénérer », « Raccourcir », « Rendre plus percutant ».
+- Réutilisation d'un prompt de la bibliothèque comme point de départ : le contenu peut être créé à partir d'un prompt existant.
+
+## 2. Médias
+
+- **Bibliothèque** : upload d'images, vignettes en grille, titre, tags, recherche, suppression. Stockage dans un espace de fichiers dédié à l'app.
+- **Retouches simples** dans le navigateur : recadrage aux formats réseaux (1:1, 4:5, 16:9, 9:16), texte en surimpression (police, taille, couleur de la charte), fond uni ou dégradé de la charte, léger réglage luminosité/contraste. La version retouchée est enregistrée comme nouveau média, l'original est conservé.
+- **Visuel généré par IA** : à partir du texte du post ou d'une description, génération d'une image (aperçu progressif pendant la génération), puis enregistrement dans la bibliothèque et attachement au contenu.
+
+## 3. Calendrier éditorial
+
+- Vue **mois** et vue **semaine**, chaque case affichant les contenus planifiés (pastille de couleur par réseau, vignette du média, début du texte).
+- Glisser-déposer pour replanifier un contenu ; clic pour ouvrir l'éditeur.
+- Encart « À planifier » listant les brouillons sans date, qu'on dépose directement dans une case.
+- Bouton « Marquer comme publié » sur chaque contenu du jour.
+
+## 4. Statistiques
+
+Tableau de bord sur l'activité dans l'app (aucune donnée réseau externe pour l'instant) :
+- Compteurs : contenus produits, planifiés, publiés, médias dans la bibliothèque.
+- Courbe des publications par semaine sur les 12 dernières semaines.
+- Répartition par réseau et par thème/tag.
+- Régularité : jours publiés vs jours prévus sur le mois, et prochaine échéance.
 
 ## Détails techniques
 
-**Base de données** — nouvelle table `essais` : `id`, `prompt_id` (référence `prompts`, `on delete cascade`), `user_id`, `variables` (jsonb), `prompt_final` (text), `modele` (text), `reponse` (text), `created_at`. RLS activée + GRANT comme les autres tables ; accès via `supabaseAdmin` et le `TEST_USER_ID` existant, pour rester cohérent avec `prompts`, `fiches` et `outils_persos` tant que l'authentification est désactivée.
+**Base de données** (migration, RLS + GRANT comme les tables existantes, accès via `supabaseAdmin` et le `TEST_USER_ID` déjà utilisé partout tant que la connexion est désactivée) :
+- `contenus` : `id`, `user_id`, `titre`, `texte`, `reseau`, `statut`, `tags[]`, `date_planifiee`, `date_publication`, `prompt_id` (référence facultative vers `prompts`), `created_at`, `updated_at`.
+- `medias` : `id`, `user_id`, `chemin` (fichier), `titre`, `tags[]`, `largeur`, `hauteur`, `origine` (upload / retouche / ia), `media_parent_id`, `created_at`.
+- `contenu_medias` : table de liaison `contenu_id` / `media_id` / `ordre`.
+- Un espace de stockage privé `medias` avec URLs signées pour l'affichage.
 
-**Serveur** — dans `src/lib/mario.server.ts`, une fonction `callAnthropicEssai` (même client Anthropic, `max_tokens` 4096, pas de system prompt MARIO : on envoie le prompt de l'utilisatrice tel quel comme message). Dans `src/lib/mario.functions.ts` :
-- `testerPrompt` (validation Zod : `prompt` borné, `variables` en record de chaînes bornées, `modele` restreint à l'enum existant) — exécute et renvoie `{ reponse, prompt_final }`, sans écrire en base.
-- `saveEssai`, `listEssais({ prompt_id })`, `deleteEssai` pour la persistance.
+**Serveur** — `src/lib/studio.functions.ts` (CRUD contenus / médias / liaisons / statistiques agrégées) et `src/lib/studio.server.ts` :
+- `callAnthropicPost` pour la rédaction et les variantes (même client Anthropic que `mario.server.ts`).
+- `genererVisuel` via la passerelle IA de Lovable en mode streaming, avec aperçus progressifs floutés jusqu'à l'image finale.
+- Validation Zod stricte sur toutes les entrées (longueurs bornées, énumérations pour réseau et statut, types d'image restreints à PNG/JPEG/WebP, taille plafonnée).
 
-**Extraction des variables** — helper pur dans `src/lib/mario.ts` (`extraireVariables(prompt)`) : capture les segments `[À PRÉCISER]`, `[XXX]` en majuscules ou `{{var}}`, en ignorant les en-têtes de sections MARIO `[M] [A] [R] [I] [O]` déjà gérés par `decouperSections`. Testable isolément.
+**Routes** — `src/routes/_authenticated/studio.tsx` (layout avec `<Outlet />` et les onglets internes) plus `studio.index.tsx` (redirige vers Contenus), `studio.contenus.tsx`, `studio.medias.tsx`, `studio.calendrier.tsx`, `studio.statistiques.tsx`. Entrée « Studio » ajoutée au rail et au menu burger de `AppShell.tsx`, filtres de chaque écran placés dans le panneau latéral `panel` déjà prévu par le shell.
 
-**UI** — nouveau composant `src/components/EssaiPrompt.tsx` (formulaire variables + sélecteur de modèle + état loading + résultat + actions), monté sous `PromptView` via une nouvelle prop optionnelle `essai` pour ne rien casser dans les usages existants. Branché dans `src/routes/index.tsx` (après génération) et `src/routes/_authenticated/bibliotheque.tsx` (vue détail, avec la liste des essais enregistrés). Style repris de l'existant : `cami-card`, blocs sémantiques, boutons coral, zones tactiles 44px sur mobile.
+**Front** — React Query pour toutes les lectures/écritures avec invalidation croisée (modifier un contenu rafraîchit calendrier et statistiques). Éditeur d'image en canvas natif, sans dépendance lourde. Calendrier construit à la main avec `date-fns` (déjà présent) plutôt qu'une librairie de calendrier, pour coller à la charte. Recharts pour les courbes de statistiques (déjà dans le projet via shadcn).
 
-**Garde-fous** — pas de clé API côté client, longueurs d'entrée bornées côté serveur, message d'erreur clair si `ANTHROPIC_API_KEY` manque ou si Claude renvoie une erreur, et invalidation React Query de `["essais", promptId]` après enregistrement/suppression.
+**Découpage de livraison** — la fonctionnalité est large ; je propose de la construire en trois passes : (1) contenus + calendrier, (2) médias (bibliothèque, retouches, visuels IA), (3) statistiques et finitions responsive.
 
 ## Hors périmètre
 
-L'authentification reste désactivée (`TEST_USER_ID` partagé) — à réactiver dans un chantier séparé avant tout partage public.
+Pas de publication automatique sur les réseaux ni de récupération des vues/likes : le calendrier planifie et on marque manuellement comme publié. L'authentification reste désactivée (utilisateur de test partagé).
