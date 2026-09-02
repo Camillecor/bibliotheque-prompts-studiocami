@@ -252,7 +252,7 @@ export function AppShell({ children, panel }: { children: ReactNode; panel?: Rea
 
       {/* Panneau contextuel (desktop) */}
       {panel ? (
-        <aside className="z-10 hidden w-[22rem] shrink-0 overflow-y-auto border-l border-border bg-card p-5 lg:block xl:w-[26rem]">
+        <aside className="z-10 hidden w-[22rem] shrink-0 overflow-y-auto border-l border-border bg-card lg:block xl:w-[26rem]">
           {panel}
         </aside>
       ) : null}

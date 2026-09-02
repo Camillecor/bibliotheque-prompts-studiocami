@@ -360,7 +360,7 @@ function StudioMediasPage() {
   };
 
   const panneau = (
-    <div className="flex flex-col gap-4 max-lg:p-4">
+    <div className="flex flex-col gap-4 p-5">
       <div>
         <h2 className="font-display text-sm font-bold text-primary">Générer un visuel</h2>
         <p className="mt-1 text-xs text-muted-foreground">

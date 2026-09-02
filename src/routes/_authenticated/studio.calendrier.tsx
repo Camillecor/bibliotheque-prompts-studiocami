@@ -111,7 +111,7 @@ function StudioCalendrierPage() {
   };
 
   const panneau = (
-    <div className="flex flex-col gap-3 max-lg:p-4">
+    <div className="flex flex-col gap-3 p-5">
       <h2 className="font-display text-sm font-bold text-primary">À planifier</h2>
       {aPlanifier.length === 0 ? (
         <p className="text-xs text-muted-foreground">
