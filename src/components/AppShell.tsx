@@ -20,6 +20,8 @@ const NAV_ITEMS = [
   { to: "/bibliotheque", icon: Library, label: "Bibliothèque" },
   { to: "/glossaire", icon: BookOpen, label: "Glossaire" },
   { to: "/outils", icon: Wrench, label: "Outils" },
+  { to: "/studio", icon: Clapperboard, label: "Studio" },
+
 ];
 
 
