@@ -107,6 +107,9 @@ function StudioContenusPage() {
   const [ton, setTon] = useState<string>("professionnel");
   const [nouveauTag, setNouveauTag] = useState("");
   const [selecteurMedias, setSelecteurMedias] = useState(false);
+  const [recherche, setRecherche] = useState("");
+  const [filtreStatut, setFiltreStatut] = useState<string>("tous");
+
 
   const fetchContenus = useServerFn(listContenus);
   const fetchMedias = useServerFn(listMedias);
