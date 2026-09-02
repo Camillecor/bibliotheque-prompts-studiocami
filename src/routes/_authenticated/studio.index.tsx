@@ -3,15 +3,20 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+  CalendarClock,
   CheckCircle2,
+  Copy,
   ImagePlus,
   Loader2,
+  Pencil,
   Plus,
+  Search,
   Sparkles,
   Trash2,
   Wand2,
   X,
 } from "lucide-react";
+
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { StudioTabs } from "@/components/StudioTabs";
