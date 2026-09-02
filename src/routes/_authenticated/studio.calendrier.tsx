@@ -185,6 +185,21 @@ function StudioCalendrierPage() {
             </div>
           </div>
           <StudioTabs />
+          <div className="flex flex-wrap items-center gap-2">
+            {RESEAUX.map((reseau) => (
+              <span
+                key={reseau.value}
+                className="inline-flex items-center gap-1.5 rounded-full border-l-[3px] px-2.5 py-1 text-[11px] font-semibold"
+                style={{
+                  backgroundColor: `color-mix(in srgb, ${reseau.couleur} 14%, white)`,
+                  borderColor: reseau.couleur,
+                  color: reseau.couleur,
+                }}
+              >
+                {reseau.label}
+              </span>
+            ))}
+          </div>
         </header>
 
         {isLoading ? (
