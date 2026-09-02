@@ -177,6 +177,28 @@ function StudioContenusPage() {
     },
     onError: (error: Error) => toast.error(error.message),
   });
+  const mutationDupliquer = useMutation({
+    mutationFn: async (contenu: ContenuRow) =>
+      enregistrer({
+        data: {
+          titre: `${contenu.titre || "Sans titre"} (copie)`,
+          texte: contenu.texte,
+          reseau: contenu.reseau as ReseauValue,
+          statut: "brouillon" as StatutValue,
+          tags: contenu.tags ?? [],
+          date_planifiee: null,
+          date_publication: null,
+          prompt_id: null,
+          media_ids: contenu.medias.map((m) => m.id),
+        },
+      }),
+    onSuccess: () => {
+      invalider();
+      toast.success("Contenu dupliqué");
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+
 
   const mutationRediger = useMutation({
     mutationFn: async () =>
