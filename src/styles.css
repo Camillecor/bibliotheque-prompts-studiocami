@@ -251,6 +251,33 @@
     @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm font-semibold text-primary transition duration-200 hover:-translate-y-0.5 hover:border-[var(--coral)] hover:text-[var(--coral)] active:scale-95;
   }
 
+  /* Bouton secondaire du Studio : pastille claire, icône + texte sur une ligne */
+  .cami-btn-secondary {
+    @apply inline-flex min-h-11 shrink-0 flex-nowrap items-center justify-center gap-2 whitespace-nowrap rounded-full border border-border bg-card px-4 text-sm font-semibold text-primary transition duration-200 hover:-translate-y-0.5 hover:border-[var(--coral)] hover:text-[var(--coral)] active:scale-95;
+    box-shadow: 0 1px 2px rgba(17, 26, 61, 0.05);
+  }
+
+  /* Bouton d'action principal, pleine largeur */
+  .cami-btn-primary-full {
+    @apply inline-flex min-h-12 w-full flex-nowrap items-center justify-center gap-2 whitespace-nowrap rounded-full bg-[var(--coral)] px-5 text-sm font-bold text-white transition duration-200 hover:-translate-y-0.5 hover:bg-[var(--coral-dark)] active:scale-95;
+    box-shadow:
+      0 1px 2px rgba(17, 26, 61, 0.06),
+      0 10px 24px -12px rgba(255, 107, 53, 0.7);
+  }
+
+  /* Bouton d'action coral compact (ex. « Générer le post ») */
+  .cami-btn-accent {
+    @apply inline-flex min-h-11 shrink-0 flex-nowrap items-center justify-center gap-2 whitespace-nowrap rounded-full bg-[var(--coral)] px-5 text-sm font-bold text-white transition duration-200 hover:-translate-y-0.5 hover:bg-[var(--coral-dark)] active:scale-95;
+    box-shadow:
+      0 1px 2px rgba(17, 26, 61, 0.06),
+      0 10px 24px -12px rgba(255, 107, 53, 0.7);
+  }
+
+  .cami-select {
+    @apply min-h-11 cursor-pointer appearance-none rounded-full border border-border bg-muted py-2 pl-4 pr-9 text-sm font-semibold text-primary outline-none transition [background-position:right_0.75rem_center] [background-repeat:no-repeat] [background-size:0.7rem] hover:border-[var(--coral)] focus:border-[var(--info)];
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%235a6690'%3E%3Cpath fill-rule='evenodd' d='M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z' clip-rule='evenodd'/%3E%3C/svg%3E");
+  }
+
   .cami-pill {
     @apply inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-4 py-1.5 text-[11px] font-medium uppercase tracking-[0.08em] text-primary;
   }
