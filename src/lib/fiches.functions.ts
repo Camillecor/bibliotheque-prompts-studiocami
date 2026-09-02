@@ -56,7 +56,6 @@ export const ameliorerFiche = createServerFn({ method: "POST" })
 // Sauvegarde/historique des fiches générées : application mono-compte sans
 // authentification, le filtrage sur COMPTE_ID reste côté serveur.
 
-
 export type FicheRow = {
   id: string;
   titre: string;

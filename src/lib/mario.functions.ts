@@ -29,7 +29,6 @@ const GenerateInput = z.object({
     .optional(),
 });
 
-
 export const generateMarioPrompt = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => GenerateInput.parse(input))
   .handler(async ({ data }): Promise<MarioResult> => {
@@ -47,7 +46,6 @@ const QuestionsInput = z.object({
   typePrompt: z.string().trim().max(80).default(""),
   ton: z.string().trim().max(80).default(""),
 });
-
 
 export const poserQuestionsMario = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => QuestionsInput.parse(input))

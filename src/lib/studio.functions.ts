@@ -23,13 +23,23 @@ const DUREE_SIGNATURE = 60 * 60; // 1 h
 type MediaBrut = Omit<MediaRow, "url">;
 
 async function signerMedias(
-  admin: { storage: { from: (b: string) => { createSignedUrls: (paths: string[], expires: number) => Promise<{ data: { path?: string | null; signedUrl?: string | null }[] | null }> } } },
+  admin: {
+    storage: {
+      from: (b: string) => {
+        createSignedUrls: (
+          paths: string[],
+          expires: number,
+        ) => Promise<{ data: { path?: string | null; signedUrl?: string | null }[] | null }>;
+      };
+    };
+  },
   medias: MediaBrut[],
 ): Promise<MediaRow[]> {
   if (medias.length === 0) return [];
-  const { data } = await admin.storage
-    .from("medias")
-    .createSignedUrls(medias.map((m) => m.chemin), DUREE_SIGNATURE);
+  const { data } = await admin.storage.from("medias").createSignedUrls(
+    medias.map((m) => m.chemin),
+    DUREE_SIGNATURE,
+  );
 
   const parChemin = new Map<string, string>();
   for (const entree of data ?? []) {
@@ -383,7 +393,13 @@ export const statsStudio = createServerFn({ method: "GET" }).handler(
     const maintenant = new Date();
 
     // 12 dernières semaines, du lundi au dimanche.
-    const semaines: { semaine: string; debut: Date; fin: Date; publies: number; planifies: number }[] = [];
+    const semaines: {
+      semaine: string;
+      debut: Date;
+      fin: Date;
+      publies: number;
+      planifies: number;
+    }[] = [];
     const lundi = new Date(maintenant);
     const decalage = (lundi.getDay() + 6) % 7;
     lundi.setDate(lundi.getDate() - decalage);
@@ -471,11 +487,7 @@ export const statsStudio = createServerFn({ method: "GET" }).handler(
         .sort((a, b) => b.total - a.total)
         .slice(0, 8),
       joursPublies: joursPublies.size,
-      joursDuMois: new Date(
-        maintenant.getFullYear(),
-        maintenant.getMonth() + 1,
-        0,
-      ).getDate(),
+      joursDuMois: new Date(maintenant.getFullYear(), maintenant.getMonth() + 1, 0).getDate(),
       prochaine,
     };
   },
