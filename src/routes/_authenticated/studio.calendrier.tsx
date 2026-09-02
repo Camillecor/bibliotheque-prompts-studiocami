@@ -1,12 +1,18 @@
 import { useMemo, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { Link, createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { CheckCircle2, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { CheckCircle2, ChevronLeft, ChevronRight, Loader2, Pencil, X } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { StudioTabs } from "@/components/StudioTabs";
-import { cleJour, formatDateHeure, reseauInfo, type ContenuRow } from "@/lib/studio";
+import {
+  cleJour,
+  formatDateHeure,
+  reseauInfo,
+  statutLabel,
+  type ContenuRow,
+} from "@/lib/studio";
 import { changerStatutContenu, listContenus, planifierContenu } from "@/lib/studio.functions";
 
 export const Route = createFileRoute("/_authenticated/studio/calendrier")({
