@@ -41,12 +41,13 @@ export const generateMarioPrompt = createServerFn({ method: "POST" })
   });
 
 const QuestionsInput = z.object({
-  idee: z.string().min(5),
-  motsCles: z.string().default(""),
-  metier: z.string().default(""),
-  typePrompt: z.string().default(""),
-  ton: z.string().default(""),
+  idee: z.string().trim().min(5).max(4000),
+  motsCles: z.string().trim().max(500).default(""),
+  metier: z.string().trim().max(120).default(""),
+  typePrompt: z.string().trim().max(80).default(""),
+  ton: z.string().trim().max(80).default(""),
 });
+
 
 export const poserQuestionsMario = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => QuestionsInput.parse(input))
@@ -62,10 +63,10 @@ const SuggestionsInput = z.object({
   historique: z
     .array(
       z.object({
-        titre: z.string(),
-        metier: z.string(),
-        type_prompt: z.string().default(""),
-        mots_cles: z.array(z.string()).default([]),
+        titre: z.string().trim().max(160),
+        metier: z.string().trim().max(120),
+        type_prompt: z.string().trim().max(80).default(""),
+        mots_cles: z.array(z.string().trim().max(60)).max(12).default([]),
       }),
     )
     .max(20),
@@ -81,18 +82,17 @@ export const suggererIdeesMario = createServerFn({ method: "POST" })
     return callAnthropicSuggestions(data.historique);
   });
 
-
-
 const SaveInput = z.object({
-  titre: z.string().min(1),
-  metier: z.string().min(1),
-  type_prompt: z.string().default("standard"),
-  mots_cles: z.array(z.string()).default([]),
-  complexite: z.string().min(1),
-  prompt: z.string(),
-  note: z.string().default(""),
-  etapes_lancement: z.array(z.string()).default([]),
+  titre: z.string().trim().min(1).max(160),
+  metier: z.string().trim().min(1).max(120),
+  type_prompt: z.string().trim().max(80).default("standard"),
+  mots_cles: z.array(z.string().trim().max(60)).max(12).default([]),
+  complexite: z.string().trim().min(1).max(40),
+  prompt: z.string().max(100_000),
+  note: z.string().max(20_000).default(""),
+  etapes_lancement: z.array(z.string().max(2000)).max(20).default([]),
   alerte_pii: z.boolean().default(false),
+
   idee_source: z.string().default(""),
   date_ajout: z.string().datetime().optional(),
 });
