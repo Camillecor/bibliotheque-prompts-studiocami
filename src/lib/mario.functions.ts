@@ -5,29 +5,30 @@ import type { SuggestionIdee } from "@/lib/mario.server";
 import { COMPTE_ID } from "@/lib/compte";
 import { erreurBase } from "@/lib/erreurs";
 
-// TEMPORAIRE : connexion désactivée pour les tests (demande du 2026-08-03).
-// Toutes les fonctions ci-dessous utilisent supabaseAdmin (service role, contourne le RLS)
-// avec cet utilisateur fictif au lieu de l'utilisateur authentifié réel.
-// À l'issue des tests : réintroduire `.middleware([requireSupabaseAuth])` et
-// remplacer COMPTE_ID par context.userId partout ci-dessous.
-
-// 5 Mo max en binaire ≈ 6,99M caractères en base64 — plafond large pour laisser
-// passer une vraie image de 5 Mo tout en bloquant les payloads absurdes en amont.
+// Application mono-compte, sans authentification : toutes les requêtes sont
+// filtrées sur COMPTE_ID côté serveur et cet identifiant n'est jamais accepté
+// depuis le navigateur. Les entrées sont bornées pour éviter les charges utiles
+// abusives, et les appels IA sont limités en débit (voir securite.server.ts).
 const GenerateInput = z.object({
-  idee: z.string().min(5, "Décris ton idée en quelques mots de plus."),
-  motsCles: z.string().default(""),
-  metier: z.string().default(""),
+  idee: z.string().trim().min(5, "Décris ton idée en quelques mots de plus.").max(4000),
+  motsCles: z.string().trim().max(500).default(""),
+  metier: z.string().trim().max(120).default(""),
   modele: z.enum(["claude-sonnet-5", "claude-haiku-4-5"]).default("claude-sonnet-5"),
-  typePrompt: z.string().default(""),
-  ton: z.string().default(""),
-  autresInstructions: z.string().default(""),
+  typePrompt: z.string().trim().max(80).default(""),
+  ton: z.string().trim().max(80).default(""),
+  autresInstructions: z.string().trim().max(4000).default(""),
   image: z
     .object({
       mediaType: z.enum(["image/png", "image/jpeg"]),
-      base64: z.string().max(7_000_000),
+      // ~5 Mo binaires : large pour une vraie photo, bloque les charges absurdes.
+      base64: z
+        .string()
+        .max(7_000_000)
+        .regex(/^[A-Za-z0-9+/=\r\n]+$/, "Image invalide."),
     })
     .optional(),
 });
+
 
 export const generateMarioPrompt = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => GenerateInput.parse(input))
