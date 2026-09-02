@@ -32,6 +32,9 @@ const GenerateInput = z.object({
 export const generateMarioPrompt = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => GenerateInput.parse(input))
   .handler(async ({ data }): Promise<MarioResult> => {
+    const { limiterDebit } = await import("@/lib/securite.server");
+    limiterDebit("mario:generer", 10, 60_000);
+
     const { callAnthropicMario } = await import("@/lib/mario.server");
     return callAnthropicMario(data);
   });
@@ -47,6 +50,9 @@ const QuestionsInput = z.object({
 export const poserQuestionsMario = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => QuestionsInput.parse(input))
   .handler(async ({ data }): Promise<{ questions: string[] }> => {
+    const { limiterDebit } = await import("@/lib/securite.server");
+    limiterDebit("mario:questions", 20, 60_000);
+
     const { callAnthropicQuestions } = await import("@/lib/mario.server");
     return callAnthropicQuestions(data);
   });
@@ -67,6 +73,9 @@ const SuggestionsInput = z.object({
 export const suggererIdeesMario = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => SuggestionsInput.parse(input))
   .handler(async ({ data }): Promise<{ suggestions: SuggestionIdee[] }> => {
+    const { limiterDebit } = await import("@/lib/securite.server");
+    limiterDebit("mario:suggestions", 10, 60_000);
+
     const { callAnthropicSuggestions } = await import("@/lib/mario.server");
     return callAnthropicSuggestions(data.historique);
   });

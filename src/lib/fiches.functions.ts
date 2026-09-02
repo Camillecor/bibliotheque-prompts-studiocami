@@ -31,6 +31,9 @@ const FicheInputSchema = z.object({
 export const genererFiche = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => FicheInputSchema.parse(input))
   .handler(async ({ data }): Promise<{ markdown: string }> => {
+    const { limiterDebit } = await import("@/lib/securite.server");
+    limiterDebit("fiches:generer", 6, 60_000);
+
     const { callAnthropicFiche } = await import("@/lib/fiches.server");
     return callAnthropicFiche(data);
   });
@@ -43,6 +46,9 @@ const AmeliorerInput = z.object({
 export const ameliorerFiche = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => AmeliorerInput.parse(input))
   .handler(async ({ data }): Promise<{ markdown: string }> => {
+    const { limiterDebit } = await import("@/lib/securite.server");
+    limiterDebit("fiches:ameliorer", 8, 60_000);
+
     const { callAnthropicAmelioration } = await import("@/lib/fiches.server");
     return callAnthropicAmelioration(data);
   });

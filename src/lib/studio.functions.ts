@@ -226,6 +226,9 @@ function base64VersOctets(base64: string) {
 export const uploadMedia = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => ImageInput.parse(input))
   .handler(async ({ data }): Promise<MediaRow> => {
+    const { limiterDebit } = await import("@/lib/securite.server");
+    limiterDebit("studio:upload", 30, 60_000);
+
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const extension =
@@ -329,6 +332,9 @@ const RedactionInput = z.object({
 export const redigerContenu = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => RedactionInput.parse(input))
   .handler(async ({ data }) => {
+    const { limiterDebit } = await import("@/lib/securite.server");
+    limiterDebit("studio:rediger", 10, 60_000);
+
     const { redigerPost } = await import("@/lib/studio.server");
     return redigerPost(data);
   });
@@ -342,6 +348,9 @@ const VarianteInput = z.object({
 export const reecrireContenu = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => VarianteInput.parse(input))
   .handler(async ({ data }) => {
+    const { limiterDebit } = await import("@/lib/securite.server");
+    limiterDebit("studio:reecrire", 10, 60_000);
+
     const { reecrirePost } = await import("@/lib/studio.server");
     return reecrirePost(data);
   });
