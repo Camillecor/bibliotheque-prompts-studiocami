@@ -4,12 +4,12 @@
 // structure interne (noms de tables, contraintes, clés). On les journalise
 // côté serveur et on renvoie au navigateur un message générique en français.
 
-export type ErreurBase = { message?: string | null } | null | undefined;
+export type ErreurBase = { message?: string | null };
 
-export function verifierErreur(contexte: string, erreur: ErreurBase): void {
-  if (!erreur) return;
+/** Journalise l'erreur technique et renvoie l'erreur à lever côté client. */
+export function erreurBase(contexte: string, erreur: ErreurBase): Error {
   console.error(`[${contexte}]`, erreur.message ?? erreur);
-  throw Object.assign(new Error("L'opération a échoué. Réessaie dans un instant."), {
+  return Object.assign(new Error("L'opération a échoué. Réessaie dans un instant."), {
     statusCode: 500,
   });
 }
