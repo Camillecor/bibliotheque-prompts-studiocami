@@ -1,5 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { COMPTE_ID } from "@/lib/compte";
+import { erreurBase } from "@/lib/erreurs";
 
 const ImageSchema = z.object({
   mediaType: z.enum(["image/png", "image/jpeg"]),
@@ -29,6 +31,9 @@ const FicheInputSchema = z.object({
 export const genererFiche = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => FicheInputSchema.parse(input))
   .handler(async ({ data }): Promise<{ markdown: string }> => {
+    const { limiterDebit } = await import("@/lib/securite.server");
+    limiterDebit("fiches:generer", 6, 60_000);
+
     const { callAnthropicFiche } = await import("@/lib/fiches.server");
     return callAnthropicFiche(data);
   });
@@ -41,14 +46,15 @@ const AmeliorerInput = z.object({
 export const ameliorerFiche = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => AmeliorerInput.parse(input))
   .handler(async ({ data }): Promise<{ markdown: string }> => {
+    const { limiterDebit } = await import("@/lib/securite.server");
+    limiterDebit("fiches:ameliorer", 8, 60_000);
+
     const { callAnthropicAmelioration } = await import("@/lib/fiches.server");
     return callAnthropicAmelioration(data);
   });
 
-// Sauvegarde/historique des fiches générées. Même schéma d'auth temporaire
-// que mario.functions.ts et outilsPersos.functions.ts (TEST_USER_ID) — à
-// remplacer par context.userId quand l'authentification sera réactivée.
-const TEST_USER_ID = "00000000-0000-0000-0000-000000000001";
+// Sauvegarde/historique des fiches générées : application mono-compte sans
+// authentification, le filtrage sur COMPTE_ID reste côté serveur.
 
 export type FicheRow = {
   id: string;
@@ -80,20 +86,20 @@ export const saveFiche = createServerFn({ method: "POST" })
         .from("fiches")
         .update(champs)
         .eq("id", id)
-        .eq("user_id", TEST_USER_ID)
+        .eq("user_id", COMPTE_ID)
         .select(COLONNES)
         .single();
-      if (error) throw new Error(error.message);
+      if (error) throw erreurBase("fiches", error);
       return row as FicheRow;
     }
 
     const { data: row, error } = await supabaseAdmin
       .from("fiches")
-      .insert({ ...champs, user_id: TEST_USER_ID })
+      .insert({ ...champs, user_id: COMPTE_ID })
       .select(COLONNES)
       .single();
 
-    if (error) throw new Error(error.message);
+    if (error) throw erreurBase("fiches", error);
     return row as FicheRow;
   });
 
@@ -103,11 +109,11 @@ export const listFiches = createServerFn({ method: "GET" }).handler(
     const { data, error } = await supabaseAdmin
       .from("fiches")
       .select(COLONNES)
-      .eq("user_id", TEST_USER_ID)
+      .eq("user_id", COMPTE_ID)
       .order("created_at", { ascending: false })
       .limit(200);
 
-    if (error) throw new Error(error.message);
+    if (error) throw erreurBase("fiches", error);
     return (data ?? []) as FicheRow[];
   },
 );
@@ -120,7 +126,7 @@ export const deleteFiche = createServerFn({ method: "POST" })
       .from("fiches")
       .delete()
       .eq("id", data.id)
-      .eq("user_id", TEST_USER_ID);
-    if (error) throw new Error(error.message);
+      .eq("user_id", COMPTE_ID);
+    if (error) throw erreurBase("fiches", error);
     return { ok: true };
   });
