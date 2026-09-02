@@ -570,10 +570,18 @@ function StudioMediasPage() {
               </button>
             </div>
 
-            <canvas
-              ref={canvasRef}
-              className="mt-4 max-h-[45dvh] w-full rounded-2xl border border-border object-contain"
-            />
+            <div className="mt-4 flex max-h-[45dvh] items-center justify-center rounded-2xl border border-border bg-muted p-3">
+              <canvas
+                ref={canvasRef}
+                className="max-h-[41dvh] max-w-full rounded-xl"
+                style={{ width: "auto", height: "auto" }}
+              />
+            </div>
+            <p className="mt-2 text-center text-[11px] text-muted-foreground">
+              Sortie : {canvasRef.current?.width ?? retouche.taille} ×{" "}
+              {canvasRef.current?.height ?? "—"} px
+            </p>
+
 
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               <label className="flex flex-col gap-1 text-xs font-semibold text-primary">
