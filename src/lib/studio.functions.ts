@@ -11,10 +11,8 @@ import {
 import { COMPTE_ID } from "@/lib/compte";
 import { erreurBase } from "@/lib/erreurs";
 
-// Même schéma d'auth temporaire que mario.functions.ts / fiches.functions.ts :
-// la connexion est désactivée pour les tests, toutes les fonctions utilisent
-// cet utilisateur fictif via supabaseAdmin. À remplacer par context.userId
-// quand l'authentification sera réactivée.
+// Application mono-compte, sans authentification : le filtrage sur COMPTE_ID
+// est fait côté serveur uniquement, jamais d'après une valeur du navigateur.
 
 const COLONNES_CONTENU =
   "id, titre, texte, reseau, statut, tags, date_planifiee, date_publication, prompt_id, created_at, updated_at";

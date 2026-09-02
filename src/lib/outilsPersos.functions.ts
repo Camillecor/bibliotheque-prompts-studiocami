@@ -4,8 +4,8 @@ import { COMPTE_ID } from "@/lib/compte";
 import { erreurBase } from "@/lib/erreurs";
 
 // Outils ajoutés manuellement par l'utilisatrice depuis l'onglet Outils.
-// Même schéma d'auth temporaire que mario.functions.ts (COMPTE_ID) — à
-// remplacer par context.userId quand l'authentification sera réactivée.
+// Application mono-compte, sans authentification : le filtrage sur COMPTE_ID
+// est fait côté serveur uniquement, jamais d'après une valeur du navigateur.
 
 export type OutilPersoRow = {
   id: string;
