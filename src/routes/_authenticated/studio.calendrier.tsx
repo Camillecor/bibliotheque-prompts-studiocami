@@ -53,6 +53,7 @@ function StudioCalendrierPage() {
   const queryClient = useQueryClient();
   const [mois, setMois] = useState(() => new Date());
   const [glisse, setGlisse] = useState<string | null>(null);
+  const [apercu, setApercu] = useState<ContenuRow | null>(null);
 
   const fetchContenus = useServerFn(listContenus);
   const planifier = useServerFn(planifierContenu);
