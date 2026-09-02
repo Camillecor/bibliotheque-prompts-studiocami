@@ -53,9 +53,9 @@ export const ameliorerFiche = createServerFn({ method: "POST" })
     return callAnthropicAmelioration(data);
   });
 
-// Sauvegarde/historique des fiches générées. Même schéma d'auth temporaire
-// que mario.functions.ts et outilsPersos.functions.ts (COMPTE_ID) — à
-// remplacer par context.userId quand l'authentification sera réactivée.
+// Sauvegarde/historique des fiches générées : application mono-compte sans
+// authentification, le filtrage sur COMPTE_ID reste côté serveur.
+
 
 export type FicheRow = {
   id: string;
