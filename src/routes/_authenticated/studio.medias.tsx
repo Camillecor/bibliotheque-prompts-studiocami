@@ -301,38 +301,55 @@ function StudioMediasPage() {
       try {
         const image = await chargerImage(retouche.media.url);
         if (annule) return;
-        const ratio =
-          FORMATS_MEDIA.find((f) => f.value === retouche.format)?.ratio ??
-          image.naturalWidth / image.naturalHeight;
 
-        const pivote = retouche.rotation % 180 !== 0;
+        const pivote = ((retouche.rotation % 360) + 360) % 360 % 180 !== 0;
+        // Dimensions de l'image après rotation.
         const largeurSource = pivote ? image.naturalHeight : image.naturalWidth;
         const hauteurSource = pivote ? image.naturalWidth : image.naturalHeight;
 
-        // Recadrage centré au format demandé.
-        let largeurCrop = largeurSource;
-        let hauteurCrop = largeurSource / ratio;
-        if (hauteurCrop > hauteurSource) {
-          hauteurCrop = hauteurSource;
-          largeurCrop = hauteurSource * ratio;
-        }
+        const ratio =
+          FORMATS_MEDIA.find((f) => f.value === retouche.format)?.ratio ??
+          largeurSource / hauteurSource;
 
-        canvas.width = Math.round(largeurCrop);
-        canvas.height = Math.round(hauteurCrop);
+        // Taille de sortie demandée, bornée à un rendu raisonnable.
+        const largeurSortie = Math.max(64, Math.round(retouche.taille));
+        const hauteurSortie = Math.max(64, Math.round(largeurSortie / ratio));
+
+        canvas.width = largeurSortie;
+        canvas.height = hauteurSortie;
         const ctx = canvas.getContext("2d");
         if (!ctx) return;
+
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.imageSmoothingQuality = "high";
         ctx.filter = `brightness(${retouche.luminosite}%) contrast(${retouche.contraste}%) saturate(${retouche.saturation}%)`;
+
+        // Échelle « cover » : l'image remplit toujours le cadre, puis zoom manuel.
+        const echelle =
+          Math.max(largeurSortie / largeurSource, hauteurSortie / hauteurSource) * retouche.zoom;
+        const largeurRendue = largeurSource * echelle;
+        const hauteurRendue = hauteurSource * echelle;
+
+        // Marge de déplacement possible (recadrage).
+        const margeX = Math.max(0, (largeurRendue - largeurSortie) / 2);
+        const margeY = Math.max(0, (hauteurRendue - hauteurSortie) / 2);
+        const centreX = largeurSortie / 2 + retouche.decalageX * margeX;
+        const centreY = hauteurSortie / 2 + retouche.decalageY * margeY;
+
         ctx.save();
-        ctx.translate(canvas.width / 2, canvas.height / 2);
+        ctx.translate(centreX, centreY);
         ctx.rotate((retouche.rotation * Math.PI) / 180);
         ctx.drawImage(
           image,
-          -image.naturalWidth / 2,
-          -image.naturalHeight / 2,
-          image.naturalWidth,
-          image.naturalHeight,
+          (-image.naturalWidth * echelle) / 2,
+          (-image.naturalHeight * echelle) / 2,
+          image.naturalWidth * echelle,
+          image.naturalHeight * echelle,
         );
         ctx.restore();
+        ctx.filter = "none";
+
       } catch (error) {
         toast.error((error as Error).message);
       }
