@@ -503,23 +503,29 @@ function StudioContenusPage() {
             placeholder="Ton idée : « retour d'expérience sur l'automatisation de ma facturation »"
             className="mt-3 w-full resize-none rounded-2xl border border-border bg-muted p-3 text-sm text-primary outline-none focus:border-[var(--info)]"
           />
-          <div className="mt-3 flex flex-wrap items-center gap-2">
-            <select
-              value={ton}
-              onChange={(event) => setTon(event.target.value)}
-              className="cami-select"
-            >
-              {TONS_POST.map((option) => (
-                <option key={option.value} value={option.value}>
-                  Ton {option.label.toLowerCase()}
-                </option>
-              ))}
-            </select>
+          <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+            <label className="relative flex min-w-0 items-center">
+              <span className="pointer-events-none absolute left-4 text-[10px] font-bold uppercase tracking-[0.12em] text-muted-foreground">
+                Ton
+              </span>
+              <select
+                value={ton}
+                onChange={(event) => setTon(event.target.value)}
+                aria-label="Ton du post"
+                className="cami-select w-full pl-14"
+              >
+                {TONS_POST.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
             <button
               type="button"
               disabled={idee.trim().length < 5 || mutationRediger.isPending}
               onClick={() => mutationRediger.mutate()}
-              className="cami-btn-secondary flex-nowrap whitespace-nowrap disabled:pointer-events-none disabled:opacity-50"
+              className="cami-btn-accent w-full disabled:pointer-events-none disabled:opacity-50 sm:w-auto"
             >
               {mutationRediger.isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -529,6 +535,7 @@ function StudioContenusPage() {
               Générer le post
             </button>
           </div>
+
         </section>
 
         {/* Éditeur */}
