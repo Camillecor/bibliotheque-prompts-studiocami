@@ -38,6 +38,9 @@ import {
 } from "@/lib/studio.functions";
 
 export const Route = createFileRoute("/_authenticated/studio/")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    contenu: typeof search.contenu === "string" ? search.contenu : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Studio — Production de contenu | Studio Cami IA" },
