@@ -70,7 +70,13 @@ type Retouche = {
   contraste: number;
   saturation: number;
   rotation: number;
+  zoom: number; // 1 = image entière visible dans le cadre
+  decalageX: number; // -1 → 1, position du recadrage
+  decalageY: number;
+  taille: number; // largeur de sortie en pixels
 };
+
+const TAILLES_SORTIE = [640, 1080, 1440, 2048] as const;
 
 function StudioMediasPage() {
   const queryClient = useQueryClient();
@@ -504,6 +510,10 @@ function StudioMediasPage() {
                             contraste: 100,
                             saturation: 100,
                             rotation: 0,
+                            zoom: 1,
+                            decalageX: 0,
+                            decalageY: 0,
+                            taille: 1080,
                           })
                         }
                         className="cami-icon-btn"
