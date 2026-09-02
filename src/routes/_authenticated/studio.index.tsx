@@ -233,7 +233,7 @@ function StudioContenusPage() {
     const cible = contenus.find((c) => c.id === contenuDemande);
     if (!cible) return;
     chargerContenu(cible);
-    void navigate({ search: {}, replace: true });
+    void navigate({ search: { contenu: undefined }, replace: true });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contenuDemande, contenus]);
 
