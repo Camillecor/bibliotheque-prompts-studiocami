@@ -378,7 +378,7 @@ function StudioMediasPage() {
         type="button"
         disabled={promptIA.trim().length < 5 || generationEnCours}
         onClick={() => void genererVisuel()}
-        className="cami-btn-secondary disabled:pointer-events-none disabled:opacity-50"
+        className="cami-btn-secondary flex-nowrap whitespace-nowrap disabled:pointer-events-none disabled:opacity-50"
       >
         {generationEnCours ? (
           <Loader2 className="h-4 w-4 animate-spin" />
@@ -402,7 +402,7 @@ function StudioMediasPage() {
             type="button"
             disabled={!apercuIA.final || mutationUpload.isPending}
             onClick={() => void enregistrerVisuelIA()}
-            className="cami-btn-secondary disabled:pointer-events-none disabled:opacity-50"
+            className="cami-btn-secondary flex-nowrap whitespace-nowrap disabled:pointer-events-none disabled:opacity-50"
           >
             <Download className="h-4 w-4" /> Ajouter à mes médias
           </button>
@@ -425,7 +425,7 @@ function StudioMediasPage() {
             <button
               type="button"
               onClick={() => inputFichier.current?.click()}
-              className="cami-btn-secondary"
+              className="cami-btn-secondary flex-nowrap whitespace-nowrap"
             >
               <Upload className="h-4 w-4" /> Importer des images
             </button>
@@ -614,7 +614,7 @@ function StudioMediasPage() {
               type="button"
               disabled={enTraitement || mutationUpload.isPending}
               onClick={() => void enregistrerRetouche()}
-              className="cami-btn-primary-full mt-5 disabled:pointer-events-none disabled:opacity-50"
+              className="cami-btn-primary-full mt-5 flex-nowrap whitespace-nowrap disabled:pointer-events-none disabled:opacity-50"
             >
               {enTraitement || mutationUpload.isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin" />

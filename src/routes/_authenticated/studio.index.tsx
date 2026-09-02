@@ -301,7 +301,7 @@ function StudioContenusPage() {
             <button
               type="button"
               onClick={() => setBrouillon(BROUILLON_VIDE)}
-              className="cami-btn-secondary"
+              className="cami-btn-secondary flex-nowrap whitespace-nowrap"
             >
               <Plus className="h-4 w-4" /> Nouveau contenu
             </button>
@@ -337,7 +337,7 @@ function StudioContenusPage() {
               type="button"
               disabled={idee.trim().length < 5 || mutationRediger.isPending}
               onClick={() => mutationRediger.mutate()}
-              className="cami-btn-secondary disabled:pointer-events-none disabled:opacity-50"
+              className="cami-btn-secondary flex-nowrap whitespace-nowrap disabled:pointer-events-none disabled:opacity-50"
             >
               {mutationRediger.isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -575,7 +575,7 @@ function StudioContenusPage() {
             type="button"
             disabled={brouillon.texte.trim().length === 0 || mutationEnregistrer.isPending}
             onClick={() => mutationEnregistrer.mutate(brouillon)}
-            className="cami-btn-primary-full disabled:pointer-events-none disabled:opacity-50"
+            className="cami-btn-primary-full flex-nowrap whitespace-nowrap disabled:pointer-events-none disabled:opacity-50"
           >
             {mutationEnregistrer.isPending ? (
               <Loader2 className="h-4 w-4 animate-spin" />
