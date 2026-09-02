@@ -620,6 +620,74 @@ function StudioMediasPage() {
                 </select>
               </label>
 
+              <label className="flex flex-col gap-1 text-xs font-semibold text-primary">
+                Taille de sortie
+                <select
+                  value={retouche.taille}
+                  onChange={(event) =>
+                    setRetouche((etat) =>
+                      etat ? { ...etat, taille: Number(event.target.value) } : etat,
+                    )
+                  }
+                  className="min-h-11 rounded-2xl border border-border bg-muted px-3 text-sm outline-none focus:border-[var(--info)]"
+                >
+                  {TAILLES_SORTIE.map((taille) => (
+                    <option key={taille} value={taille}>
+                      {taille} px de large
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label className="flex flex-col gap-1 text-xs font-semibold text-primary">
+                Zoom — {Math.round(retouche.zoom * 100)}%
+                <input
+                  type="range"
+                  min={100}
+                  max={300}
+                  value={Math.round(retouche.zoom * 100)}
+                  onChange={(event) =>
+                    setRetouche((etat) =>
+                      etat ? { ...etat, zoom: Number(event.target.value) / 100 } : etat,
+                    )
+                  }
+                  className="accent-[var(--coral)]"
+                />
+              </label>
+
+              <label className="flex flex-col gap-1 text-xs font-semibold text-primary">
+                Cadrage horizontal
+                <input
+                  type="range"
+                  min={-100}
+                  max={100}
+                  value={Math.round(retouche.decalageX * 100)}
+                  onChange={(event) =>
+                    setRetouche((etat) =>
+                      etat ? { ...etat, decalageX: Number(event.target.value) / 100 } : etat,
+                    )
+                  }
+                  className="accent-[var(--info)]"
+                />
+              </label>
+
+              <label className="flex flex-col gap-1 text-xs font-semibold text-primary">
+                Cadrage vertical
+                <input
+                  type="range"
+                  min={-100}
+                  max={100}
+                  value={Math.round(retouche.decalageY * 100)}
+                  onChange={(event) =>
+                    setRetouche((etat) =>
+                      etat ? { ...etat, decalageY: Number(event.target.value) / 100 } : etat,
+                    )
+                  }
+                  className="accent-[var(--info)]"
+                />
+              </label>
+
+
               {(
                 [
                   ["luminosite", "Luminosité"],
