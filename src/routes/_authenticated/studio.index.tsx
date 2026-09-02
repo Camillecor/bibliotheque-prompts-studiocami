@@ -38,6 +38,9 @@ import {
 } from "@/lib/studio.functions";
 
 export const Route = createFileRoute("/_authenticated/studio/")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    contenu: typeof search["contenu"] === "string" ? (search["contenu"] as string) : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Studio — Production de contenu | Studio Cami IA" },
@@ -221,6 +224,18 @@ function StudioContenusPage() {
     window.addEventListener("keydown", fermer);
     return () => window.removeEventListener("keydown", fermer);
   }, [selecteurMedias]);
+
+  // Ouverture directe d'un contenu depuis le calendrier (/studio?contenu=id)
+  const { contenu: contenuDemande } = Route.useSearch();
+  const navigate = Route.useNavigate();
+  useEffect(() => {
+    if (!contenuDemande) return;
+    const cible = contenus.find((c) => c.id === contenuDemande);
+    if (!cible) return;
+    chargerContenu(cible);
+    void navigate({ search: { contenu: undefined }, replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contenuDemande, contenus]);
 
   const panneau = (
     <div className="flex h-full flex-col gap-3">

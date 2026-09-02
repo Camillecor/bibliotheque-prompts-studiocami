@@ -1,12 +1,18 @@
 import { useMemo, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { Link, createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { CheckCircle2, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { CheckCircle2, ChevronLeft, ChevronRight, Loader2, Pencil, X } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { StudioTabs } from "@/components/StudioTabs";
-import { cleJour, formatDateHeure, reseauInfo, type ContenuRow } from "@/lib/studio";
+import {
+  cleJour,
+  formatDateHeure,
+  reseauInfo,
+  statutLabel,
+  type ContenuRow,
+} from "@/lib/studio";
 import { changerStatutContenu, listContenus, planifierContenu } from "@/lib/studio.functions";
 
 export const Route = createFileRoute("/_authenticated/studio/calendrier")({
@@ -47,6 +53,7 @@ function StudioCalendrierPage() {
   const queryClient = useQueryClient();
   const [mois, setMois] = useState(() => new Date());
   const [glisse, setGlisse] = useState<string | null>(null);
+  const [apercu, setApercu] = useState<ContenuRow | null>(null);
 
   const fetchContenus = useServerFn(listContenus);
   const planifier = useServerFn(planifierContenu);
@@ -185,8 +192,8 @@ function StudioCalendrierPage() {
             <Loader2 className="h-4 w-4 animate-spin" /> Chargement du calendrier…
           </div>
         ) : (
-          <div className="cami-card overflow-hidden p-2">
-            <div className="grid grid-cols-7 gap-1 pb-1">
+          <div className="cami-card overflow-hidden p-3 sm:p-4">
+            <div className="grid grid-cols-7 gap-1.5 pb-2">
               {JOURS.map((jour) => (
                 <div
                   key={jour}
@@ -196,7 +203,7 @@ function StudioCalendrierPage() {
                 </div>
               ))}
             </div>
-            <div className="grid grid-cols-7 gap-1">
+            <div className="grid grid-cols-7 gap-1.5">
               {jours.map((jour) => {
                 const cle = cleJour(jour);
                 const duMois = jour.getMonth() === mois.getMonth();
@@ -207,7 +214,7 @@ function StudioCalendrierPage() {
                     onDragOver={(event) => event.preventDefault()}
                     onDrop={() => deposer(jour)}
                     className={[
-                      "min-h-24 rounded-xl border p-1.5 transition",
+                      "min-h-28 rounded-xl border p-2 transition",
                       duMois ? "border-border bg-card" : "border-transparent bg-muted/40",
                       glisse ? "hover:border-[var(--coral)]" : "",
                     ].join(" ")}
@@ -224,34 +231,28 @@ function StudioCalendrierPage() {
                     >
                       {jour.getDate()}
                     </span>
-                    <div className="mt-1 flex flex-col gap-1">
+                    <div className="mt-1.5 flex flex-col gap-1.5">
                       {items.map((contenu) => {
                         const info = reseauInfo(contenu.reseau);
                         return (
-                          <div
+                          <button
                             key={contenu.id}
+                            type="button"
                             draggable
                             onDragStart={() => setGlisse(contenu.id)}
                             onDragEnd={() => setGlisse(null)}
-                            className="cursor-grab rounded-lg px-1.5 py-1 text-[10px] font-semibold leading-tight text-white"
+                            onClick={() => setApercu(contenu)}
+                            className="w-full cursor-pointer rounded-lg px-2 py-1.5 text-left text-[10px] font-semibold leading-tight text-white transition hover:opacity-90"
                             style={{ backgroundColor: info.couleur }}
                             title={`${contenu.titre} — ${formatDateHeure(contenu.date_planifiee ?? "")}`}
                           >
                             <span className="line-clamp-2 block">
                               {contenu.titre || "Sans titre"}
                             </span>
-                            {contenu.statut !== "publie" ? (
-                              <button
-                                type="button"
-                                onClick={() => mutationPublier.mutate(contenu.id)}
-                                className="mt-1 inline-flex items-center gap-1 rounded-full bg-white/20 px-1.5 py-0.5 text-[9px]"
-                              >
-                                <CheckCircle2 className="h-3 w-3" /> Publié
-                              </button>
-                            ) : (
-                              <span className="mt-1 block text-[9px] opacity-80">✓ publié</span>
-                            )}
-                          </div>
+                            <span className="mt-0.5 block text-[9px] opacity-80">
+                              {contenu.statut === "publie" ? "✓ publié" : "Voir l'aperçu"}
+                            </span>
+                          </button>
                         );
                       })}
                     </div>
@@ -262,6 +263,99 @@ function StudioCalendrierPage() {
           </div>
         )}
       </div>
+
+      {apercu ? (
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center bg-primary/30 p-0 backdrop-blur-sm sm:items-center sm:p-6"
+          role="dialog"
+          aria-modal="true"
+          onClick={() => setApercu(null)}
+        >
+          <div
+            onClick={(event) => event.stopPropagation()}
+            className="flex max-h-[85vh] w-full max-w-lg flex-col gap-4 overflow-y-auto rounded-t-[20px] border border-border bg-card p-5 sm:rounded-[20px] sm:p-6"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <span
+                  className="text-[10px] font-bold uppercase tracking-wide"
+                  style={{ color: reseauInfo(apercu.reseau).couleur }}
+                >
+                  {reseauInfo(apercu.reseau).label} · {statutLabel(apercu.statut)}
+                </span>
+                <h2 className="mt-1 font-display text-lg font-bold text-primary">
+                  {apercu.titre || "Sans titre"}
+                </h2>
+                {apercu.date_planifiee ? (
+                  <p className="mt-0.5 text-xs text-muted-foreground">
+                    {formatDateHeure(apercu.date_planifiee)}
+                  </p>
+                ) : null}
+              </div>
+              <button
+                type="button"
+                aria-label="Fermer l'aperçu"
+                onClick={() => setApercu(null)}
+                className="cami-icon-btn shrink-0"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            {apercu.medias.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {apercu.medias.map((media) => (
+                  <img
+                    key={media.id}
+                    src={media.url}
+                    alt={media.titre || "Visuel du contenu"}
+                    className="h-24 w-24 rounded-xl object-cover"
+                  />
+                ))}
+              </div>
+            ) : null}
+
+            <p className="whitespace-pre-wrap rounded-2xl border border-border bg-muted p-4 text-sm leading-relaxed text-primary">
+              {apercu.texte || "Ce contenu n'a pas encore de texte."}
+            </p>
+
+            {apercu.tags.length > 0 ? (
+              <div className="flex flex-wrap gap-1.5">
+                {apercu.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="rounded-full bg-secondary px-3 py-1 text-[11px] font-semibold text-primary"
+                  >
+                    #{tag}
+                  </span>
+                ))}
+              </div>
+            ) : null}
+
+            <div className="flex flex-wrap items-center gap-2">
+              <Link
+                to="/studio"
+                search={{ contenu: apercu.id }}
+                className="cami-btn flex-nowrap whitespace-nowrap"
+              >
+                <Pencil className="h-4 w-4" /> Modifier
+              </Link>
+              {apercu.statut !== "publie" ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    mutationPublier.mutate(apercu.id);
+                    setApercu(null);
+                  }}
+                  className="cami-btn flex-nowrap whitespace-nowrap"
+                >
+                  <CheckCircle2 className="h-4 w-4" /> Marquer comme publié
+                </button>
+              ) : null}
+            </div>
+          </div>
+        </div>
+      ) : null}
     </AppShell>
   );
 }
