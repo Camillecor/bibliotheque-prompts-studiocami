@@ -22,6 +22,7 @@ import { Route as ApiStudioVisuelRouteImport } from './routes/api/studio-visuel'
 import { Route as AuthenticatedOutilsIndexRouteImport } from './routes/_authenticated/outils.index'
 import { Route as AuthenticatedOutilsSlugRouteImport } from './routes/_authenticated/outils.$slug'
 import { Route as AuthenticatedStudioIndexRouteImport } from './routes/_authenticated/studio.index'
+import { Route as AuthenticatedStudioCalendrierRouteImport } from './routes/_authenticated/studio.calendrier'
 import { Route as AuthenticatedStudioMediasRouteImport } from './routes/_authenticated/studio.medias'
 
 const IndexRoute = IndexRouteImport.update({
@@ -91,6 +92,12 @@ const AuthenticatedStudioIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedStudioRoute,
   } as any)
+const AuthenticatedStudioCalendrierRoute =
+  AuthenticatedStudioCalendrierRouteImport.update({
+    id: '/calendrier',
+    path: '/calendrier',
+    getParentRoute: () => AuthenticatedStudioRoute,
+  } as any)
 const AuthenticatedStudioMediasRoute =
   AuthenticatedStudioMediasRouteImport.update({
     id: '/medias',
@@ -109,6 +116,7 @@ export interface FileRoutesByFullPath {
   '/studio': typeof AuthenticatedStudioRouteWithChildren
   '/api/studio-visuel': typeof ApiStudioVisuelRoute
   '/outils/$slug': typeof AuthenticatedOutilsSlugRoute
+  '/studio/calendrier': typeof AuthenticatedStudioCalendrierRoute
   '/studio/medias': typeof AuthenticatedStudioMediasRoute
   '/outils/': typeof AuthenticatedOutilsIndexRoute
   '/studio/': typeof AuthenticatedStudioIndexRoute
@@ -122,6 +130,7 @@ export interface FileRoutesByTo {
   '/mes-fiches': typeof AuthenticatedMesFichesRoute
   '/api/studio-visuel': typeof ApiStudioVisuelRoute
   '/outils/$slug': typeof AuthenticatedOutilsSlugRoute
+  '/studio/calendrier': typeof AuthenticatedStudioCalendrierRoute
   '/studio/medias': typeof AuthenticatedStudioMediasRoute
   '/outils': typeof AuthenticatedOutilsIndexRoute
   '/studio': typeof AuthenticatedStudioIndexRoute
@@ -139,6 +148,7 @@ export interface FileRoutesById {
   '/_authenticated/studio': typeof AuthenticatedStudioRouteWithChildren
   '/api/studio-visuel': typeof ApiStudioVisuelRoute
   '/_authenticated/outils/$slug': typeof AuthenticatedOutilsSlugRoute
+  '/_authenticated/studio/calendrier': typeof AuthenticatedStudioCalendrierRoute
   '/_authenticated/studio/medias': typeof AuthenticatedStudioMediasRoute
   '/_authenticated/outils/': typeof AuthenticatedOutilsIndexRoute
   '/_authenticated/studio/': typeof AuthenticatedStudioIndexRoute
@@ -156,6 +166,7 @@ export interface FileRouteTypes {
     | '/studio'
     | '/api/studio-visuel'
     | '/outils/$slug'
+    | '/studio/calendrier'
     | '/studio/medias'
     | '/outils/'
     | '/studio/'
@@ -169,6 +180,7 @@ export interface FileRouteTypes {
     | '/mes-fiches'
     | '/api/studio-visuel'
     | '/outils/$slug'
+    | '/studio/calendrier'
     | '/studio/medias'
     | '/outils'
     | '/studio'
@@ -185,6 +197,7 @@ export interface FileRouteTypes {
     | '/_authenticated/studio'
     | '/api/studio-visuel'
     | '/_authenticated/outils/$slug'
+    | '/_authenticated/studio/calendrier'
     | '/_authenticated/studio/medias'
     | '/_authenticated/outils/'
     | '/_authenticated/studio/'
@@ -290,6 +303,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStudioIndexRouteImport
       parentRoute: typeof AuthenticatedStudioRoute
     }
+    '/_authenticated/studio/calendrier': {
+      id: '/_authenticated/studio/calendrier'
+      path: '/calendrier'
+      fullPath: '/studio/calendrier'
+      preLoaderRoute: typeof AuthenticatedStudioCalendrierRouteImport
+      parentRoute: typeof AuthenticatedStudioRoute
+    }
     '/_authenticated/studio/medias': {
       id: '/_authenticated/studio/medias'
       path: '/medias'
@@ -314,11 +334,13 @@ const AuthenticatedOutilsRouteWithChildren =
   AuthenticatedOutilsRoute._addFileChildren(AuthenticatedOutilsRouteChildren)
 
 interface AuthenticatedStudioRouteChildren {
+  AuthenticatedStudioCalendrierRoute: typeof AuthenticatedStudioCalendrierRoute
   AuthenticatedStudioMediasRoute: typeof AuthenticatedStudioMediasRoute
   AuthenticatedStudioIndexRoute: typeof AuthenticatedStudioIndexRoute
 }
 
 const AuthenticatedStudioRouteChildren: AuthenticatedStudioRouteChildren = {
+  AuthenticatedStudioCalendrierRoute: AuthenticatedStudioCalendrierRoute,
   AuthenticatedStudioMediasRoute: AuthenticatedStudioMediasRoute,
   AuthenticatedStudioIndexRoute: AuthenticatedStudioIndexRoute,
 }
