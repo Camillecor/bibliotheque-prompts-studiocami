@@ -17,8 +17,14 @@ import { Route as AuthenticatedFichesRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedGlossaireRouteImport } from './routes/_authenticated/glossaire'
 import { Route as AuthenticatedMesFichesRouteImport } from './routes/_authenticated/mes-fiches'
 import { Route as AuthenticatedOutilsRouteImport } from './routes/_authenticated/outils'
+import { Route as AuthenticatedStudioRouteImport } from './routes/_authenticated/studio'
+import { Route as ApiStudioVisuelRouteImport } from './routes/api/studio-visuel'
 import { Route as AuthenticatedOutilsIndexRouteImport } from './routes/_authenticated/outils.index'
 import { Route as AuthenticatedOutilsSlugRouteImport } from './routes/_authenticated/outils.$slug'
+import { Route as AuthenticatedStudioIndexRouteImport } from './routes/_authenticated/studio.index'
+import { Route as AuthenticatedStudioCalendrierRouteImport } from './routes/_authenticated/studio.calendrier'
+import { Route as AuthenticatedStudioMediasRouteImport } from './routes/_authenticated/studio.medias'
+import { Route as AuthenticatedStudioStatistiquesRouteImport } from './routes/_authenticated/studio.statistiques'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -60,6 +66,16 @@ const AuthenticatedOutilsRoute = AuthenticatedOutilsRouteImport.update({
   path: '/outils',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedStudioRoute = AuthenticatedStudioRouteImport.update({
+  id: '/studio',
+  path: '/studio',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const ApiStudioVisuelRoute = ApiStudioVisuelRouteImport.update({
+  id: '/api/studio-visuel',
+  path: '/api/studio-visuel',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedOutilsIndexRoute =
   AuthenticatedOutilsIndexRouteImport.update({
     id: '/',
@@ -71,6 +87,30 @@ const AuthenticatedOutilsSlugRoute = AuthenticatedOutilsSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => AuthenticatedOutilsRoute,
 } as any)
+const AuthenticatedStudioIndexRoute =
+  AuthenticatedStudioIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedStudioRoute,
+  } as any)
+const AuthenticatedStudioCalendrierRoute =
+  AuthenticatedStudioCalendrierRouteImport.update({
+    id: '/calendrier',
+    path: '/calendrier',
+    getParentRoute: () => AuthenticatedStudioRoute,
+  } as any)
+const AuthenticatedStudioMediasRoute =
+  AuthenticatedStudioMediasRouteImport.update({
+    id: '/medias',
+    path: '/medias',
+    getParentRoute: () => AuthenticatedStudioRoute,
+  } as any)
+const AuthenticatedStudioStatistiquesRoute =
+  AuthenticatedStudioStatistiquesRouteImport.update({
+    id: '/statistiques',
+    path: '/statistiques',
+    getParentRoute: () => AuthenticatedStudioRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -80,8 +120,14 @@ export interface FileRoutesByFullPath {
   '/glossaire': typeof AuthenticatedGlossaireRoute
   '/mes-fiches': typeof AuthenticatedMesFichesRoute
   '/outils': typeof AuthenticatedOutilsRouteWithChildren
+  '/studio': typeof AuthenticatedStudioRouteWithChildren
+  '/api/studio-visuel': typeof ApiStudioVisuelRoute
   '/outils/$slug': typeof AuthenticatedOutilsSlugRoute
+  '/studio/calendrier': typeof AuthenticatedStudioCalendrierRoute
+  '/studio/medias': typeof AuthenticatedStudioMediasRoute
+  '/studio/statistiques': typeof AuthenticatedStudioStatistiquesRoute
   '/outils/': typeof AuthenticatedOutilsIndexRoute
+  '/studio/': typeof AuthenticatedStudioIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -90,8 +136,13 @@ export interface FileRoutesByTo {
   '/fiches': typeof AuthenticatedFichesRoute
   '/glossaire': typeof AuthenticatedGlossaireRoute
   '/mes-fiches': typeof AuthenticatedMesFichesRoute
+  '/api/studio-visuel': typeof ApiStudioVisuelRoute
   '/outils/$slug': typeof AuthenticatedOutilsSlugRoute
+  '/studio/calendrier': typeof AuthenticatedStudioCalendrierRoute
+  '/studio/medias': typeof AuthenticatedStudioMediasRoute
+  '/studio/statistiques': typeof AuthenticatedStudioStatistiquesRoute
   '/outils': typeof AuthenticatedOutilsIndexRoute
+  '/studio': typeof AuthenticatedStudioIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -103,8 +154,14 @@ export interface FileRoutesById {
   '/_authenticated/glossaire': typeof AuthenticatedGlossaireRoute
   '/_authenticated/mes-fiches': typeof AuthenticatedMesFichesRoute
   '/_authenticated/outils': typeof AuthenticatedOutilsRouteWithChildren
+  '/_authenticated/studio': typeof AuthenticatedStudioRouteWithChildren
+  '/api/studio-visuel': typeof ApiStudioVisuelRoute
   '/_authenticated/outils/$slug': typeof AuthenticatedOutilsSlugRoute
+  '/_authenticated/studio/calendrier': typeof AuthenticatedStudioCalendrierRoute
+  '/_authenticated/studio/medias': typeof AuthenticatedStudioMediasRoute
+  '/_authenticated/studio/statistiques': typeof AuthenticatedStudioStatistiquesRoute
   '/_authenticated/outils/': typeof AuthenticatedOutilsIndexRoute
+  '/_authenticated/studio/': typeof AuthenticatedStudioIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -116,8 +173,14 @@ export interface FileRouteTypes {
     | '/glossaire'
     | '/mes-fiches'
     | '/outils'
+    | '/studio'
+    | '/api/studio-visuel'
     | '/outils/$slug'
+    | '/studio/calendrier'
+    | '/studio/medias'
+    | '/studio/statistiques'
     | '/outils/'
+    | '/studio/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -126,8 +189,13 @@ export interface FileRouteTypes {
     | '/fiches'
     | '/glossaire'
     | '/mes-fiches'
+    | '/api/studio-visuel'
     | '/outils/$slug'
+    | '/studio/calendrier'
+    | '/studio/medias'
+    | '/studio/statistiques'
     | '/outils'
+    | '/studio'
   id:
     | '__root__'
     | '/'
@@ -138,14 +206,21 @@ export interface FileRouteTypes {
     | '/_authenticated/glossaire'
     | '/_authenticated/mes-fiches'
     | '/_authenticated/outils'
+    | '/_authenticated/studio'
+    | '/api/studio-visuel'
     | '/_authenticated/outils/$slug'
+    | '/_authenticated/studio/calendrier'
+    | '/_authenticated/studio/medias'
+    | '/_authenticated/studio/statistiques'
     | '/_authenticated/outils/'
+    | '/_authenticated/studio/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ApiStudioVisuelRoute: typeof ApiStudioVisuelRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -206,6 +281,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOutilsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/studio': {
+      id: '/_authenticated/studio'
+      path: '/studio'
+      fullPath: '/studio'
+      preLoaderRoute: typeof AuthenticatedStudioRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/api/studio-visuel': {
+      id: '/api/studio-visuel'
+      path: '/api/studio-visuel'
+      fullPath: '/api/studio-visuel'
+      preLoaderRoute: typeof ApiStudioVisuelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/outils/': {
       id: '/_authenticated/outils/'
       path: '/'
@@ -219,6 +308,34 @@ declare module '@tanstack/react-router' {
       fullPath: '/outils/$slug'
       preLoaderRoute: typeof AuthenticatedOutilsSlugRouteImport
       parentRoute: typeof AuthenticatedOutilsRoute
+    }
+    '/_authenticated/studio/': {
+      id: '/_authenticated/studio/'
+      path: '/'
+      fullPath: '/studio/'
+      preLoaderRoute: typeof AuthenticatedStudioIndexRouteImport
+      parentRoute: typeof AuthenticatedStudioRoute
+    }
+    '/_authenticated/studio/calendrier': {
+      id: '/_authenticated/studio/calendrier'
+      path: '/calendrier'
+      fullPath: '/studio/calendrier'
+      preLoaderRoute: typeof AuthenticatedStudioCalendrierRouteImport
+      parentRoute: typeof AuthenticatedStudioRoute
+    }
+    '/_authenticated/studio/medias': {
+      id: '/_authenticated/studio/medias'
+      path: '/medias'
+      fullPath: '/studio/medias'
+      preLoaderRoute: typeof AuthenticatedStudioMediasRouteImport
+      parentRoute: typeof AuthenticatedStudioRoute
+    }
+    '/_authenticated/studio/statistiques': {
+      id: '/_authenticated/studio/statistiques'
+      path: '/statistiques'
+      fullPath: '/studio/statistiques'
+      preLoaderRoute: typeof AuthenticatedStudioStatistiquesRouteImport
+      parentRoute: typeof AuthenticatedStudioRoute
     }
   }
 }
@@ -236,12 +353,30 @@ const AuthenticatedOutilsRouteChildren: AuthenticatedOutilsRouteChildren = {
 const AuthenticatedOutilsRouteWithChildren =
   AuthenticatedOutilsRoute._addFileChildren(AuthenticatedOutilsRouteChildren)
 
+interface AuthenticatedStudioRouteChildren {
+  AuthenticatedStudioCalendrierRoute: typeof AuthenticatedStudioCalendrierRoute
+  AuthenticatedStudioMediasRoute: typeof AuthenticatedStudioMediasRoute
+  AuthenticatedStudioStatistiquesRoute: typeof AuthenticatedStudioStatistiquesRoute
+  AuthenticatedStudioIndexRoute: typeof AuthenticatedStudioIndexRoute
+}
+
+const AuthenticatedStudioRouteChildren: AuthenticatedStudioRouteChildren = {
+  AuthenticatedStudioCalendrierRoute: AuthenticatedStudioCalendrierRoute,
+  AuthenticatedStudioMediasRoute: AuthenticatedStudioMediasRoute,
+  AuthenticatedStudioStatistiquesRoute: AuthenticatedStudioStatistiquesRoute,
+  AuthenticatedStudioIndexRoute: AuthenticatedStudioIndexRoute,
+}
+
+const AuthenticatedStudioRouteWithChildren =
+  AuthenticatedStudioRoute._addFileChildren(AuthenticatedStudioRouteChildren)
+
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedBibliothequeRoute: typeof AuthenticatedBibliothequeRoute
   AuthenticatedFichesRoute: typeof AuthenticatedFichesRoute
   AuthenticatedGlossaireRoute: typeof AuthenticatedGlossaireRoute
   AuthenticatedMesFichesRoute: typeof AuthenticatedMesFichesRoute
   AuthenticatedOutilsRoute: typeof AuthenticatedOutilsRouteWithChildren
+  AuthenticatedStudioRoute: typeof AuthenticatedStudioRouteWithChildren
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -250,6 +385,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedGlossaireRoute: AuthenticatedGlossaireRoute,
   AuthenticatedMesFichesRoute: AuthenticatedMesFichesRoute,
   AuthenticatedOutilsRoute: AuthenticatedOutilsRouteWithChildren,
+  AuthenticatedStudioRoute: AuthenticatedStudioRouteWithChildren,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -259,6 +395,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  ApiStudioVisuelRoute: ApiStudioVisuelRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
