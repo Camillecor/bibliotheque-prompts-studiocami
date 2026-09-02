@@ -80,7 +80,7 @@ type Brouillon = {
 const BROUILLON_VIDE: Brouillon = {
   titre: "",
   texte: "",
-  reseau: "linkedin",
+  reseau: "instagram",
   statut: "brouillon",
   tags: [],
   datePlanifiee: "",
