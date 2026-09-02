@@ -2,13 +2,14 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import type { MarioResult, PromptRow } from "@/lib/mario";
 import type { SuggestionIdee } from "@/lib/mario.server";
+import { COMPTE_ID } from "@/lib/compte";
+import { erreurBase } from "@/lib/erreurs";
 
 // TEMPORAIRE : connexion désactivée pour les tests (demande du 2026-08-03).
 // Toutes les fonctions ci-dessous utilisent supabaseAdmin (service role, contourne le RLS)
 // avec cet utilisateur fictif au lieu de l'utilisateur authentifié réel.
 // À l'issue des tests : réintroduire `.middleware([requireSupabaseAuth])` et
-// remplacer TEST_USER_ID par context.userId partout ci-dessous.
-const TEST_USER_ID = "00000000-0000-0000-0000-000000000001";
+// remplacer COMPTE_ID par context.userId partout ci-dessous.
 
 // 5 Mo max en binaire ≈ 6,99M caractères en base64 — plafond large pour laisser
 // passer une vraie image de 5 Mo tout en bloquant les payloads absurdes en amont.
@@ -94,11 +95,11 @@ export const savePrompt = createServerFn({ method: "POST" })
     const { date_ajout, ...rest } = data;
     const { data: row, error } = await supabaseAdmin
       .from("prompts")
-      .insert({ ...rest, user_id: TEST_USER_ID, ...(date_ajout ? { date_ajout } : {}) })
+      .insert({ ...rest, user_id: COMPTE_ID, ...(date_ajout ? { date_ajout } : {}) })
       .select("id")
       .single();
 
-    if (error) throw new Error(error.message);
+    if (error) throw erreurBase("mario", error);
     return { id: row.id as string };
   });
 
@@ -110,10 +111,10 @@ export const listPrompts = createServerFn({ method: "GET" }).handler(
       .select(
         "id, titre, metier, type_prompt, mots_cles, complexite, prompt, note, etapes_lancement, alerte_pii, favori, date_ajout",
       )
-      .eq("user_id", TEST_USER_ID)
+      .eq("user_id", COMPTE_ID)
       .order("date_ajout", { ascending: false });
 
-    if (error) throw new Error(error.message);
+    if (error) throw erreurBase("mario", error);
     return (data ?? []) as unknown as PromptRow[];
   },
 );
@@ -126,8 +127,8 @@ export const deletePrompt = createServerFn({ method: "POST" })
       .from("prompts")
       .delete()
       .eq("id", data.id)
-      .eq("user_id", TEST_USER_ID);
-    if (error) throw new Error(error.message);
+      .eq("user_id", COMPTE_ID);
+    if (error) throw erreurBase("mario", error);
     return { ok: true };
   });
 
@@ -141,7 +142,7 @@ export const toggleFavori = createServerFn({ method: "POST" })
       .from("prompts")
       .update({ favori: data.favori })
       .eq("id", data.id)
-      .eq("user_id", TEST_USER_ID);
-    if (error) throw new Error(error.message);
+      .eq("user_id", COMPTE_ID);
+    if (error) throw erreurBase("mario", error);
     return { ok: true };
   });

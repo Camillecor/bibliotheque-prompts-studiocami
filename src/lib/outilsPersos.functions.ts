@@ -1,10 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { COMPTE_ID } from "@/lib/compte";
+import { erreurBase } from "@/lib/erreurs";
 
 // Outils ajoutés manuellement par l'utilisatrice depuis l'onglet Outils.
-// Même schéma d'auth temporaire que mario.functions.ts (TEST_USER_ID) — à
+// Même schéma d'auth temporaire que mario.functions.ts (COMPTE_ID) — à
 // remplacer par context.userId quand l'authentification sera réactivée.
-const TEST_USER_ID = "00000000-0000-0000-0000-000000000001";
 
 export type OutilPersoRow = {
   id: string;
@@ -30,11 +31,11 @@ export const saveOutilPerso = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: row, error } = await supabaseAdmin
       .from("outils_persos")
-      .insert({ ...data, user_id: TEST_USER_ID })
+      .insert({ ...data, user_id: COMPTE_ID })
       .select("id, nom, slug, definition, prix, categorie, created_at")
       .single();
 
-    if (error) throw new Error(error.message);
+    if (error) throw erreurBase("outils", error);
     return row as OutilPersoRow;
   });
 
@@ -44,10 +45,10 @@ export const listOutilsPersos = createServerFn({ method: "GET" }).handler(
     const { data, error } = await supabaseAdmin
       .from("outils_persos")
       .select("id, nom, slug, definition, prix, categorie, created_at")
-      .eq("user_id", TEST_USER_ID)
+      .eq("user_id", COMPTE_ID)
       .order("created_at", { ascending: false });
 
-    if (error) throw new Error(error.message);
+    if (error) throw erreurBase("outils", error);
     return (data ?? []) as OutilPersoRow[];
   },
 );
@@ -60,7 +61,7 @@ export const deleteOutilPerso = createServerFn({ method: "POST" })
       .from("outils_persos")
       .delete()
       .eq("id", data.id)
-      .eq("user_id", TEST_USER_ID);
-    if (error) throw new Error(error.message);
+      .eq("user_id", COMPTE_ID);
+    if (error) throw erreurBase("outils", error);
     return { ok: true };
   });

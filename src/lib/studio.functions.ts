@@ -8,12 +8,13 @@ import {
   type StatsStudio,
   RESEAUX,
 } from "@/lib/studio";
+import { COMPTE_ID } from "@/lib/compte";
+import { erreurBase } from "@/lib/erreurs";
 
 // Même schéma d'auth temporaire que mario.functions.ts / fiches.functions.ts :
 // la connexion est désactivée pour les tests, toutes les fonctions utilisent
 // cet utilisateur fictif via supabaseAdmin. À remplacer par context.userId
 // quand l'authentification sera réactivée.
-const TEST_USER_ID = "00000000-0000-0000-0000-000000000001";
 
 const COLONNES_CONTENU =
   "id, titre, texte, reseau, statut, tags, date_planifiee, date_publication, prompt_id, created_at, updated_at";
@@ -66,15 +67,15 @@ export const saveContenu = createServerFn({ method: "POST" })
         .from("contenus")
         .update(champs)
         .eq("id", contenuId)
-        .eq("user_id", TEST_USER_ID);
-      if (error) throw new Error(error.message);
+        .eq("user_id", COMPTE_ID);
+      if (error) throw erreurBase("studio", error);
     } else {
       const { data: row, error } = await supabaseAdmin
         .from("contenus")
-        .insert({ ...champs, user_id: TEST_USER_ID })
+        .insert({ ...champs, user_id: COMPTE_ID })
         .select("id")
         .single();
-      if (error) throw new Error(error.message);
+      if (error) throw erreurBase("studio", error);
       contenuId = row.id as string;
     }
 
@@ -82,18 +83,18 @@ export const saveContenu = createServerFn({ method: "POST" })
       .from("contenu_medias")
       .delete()
       .eq("contenu_id", contenuId)
-      .eq("user_id", TEST_USER_ID);
+      .eq("user_id", COMPTE_ID);
 
     if (media_ids.length > 0) {
       const { error } = await supabaseAdmin.from("contenu_medias").insert(
         media_ids.map((mediaId, index) => ({
-          user_id: TEST_USER_ID,
+          user_id: COMPTE_ID,
           contenu_id: contenuId as string,
           media_id: mediaId,
           ordre: index,
         })),
       );
-      if (error) throw new Error(error.message);
+      if (error) throw erreurBase("studio", error);
     }
 
     return { id: contenuId as string };
@@ -106,22 +107,22 @@ export const listContenus = createServerFn({ method: "GET" }).handler(
     const { data: contenus, error } = await supabaseAdmin
       .from("contenus")
       .select(COLONNES_CONTENU)
-      .eq("user_id", TEST_USER_ID)
+      .eq("user_id", COMPTE_ID)
       .order("created_at", { ascending: false })
       .limit(500);
-    if (error) throw new Error(error.message);
+    if (error) throw erreurBase("studio", error);
 
     const { data: liaisons, error: erreurLiaisons } = await supabaseAdmin
       .from("contenu_medias")
       .select("contenu_id, media_id, ordre")
-      .eq("user_id", TEST_USER_ID);
-    if (erreurLiaisons) throw new Error(erreurLiaisons.message);
+      .eq("user_id", COMPTE_ID);
+    if (erreurLiaisons) throw erreurBase("studio", erreurLiaisons);
 
     const { data: medias, error: erreurMedias } = await supabaseAdmin
       .from("medias")
       .select(COLONNES_MEDIA)
-      .eq("user_id", TEST_USER_ID);
-    if (erreurMedias) throw new Error(erreurMedias.message);
+      .eq("user_id", COMPTE_ID);
+    if (erreurMedias) throw erreurBase("studio", erreurMedias);
 
     const signes = await signerMedias(supabaseAdmin, (medias ?? []) as unknown as MediaBrut[]);
     const parId = new Map(signes.map((m) => [m.id, m]));
@@ -150,8 +151,8 @@ export const deleteContenu = createServerFn({ method: "POST" })
       .from("contenus")
       .delete()
       .eq("id", data.id)
-      .eq("user_id", TEST_USER_ID);
-    if (error) throw new Error(error.message);
+      .eq("user_id", COMPTE_ID);
+    if (error) throw erreurBase("studio", error);
     return { ok: true };
   });
 
@@ -171,9 +172,9 @@ export const planifierContenu = createServerFn({ method: "POST" })
         statut: data.date_planifiee ? "planifie" : "brouillon",
       })
       .eq("id", data.id)
-      .eq("user_id", TEST_USER_ID)
+      .eq("user_id", COMPTE_ID)
       .neq("statut", "publie");
-    if (error) throw new Error(error.message);
+    if (error) throw erreurBase("studio", error);
     return { ok: true };
   });
 
@@ -193,8 +194,8 @@ export const changerStatutContenu = createServerFn({ method: "POST" })
         date_publication: data.statut === "publie" ? new Date().toISOString() : null,
       })
       .eq("id", data.id)
-      .eq("user_id", TEST_USER_ID);
-    if (error) throw new Error(error.message);
+      .eq("user_id", COMPTE_ID);
+    if (error) throw erreurBase("studio", error);
     return { ok: true };
   });
 
@@ -229,7 +230,7 @@ export const uploadMedia = createServerFn({ method: "POST" })
 
     const extension =
       data.mediaType === "image/png" ? "png" : data.mediaType === "image/webp" ? "webp" : "jpg";
-    const chemin = `${TEST_USER_ID}/${crypto.randomUUID()}.${extension}`;
+    const chemin = `${COMPTE_ID}/${crypto.randomUUID()}.${extension}`;
 
     const { error: erreurUpload } = await supabaseAdmin.storage
       .from("medias")
@@ -237,12 +238,12 @@ export const uploadMedia = createServerFn({ method: "POST" })
         contentType: data.mediaType,
         upsert: false,
       });
-    if (erreurUpload) throw new Error(erreurUpload.message);
+    if (erreurUpload) throw erreurBase("studio", erreurUpload);
 
     const { data: row, error } = await supabaseAdmin
       .from("medias")
       .insert({
-        user_id: TEST_USER_ID,
+        user_id: COMPTE_ID,
         chemin,
         titre: data.titre,
         tags: data.tags,
@@ -253,7 +254,7 @@ export const uploadMedia = createServerFn({ method: "POST" })
       })
       .select(COLONNES_MEDIA)
       .single();
-    if (error) throw new Error(error.message);
+    if (error) throw erreurBase("studio", error);
 
     const [signe] = await signerMedias(supabaseAdmin, [row as unknown as MediaBrut]);
     return signe as MediaRow;
@@ -265,10 +266,10 @@ export const listMedias = createServerFn({ method: "GET" }).handler(
     const { data, error } = await supabaseAdmin
       .from("medias")
       .select(COLONNES_MEDIA)
-      .eq("user_id", TEST_USER_ID)
+      .eq("user_id", COMPTE_ID)
       .order("created_at", { ascending: false })
       .limit(300);
-    if (error) throw new Error(error.message);
+    if (error) throw erreurBase("studio", error);
     return signerMedias(supabaseAdmin, (data ?? []) as unknown as MediaBrut[]);
   },
 );
@@ -287,8 +288,8 @@ export const majMedia = createServerFn({ method: "POST" })
       .from("medias")
       .update({ titre: data.titre, tags: data.tags })
       .eq("id", data.id)
-      .eq("user_id", TEST_USER_ID);
-    if (error) throw new Error(error.message);
+      .eq("user_id", COMPTE_ID);
+    if (error) throw erreurBase("studio", error);
     return { ok: true };
   });
 
@@ -300,7 +301,7 @@ export const deleteMedia = createServerFn({ method: "POST" })
       .from("medias")
       .select("chemin")
       .eq("id", data.id)
-      .eq("user_id", TEST_USER_ID)
+      .eq("user_id", COMPTE_ID)
       .maybeSingle();
 
     if (row?.chemin) {
@@ -311,8 +312,8 @@ export const deleteMedia = createServerFn({ method: "POST" })
       .from("medias")
       .delete()
       .eq("id", data.id)
-      .eq("user_id", TEST_USER_ID);
-    if (error) throw new Error(error.message);
+      .eq("user_id", COMPTE_ID);
+    if (error) throw erreurBase("studio", error);
     return { ok: true };
   });
 
@@ -354,14 +355,14 @@ export const statsStudio = createServerFn({ method: "GET" }).handler(
     const { data: contenus, error } = await supabaseAdmin
       .from("contenus")
       .select("statut, reseau, tags, date_planifiee, date_publication, titre")
-      .eq("user_id", TEST_USER_ID)
+      .eq("user_id", COMPTE_ID)
       .limit(2000);
-    if (error) throw new Error(error.message);
+    if (error) throw erreurBase("studio", error);
 
     const { count: nbMedias } = await supabaseAdmin
       .from("medias")
       .select("id", { count: "exact", head: true })
-      .eq("user_id", TEST_USER_ID);
+      .eq("user_id", COMPTE_ID);
 
     const lignes = (contenus ?? []) as unknown as {
       statut: string;
