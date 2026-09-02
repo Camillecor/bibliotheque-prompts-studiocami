@@ -556,6 +556,14 @@ function StudioContenusPage() {
             ))}
           </div>
 
+          {!reseauConnu(brouillon.reseau) ? (
+            <p className="rounded-2xl border border-[color-mix(in_srgb,var(--coral)_35%,transparent)] bg-[color-mix(in_srgb,var(--coral)_10%,white)] px-3 py-2 text-[11px] font-semibold text-[var(--coral)]">
+              Ce contenu utilise « {reseau.label} », un réseau qui n'est plus proposé. Choisis
+              Instagram, LinkedIn ou Facebook avant d'enregistrer.
+            </p>
+          ) : null}
+
+
           <div>
             <textarea
               value={brouillon.texte}
