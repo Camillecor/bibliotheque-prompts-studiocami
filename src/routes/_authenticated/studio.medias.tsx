@@ -70,7 +70,13 @@ type Retouche = {
   contraste: number;
   saturation: number;
   rotation: number;
+  zoom: number; // 1 = image entière visible dans le cadre
+  decalageX: number; // -1 → 1, position du recadrage
+  decalageY: number;
+  taille: number; // largeur de sortie en pixels
 };
+
+const TAILLES_SORTIE = [640, 1080, 1440, 2048] as const;
 
 function StudioMediasPage() {
   const queryClient = useQueryClient();
@@ -295,38 +301,55 @@ function StudioMediasPage() {
       try {
         const image = await chargerImage(retouche.media.url);
         if (annule) return;
-        const ratio =
-          FORMATS_MEDIA.find((f) => f.value === retouche.format)?.ratio ??
-          image.naturalWidth / image.naturalHeight;
 
-        const pivote = retouche.rotation % 180 !== 0;
+        const pivote = ((retouche.rotation % 360) + 360) % 360 % 180 !== 0;
+        // Dimensions de l'image après rotation.
         const largeurSource = pivote ? image.naturalHeight : image.naturalWidth;
         const hauteurSource = pivote ? image.naturalWidth : image.naturalHeight;
 
-        // Recadrage centré au format demandé.
-        let largeurCrop = largeurSource;
-        let hauteurCrop = largeurSource / ratio;
-        if (hauteurCrop > hauteurSource) {
-          hauteurCrop = hauteurSource;
-          largeurCrop = hauteurSource * ratio;
-        }
+        const ratio =
+          FORMATS_MEDIA.find((f) => f.value === retouche.format)?.ratio ??
+          largeurSource / hauteurSource;
 
-        canvas.width = Math.round(largeurCrop);
-        canvas.height = Math.round(hauteurCrop);
+        // Taille de sortie demandée, bornée à un rendu raisonnable.
+        const largeurSortie = Math.max(64, Math.round(retouche.taille));
+        const hauteurSortie = Math.max(64, Math.round(largeurSortie / ratio));
+
+        canvas.width = largeurSortie;
+        canvas.height = hauteurSortie;
         const ctx = canvas.getContext("2d");
         if (!ctx) return;
+
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.imageSmoothingQuality = "high";
         ctx.filter = `brightness(${retouche.luminosite}%) contrast(${retouche.contraste}%) saturate(${retouche.saturation}%)`;
+
+        // Échelle « cover » : l'image remplit toujours le cadre, puis zoom manuel.
+        const echelle =
+          Math.max(largeurSortie / largeurSource, hauteurSortie / hauteurSource) * retouche.zoom;
+        const largeurRendue = largeurSource * echelle;
+        const hauteurRendue = hauteurSource * echelle;
+
+        // Marge de déplacement possible (recadrage).
+        const margeX = Math.max(0, (largeurRendue - largeurSortie) / 2);
+        const margeY = Math.max(0, (hauteurRendue - hauteurSortie) / 2);
+        const centreX = largeurSortie / 2 + retouche.decalageX * margeX;
+        const centreY = hauteurSortie / 2 + retouche.decalageY * margeY;
+
         ctx.save();
-        ctx.translate(canvas.width / 2, canvas.height / 2);
+        ctx.translate(centreX, centreY);
         ctx.rotate((retouche.rotation * Math.PI) / 180);
         ctx.drawImage(
           image,
-          -image.naturalWidth / 2,
-          -image.naturalHeight / 2,
-          image.naturalWidth,
-          image.naturalHeight,
+          (-image.naturalWidth * echelle) / 2,
+          (-image.naturalHeight * echelle) / 2,
+          image.naturalWidth * echelle,
+          image.naturalHeight * echelle,
         );
         ctx.restore();
+        ctx.filter = "none";
+
       } catch (error) {
         toast.error((error as Error).message);
       }
@@ -360,7 +383,7 @@ function StudioMediasPage() {
   };
 
   const panneau = (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 p-5">
       <div>
         <h2 className="font-display text-sm font-bold text-primary">Générer un visuel</h2>
         <p className="mt-1 text-xs text-muted-foreground">
@@ -504,6 +527,10 @@ function StudioMediasPage() {
                             contraste: 100,
                             saturation: 100,
                             rotation: 0,
+                            zoom: 1,
+                            decalageX: 0,
+                            decalageY: 0,
+                            taille: 1080,
                           })
                         }
                         className="cami-icon-btn"
@@ -543,10 +570,18 @@ function StudioMediasPage() {
               </button>
             </div>
 
-            <canvas
-              ref={canvasRef}
-              className="mt-4 max-h-[45dvh] w-full rounded-2xl border border-border object-contain"
-            />
+            <div className="mt-4 flex max-h-[45dvh] items-center justify-center rounded-2xl border border-border bg-muted p-3">
+              <canvas
+                ref={canvasRef}
+                className="max-h-[41dvh] max-w-full rounded-xl"
+                style={{ width: "auto", height: "auto" }}
+              />
+            </div>
+            <p className="mt-2 text-center text-[11px] text-muted-foreground">
+              Sortie : {canvasRef.current?.width ?? retouche.taille} ×{" "}
+              {canvasRef.current?.height ?? "—"} px
+            </p>
+
 
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               <label className="flex flex-col gap-1 text-xs font-semibold text-primary">
@@ -584,6 +619,74 @@ function StudioMediasPage() {
                   ))}
                 </select>
               </label>
+
+              <label className="flex flex-col gap-1 text-xs font-semibold text-primary">
+                Taille de sortie
+                <select
+                  value={retouche.taille}
+                  onChange={(event) =>
+                    setRetouche((etat) =>
+                      etat ? { ...etat, taille: Number(event.target.value) } : etat,
+                    )
+                  }
+                  className="min-h-11 rounded-2xl border border-border bg-muted px-3 text-sm outline-none focus:border-[var(--info)]"
+                >
+                  {TAILLES_SORTIE.map((taille) => (
+                    <option key={taille} value={taille}>
+                      {taille} px de large
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label className="flex flex-col gap-1 text-xs font-semibold text-primary">
+                Zoom — {Math.round(retouche.zoom * 100)}%
+                <input
+                  type="range"
+                  min={100}
+                  max={300}
+                  value={Math.round(retouche.zoom * 100)}
+                  onChange={(event) =>
+                    setRetouche((etat) =>
+                      etat ? { ...etat, zoom: Number(event.target.value) / 100 } : etat,
+                    )
+                  }
+                  className="accent-[var(--coral)]"
+                />
+              </label>
+
+              <label className="flex flex-col gap-1 text-xs font-semibold text-primary">
+                Cadrage horizontal
+                <input
+                  type="range"
+                  min={-100}
+                  max={100}
+                  value={Math.round(retouche.decalageX * 100)}
+                  onChange={(event) =>
+                    setRetouche((etat) =>
+                      etat ? { ...etat, decalageX: Number(event.target.value) / 100 } : etat,
+                    )
+                  }
+                  className="accent-[var(--info)]"
+                />
+              </label>
+
+              <label className="flex flex-col gap-1 text-xs font-semibold text-primary">
+                Cadrage vertical
+                <input
+                  type="range"
+                  min={-100}
+                  max={100}
+                  value={Math.round(retouche.decalageY * 100)}
+                  onChange={(event) =>
+                    setRetouche((etat) =>
+                      etat ? { ...etat, decalageY: Number(event.target.value) / 100 } : etat,
+                    )
+                  }
+                  className="accent-[var(--info)]"
+                />
+              </label>
+
 
               {(
                 [

@@ -9,6 +9,7 @@ import { StudioTabs } from "@/components/StudioTabs";
 import {
   cleJour,
   formatDateHeure,
+  RESEAUX,
   reseauInfo,
   statutLabel,
   type ContenuRow,
@@ -111,7 +112,7 @@ function StudioCalendrierPage() {
   };
 
   const panneau = (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-3 p-5">
       <h2 className="font-display text-sm font-bold text-primary">À planifier</h2>
       {aPlanifier.length === 0 ? (
         <p className="text-xs text-muted-foreground">
@@ -185,6 +186,21 @@ function StudioCalendrierPage() {
             </div>
           </div>
           <StudioTabs />
+          <div className="flex flex-wrap items-center gap-2">
+            {RESEAUX.map((reseau) => (
+              <span
+                key={reseau.value}
+                className="inline-flex items-center gap-1.5 rounded-full border-l-[3px] px-2.5 py-1 text-[11px] font-semibold"
+                style={{
+                  backgroundColor: `color-mix(in srgb, ${reseau.couleur} 14%, white)`,
+                  borderColor: reseau.couleur,
+                  color: reseau.couleur,
+                }}
+              >
+                {reseau.label}
+              </span>
+            ))}
+          </div>
         </header>
 
         {isLoading ? (
@@ -234,6 +250,12 @@ function StudioCalendrierPage() {
                     <div className="mt-1.5 flex flex-col gap-1.5">
                       {items.map((contenu) => {
                         const info = reseauInfo(contenu.reseau);
+                        const heure = contenu.date_planifiee
+                          ? new Date(contenu.date_planifiee).toLocaleTimeString("fr-FR", {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })
+                          : "";
                         return (
                           <button
                             key={contenu.id}
@@ -242,20 +264,26 @@ function StudioCalendrierPage() {
                             onDragStart={() => setGlisse(contenu.id)}
                             onDragEnd={() => setGlisse(null)}
                             onClick={() => setApercu(contenu)}
-                            className="w-full cursor-pointer rounded-lg px-2 py-1.5 text-left text-[10px] font-semibold leading-tight text-white transition hover:opacity-90"
-                            style={{ backgroundColor: info.couleur }}
+                            className="w-full cursor-pointer rounded-lg border-l-[3px] px-2 py-1.5 text-left text-[10px] font-semibold leading-tight transition hover:brightness-95"
+                            style={{
+                              backgroundColor: `color-mix(in srgb, ${info.couleur} 14%, white)`,
+                              borderColor: info.couleur,
+                              color: info.couleur,
+                            }}
                             title={`${contenu.titre} — ${formatDateHeure(contenu.date_planifiee ?? "")}`}
                           >
-                            <span className="line-clamp-2 block">
-                              {contenu.titre || "Sans titre"}
+                            <span className="flex items-center gap-1 text-[10px] font-bold">
+                              {heure}
+                              {contenu.statut === "publie" ? <span>✓</span> : null}
                             </span>
-                            <span className="mt-0.5 block text-[9px] opacity-80">
-                              {contenu.statut === "publie" ? "✓ publié" : "Voir l'aperçu"}
+                            <span className="mt-0.5 line-clamp-2 block text-[10px] font-semibold text-primary">
+                              {contenu.titre || "Sans titre"}
                             </span>
                           </button>
                         );
                       })}
                     </div>
+
                   </div>
                 );
               })}

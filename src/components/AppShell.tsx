@@ -235,7 +235,7 @@ export function AppShell({ children, panel }: { children: ReactNode; panel?: Rea
                   <span>Options</span>
                 </button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[88vw] max-w-sm overflow-y-auto p-0">
+              <SheetContent side="right" className="w-[92vw] max-w-md overflow-y-auto p-0">
                 <SheetHeader className="border-b border-border px-4 py-3 text-left">
                   <SheetTitle className="text-base">Options</SheetTitle>
                 </SheetHeader>
@@ -252,7 +252,7 @@ export function AppShell({ children, panel }: { children: ReactNode; panel?: Rea
 
       {/* Panneau contextuel (desktop) */}
       {panel ? (
-        <aside className="z-10 hidden w-72 shrink-0 overflow-y-auto border-l border-border bg-card lg:block">
+        <aside className="z-10 hidden w-[22rem] shrink-0 overflow-y-auto border-l border-border bg-card lg:block xl:w-[26rem]">
           {panel}
         </aside>
       ) : null}
