@@ -92,14 +92,13 @@ const SaveInput = z.object({
   note: z.string().max(20_000).default(""),
   etapes_lancement: z.array(z.string().max(2000)).max(20).default([]),
   alerte_pii: z.boolean().default(false),
-
-  idee_source: z.string().default(""),
+  idee_source: z.string().max(8000).default(""),
   date_ajout: z.string().datetime().optional(),
 });
 
-
 export const savePrompt = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => SaveInput.parse(input))
+
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { date_ajout, ...rest } = data;
