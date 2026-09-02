@@ -24,6 +24,7 @@ import { Route as AuthenticatedOutilsSlugRouteImport } from './routes/_authentic
 import { Route as AuthenticatedStudioIndexRouteImport } from './routes/_authenticated/studio.index'
 import { Route as AuthenticatedStudioCalendrierRouteImport } from './routes/_authenticated/studio.calendrier'
 import { Route as AuthenticatedStudioMediasRouteImport } from './routes/_authenticated/studio.medias'
+import { Route as AuthenticatedStudioStatistiquesRouteImport } from './routes/_authenticated/studio.statistiques'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -104,6 +105,12 @@ const AuthenticatedStudioMediasRoute =
     path: '/medias',
     getParentRoute: () => AuthenticatedStudioRoute,
   } as any)
+const AuthenticatedStudioStatistiquesRoute =
+  AuthenticatedStudioStatistiquesRouteImport.update({
+    id: '/statistiques',
+    path: '/statistiques',
+    getParentRoute: () => AuthenticatedStudioRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -118,6 +125,7 @@ export interface FileRoutesByFullPath {
   '/outils/$slug': typeof AuthenticatedOutilsSlugRoute
   '/studio/calendrier': typeof AuthenticatedStudioCalendrierRoute
   '/studio/medias': typeof AuthenticatedStudioMediasRoute
+  '/studio/statistiques': typeof AuthenticatedStudioStatistiquesRoute
   '/outils/': typeof AuthenticatedOutilsIndexRoute
   '/studio/': typeof AuthenticatedStudioIndexRoute
 }
@@ -132,6 +140,7 @@ export interface FileRoutesByTo {
   '/outils/$slug': typeof AuthenticatedOutilsSlugRoute
   '/studio/calendrier': typeof AuthenticatedStudioCalendrierRoute
   '/studio/medias': typeof AuthenticatedStudioMediasRoute
+  '/studio/statistiques': typeof AuthenticatedStudioStatistiquesRoute
   '/outils': typeof AuthenticatedOutilsIndexRoute
   '/studio': typeof AuthenticatedStudioIndexRoute
 }
@@ -150,6 +159,7 @@ export interface FileRoutesById {
   '/_authenticated/outils/$slug': typeof AuthenticatedOutilsSlugRoute
   '/_authenticated/studio/calendrier': typeof AuthenticatedStudioCalendrierRoute
   '/_authenticated/studio/medias': typeof AuthenticatedStudioMediasRoute
+  '/_authenticated/studio/statistiques': typeof AuthenticatedStudioStatistiquesRoute
   '/_authenticated/outils/': typeof AuthenticatedOutilsIndexRoute
   '/_authenticated/studio/': typeof AuthenticatedStudioIndexRoute
 }
@@ -168,6 +178,7 @@ export interface FileRouteTypes {
     | '/outils/$slug'
     | '/studio/calendrier'
     | '/studio/medias'
+    | '/studio/statistiques'
     | '/outils/'
     | '/studio/'
   fileRoutesByTo: FileRoutesByTo
@@ -182,6 +193,7 @@ export interface FileRouteTypes {
     | '/outils/$slug'
     | '/studio/calendrier'
     | '/studio/medias'
+    | '/studio/statistiques'
     | '/outils'
     | '/studio'
   id:
@@ -199,6 +211,7 @@ export interface FileRouteTypes {
     | '/_authenticated/outils/$slug'
     | '/_authenticated/studio/calendrier'
     | '/_authenticated/studio/medias'
+    | '/_authenticated/studio/statistiques'
     | '/_authenticated/outils/'
     | '/_authenticated/studio/'
   fileRoutesById: FileRoutesById
@@ -317,6 +330,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStudioMediasRouteImport
       parentRoute: typeof AuthenticatedStudioRoute
     }
+    '/_authenticated/studio/statistiques': {
+      id: '/_authenticated/studio/statistiques'
+      path: '/statistiques'
+      fullPath: '/studio/statistiques'
+      preLoaderRoute: typeof AuthenticatedStudioStatistiquesRouteImport
+      parentRoute: typeof AuthenticatedStudioRoute
+    }
   }
 }
 
@@ -336,12 +356,14 @@ const AuthenticatedOutilsRouteWithChildren =
 interface AuthenticatedStudioRouteChildren {
   AuthenticatedStudioCalendrierRoute: typeof AuthenticatedStudioCalendrierRoute
   AuthenticatedStudioMediasRoute: typeof AuthenticatedStudioMediasRoute
+  AuthenticatedStudioStatistiquesRoute: typeof AuthenticatedStudioStatistiquesRoute
   AuthenticatedStudioIndexRoute: typeof AuthenticatedStudioIndexRoute
 }
 
 const AuthenticatedStudioRouteChildren: AuthenticatedStudioRouteChildren = {
   AuthenticatedStudioCalendrierRoute: AuthenticatedStudioCalendrierRoute,
   AuthenticatedStudioMediasRoute: AuthenticatedStudioMediasRoute,
+  AuthenticatedStudioStatistiquesRoute: AuthenticatedStudioStatistiquesRoute,
   AuthenticatedStudioIndexRoute: AuthenticatedStudioIndexRoute,
 }
 
