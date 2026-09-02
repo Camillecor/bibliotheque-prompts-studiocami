@@ -18,6 +18,7 @@ import { Route as AuthenticatedGlossaireRouteImport } from './routes/_authentica
 import { Route as AuthenticatedMesFichesRouteImport } from './routes/_authenticated/mes-fiches'
 import { Route as AuthenticatedOutilsRouteImport } from './routes/_authenticated/outils'
 import { Route as AuthenticatedStudioRouteImport } from './routes/_authenticated/studio'
+import { Route as ApiStudioVisuelRouteImport } from './routes/api/studio-visuel'
 import { Route as AuthenticatedOutilsIndexRouteImport } from './routes/_authenticated/outils.index'
 import { Route as AuthenticatedOutilsSlugRouteImport } from './routes/_authenticated/outils.$slug'
 import { Route as AuthenticatedStudioIndexRouteImport } from './routes/_authenticated/studio.index'
@@ -67,6 +68,11 @@ const AuthenticatedStudioRoute = AuthenticatedStudioRouteImport.update({
   path: '/studio',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiStudioVisuelRoute = ApiStudioVisuelRouteImport.update({
+  id: '/api/studio-visuel',
+  path: '/api/studio-visuel',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedOutilsIndexRoute =
   AuthenticatedOutilsIndexRouteImport.update({
     id: '/',
@@ -94,6 +100,7 @@ export interface FileRoutesByFullPath {
   '/mes-fiches': typeof AuthenticatedMesFichesRoute
   '/outils': typeof AuthenticatedOutilsRouteWithChildren
   '/studio': typeof AuthenticatedStudioRouteWithChildren
+  '/api/studio-visuel': typeof ApiStudioVisuelRoute
   '/outils/$slug': typeof AuthenticatedOutilsSlugRoute
   '/outils/': typeof AuthenticatedOutilsIndexRoute
   '/studio/': typeof AuthenticatedStudioIndexRoute
@@ -105,6 +112,7 @@ export interface FileRoutesByTo {
   '/fiches': typeof AuthenticatedFichesRoute
   '/glossaire': typeof AuthenticatedGlossaireRoute
   '/mes-fiches': typeof AuthenticatedMesFichesRoute
+  '/api/studio-visuel': typeof ApiStudioVisuelRoute
   '/outils/$slug': typeof AuthenticatedOutilsSlugRoute
   '/outils': typeof AuthenticatedOutilsIndexRoute
   '/studio': typeof AuthenticatedStudioIndexRoute
@@ -120,6 +128,7 @@ export interface FileRoutesById {
   '/_authenticated/mes-fiches': typeof AuthenticatedMesFichesRoute
   '/_authenticated/outils': typeof AuthenticatedOutilsRouteWithChildren
   '/_authenticated/studio': typeof AuthenticatedStudioRouteWithChildren
+  '/api/studio-visuel': typeof ApiStudioVisuelRoute
   '/_authenticated/outils/$slug': typeof AuthenticatedOutilsSlugRoute
   '/_authenticated/outils/': typeof AuthenticatedOutilsIndexRoute
   '/_authenticated/studio/': typeof AuthenticatedStudioIndexRoute
@@ -135,6 +144,7 @@ export interface FileRouteTypes {
     | '/mes-fiches'
     | '/outils'
     | '/studio'
+    | '/api/studio-visuel'
     | '/outils/$slug'
     | '/outils/'
     | '/studio/'
@@ -146,6 +156,7 @@ export interface FileRouteTypes {
     | '/fiches'
     | '/glossaire'
     | '/mes-fiches'
+    | '/api/studio-visuel'
     | '/outils/$slug'
     | '/outils'
     | '/studio'
@@ -160,6 +171,7 @@ export interface FileRouteTypes {
     | '/_authenticated/mes-fiches'
     | '/_authenticated/outils'
     | '/_authenticated/studio'
+    | '/api/studio-visuel'
     | '/_authenticated/outils/$slug'
     | '/_authenticated/outils/'
     | '/_authenticated/studio/'
@@ -169,6 +181,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ApiStudioVisuelRoute: typeof ApiStudioVisuelRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -235,6 +248,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/studio'
       preLoaderRoute: typeof AuthenticatedStudioRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/api/studio-visuel': {
+      id: '/api/studio-visuel'
+      path: '/api/studio-visuel'
+      fullPath: '/api/studio-visuel'
+      preLoaderRoute: typeof ApiStudioVisuelRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/outils/': {
       id: '/_authenticated/outils/'
@@ -309,6 +329,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  ApiStudioVisuelRoute: ApiStudioVisuelRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
