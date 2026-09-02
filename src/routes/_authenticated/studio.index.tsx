@@ -345,11 +345,11 @@ function StudioContenusPage() {
             <span className="block text-[10px] font-bold uppercase tracking-wide" style={{ color: info.couleur }}>
               {info.label}
             </span>
-            <span className="mt-0.5 block line-clamp-2 text-xs font-semibold text-primary">
+            <span className="mt-0.5 line-clamp-2 text-xs font-semibold text-primary">
               {contenu.titre || "Sans titre"}
             </span>
             {contenu.texte ? (
-              <span className="mt-0.5 block line-clamp-1 text-[11px] text-muted-foreground">
+              <span className="mt-0.5 line-clamp-2 text-[11px] text-muted-foreground">
                 {contenu.texte}
               </span>
             ) : null}
