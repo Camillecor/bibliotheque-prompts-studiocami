@@ -17,6 +17,7 @@ import { Route as AuthenticatedFichesRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedGlossaireRouteImport } from './routes/_authenticated/glossaire'
 import { Route as AuthenticatedMesFichesRouteImport } from './routes/_authenticated/mes-fiches'
 import { Route as AuthenticatedOutilsRouteImport } from './routes/_authenticated/outils'
+import { Route as AuthenticatedStudioRouteImport } from './routes/_authenticated/studio'
 import { Route as AuthenticatedOutilsIndexRouteImport } from './routes/_authenticated/outils.index'
 import { Route as AuthenticatedOutilsSlugRouteImport } from './routes/_authenticated/outils.$slug'
 
@@ -60,6 +61,11 @@ const AuthenticatedOutilsRoute = AuthenticatedOutilsRouteImport.update({
   path: '/outils',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedStudioRoute = AuthenticatedStudioRouteImport.update({
+  id: '/studio',
+  path: '/studio',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedOutilsIndexRoute =
   AuthenticatedOutilsIndexRouteImport.update({
     id: '/',
@@ -80,6 +86,7 @@ export interface FileRoutesByFullPath {
   '/glossaire': typeof AuthenticatedGlossaireRoute
   '/mes-fiches': typeof AuthenticatedMesFichesRoute
   '/outils': typeof AuthenticatedOutilsRouteWithChildren
+  '/studio': typeof AuthenticatedStudioRoute
   '/outils/$slug': typeof AuthenticatedOutilsSlugRoute
   '/outils/': typeof AuthenticatedOutilsIndexRoute
 }
@@ -90,6 +97,7 @@ export interface FileRoutesByTo {
   '/fiches': typeof AuthenticatedFichesRoute
   '/glossaire': typeof AuthenticatedGlossaireRoute
   '/mes-fiches': typeof AuthenticatedMesFichesRoute
+  '/studio': typeof AuthenticatedStudioRoute
   '/outils/$slug': typeof AuthenticatedOutilsSlugRoute
   '/outils': typeof AuthenticatedOutilsIndexRoute
 }
@@ -103,6 +111,7 @@ export interface FileRoutesById {
   '/_authenticated/glossaire': typeof AuthenticatedGlossaireRoute
   '/_authenticated/mes-fiches': typeof AuthenticatedMesFichesRoute
   '/_authenticated/outils': typeof AuthenticatedOutilsRouteWithChildren
+  '/_authenticated/studio': typeof AuthenticatedStudioRoute
   '/_authenticated/outils/$slug': typeof AuthenticatedOutilsSlugRoute
   '/_authenticated/outils/': typeof AuthenticatedOutilsIndexRoute
 }
@@ -116,6 +125,7 @@ export interface FileRouteTypes {
     | '/glossaire'
     | '/mes-fiches'
     | '/outils'
+    | '/studio'
     | '/outils/$slug'
     | '/outils/'
   fileRoutesByTo: FileRoutesByTo
@@ -126,6 +136,7 @@ export interface FileRouteTypes {
     | '/fiches'
     | '/glossaire'
     | '/mes-fiches'
+    | '/studio'
     | '/outils/$slug'
     | '/outils'
   id:
@@ -138,6 +149,7 @@ export interface FileRouteTypes {
     | '/_authenticated/glossaire'
     | '/_authenticated/mes-fiches'
     | '/_authenticated/outils'
+    | '/_authenticated/studio'
     | '/_authenticated/outils/$slug'
     | '/_authenticated/outils/'
   fileRoutesById: FileRoutesById
@@ -206,6 +218,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOutilsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/studio': {
+      id: '/_authenticated/studio'
+      path: '/studio'
+      fullPath: '/studio'
+      preLoaderRoute: typeof AuthenticatedStudioRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/outils/': {
       id: '/_authenticated/outils/'
       path: '/'
@@ -242,6 +261,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedGlossaireRoute: typeof AuthenticatedGlossaireRoute
   AuthenticatedMesFichesRoute: typeof AuthenticatedMesFichesRoute
   AuthenticatedOutilsRoute: typeof AuthenticatedOutilsRouteWithChildren
+  AuthenticatedStudioRoute: typeof AuthenticatedStudioRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -250,6 +270,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedGlossaireRoute: AuthenticatedGlossaireRoute,
   AuthenticatedMesFichesRoute: AuthenticatedMesFichesRoute,
   AuthenticatedOutilsRoute: AuthenticatedOutilsRouteWithChildren,
+  AuthenticatedStudioRoute: AuthenticatedStudioRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
