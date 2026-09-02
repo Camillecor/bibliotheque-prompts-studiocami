@@ -22,6 +22,7 @@ import { Route as ApiStudioVisuelRouteImport } from './routes/api/studio-visuel'
 import { Route as AuthenticatedOutilsIndexRouteImport } from './routes/_authenticated/outils.index'
 import { Route as AuthenticatedOutilsSlugRouteImport } from './routes/_authenticated/outils.$slug'
 import { Route as AuthenticatedStudioIndexRouteImport } from './routes/_authenticated/studio.index'
+import { Route as AuthenticatedStudioMediasRouteImport } from './routes/_authenticated/studio.medias'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -90,6 +91,12 @@ const AuthenticatedStudioIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedStudioRoute,
   } as any)
+const AuthenticatedStudioMediasRoute =
+  AuthenticatedStudioMediasRouteImport.update({
+    id: '/medias',
+    path: '/medias',
+    getParentRoute: () => AuthenticatedStudioRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -102,6 +109,7 @@ export interface FileRoutesByFullPath {
   '/studio': typeof AuthenticatedStudioRouteWithChildren
   '/api/studio-visuel': typeof ApiStudioVisuelRoute
   '/outils/$slug': typeof AuthenticatedOutilsSlugRoute
+  '/studio/medias': typeof AuthenticatedStudioMediasRoute
   '/outils/': typeof AuthenticatedOutilsIndexRoute
   '/studio/': typeof AuthenticatedStudioIndexRoute
 }
@@ -114,6 +122,7 @@ export interface FileRoutesByTo {
   '/mes-fiches': typeof AuthenticatedMesFichesRoute
   '/api/studio-visuel': typeof ApiStudioVisuelRoute
   '/outils/$slug': typeof AuthenticatedOutilsSlugRoute
+  '/studio/medias': typeof AuthenticatedStudioMediasRoute
   '/outils': typeof AuthenticatedOutilsIndexRoute
   '/studio': typeof AuthenticatedStudioIndexRoute
 }
@@ -130,6 +139,7 @@ export interface FileRoutesById {
   '/_authenticated/studio': typeof AuthenticatedStudioRouteWithChildren
   '/api/studio-visuel': typeof ApiStudioVisuelRoute
   '/_authenticated/outils/$slug': typeof AuthenticatedOutilsSlugRoute
+  '/_authenticated/studio/medias': typeof AuthenticatedStudioMediasRoute
   '/_authenticated/outils/': typeof AuthenticatedOutilsIndexRoute
   '/_authenticated/studio/': typeof AuthenticatedStudioIndexRoute
 }
@@ -146,6 +156,7 @@ export interface FileRouteTypes {
     | '/studio'
     | '/api/studio-visuel'
     | '/outils/$slug'
+    | '/studio/medias'
     | '/outils/'
     | '/studio/'
   fileRoutesByTo: FileRoutesByTo
@@ -158,6 +169,7 @@ export interface FileRouteTypes {
     | '/mes-fiches'
     | '/api/studio-visuel'
     | '/outils/$slug'
+    | '/studio/medias'
     | '/outils'
     | '/studio'
   id:
@@ -173,6 +185,7 @@ export interface FileRouteTypes {
     | '/_authenticated/studio'
     | '/api/studio-visuel'
     | '/_authenticated/outils/$slug'
+    | '/_authenticated/studio/medias'
     | '/_authenticated/outils/'
     | '/_authenticated/studio/'
   fileRoutesById: FileRoutesById
@@ -277,6 +290,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStudioIndexRouteImport
       parentRoute: typeof AuthenticatedStudioRoute
     }
+    '/_authenticated/studio/medias': {
+      id: '/_authenticated/studio/medias'
+      path: '/medias'
+      fullPath: '/studio/medias'
+      preLoaderRoute: typeof AuthenticatedStudioMediasRouteImport
+      parentRoute: typeof AuthenticatedStudioRoute
+    }
   }
 }
 
@@ -294,10 +314,12 @@ const AuthenticatedOutilsRouteWithChildren =
   AuthenticatedOutilsRoute._addFileChildren(AuthenticatedOutilsRouteChildren)
 
 interface AuthenticatedStudioRouteChildren {
+  AuthenticatedStudioMediasRoute: typeof AuthenticatedStudioMediasRoute
   AuthenticatedStudioIndexRoute: typeof AuthenticatedStudioIndexRoute
 }
 
 const AuthenticatedStudioRouteChildren: AuthenticatedStudioRouteChildren = {
+  AuthenticatedStudioMediasRoute: AuthenticatedStudioMediasRoute,
   AuthenticatedStudioIndexRoute: AuthenticatedStudioIndexRoute,
 }
 

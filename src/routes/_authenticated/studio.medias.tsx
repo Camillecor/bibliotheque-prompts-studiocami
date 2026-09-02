@@ -108,8 +108,19 @@ function StudioMediasPage() {
     );
   }, [medias, recherche]);
 
+  type EntreeMedia = {
+    mediaType: "image/png" | "image/jpeg" | "image/webp";
+    base64: string;
+    titre: string;
+    tags: string[];
+    largeur: number;
+    hauteur: number;
+    origine: "upload" | "retouche" | "ia";
+    media_parent_id: string | null;
+  };
+
   const mutationUpload = useMutation({
-    mutationFn: async (input: Parameters<typeof envoyer>[0]["data"]) => envoyer({ data: input }),
+    mutationFn: async (input: EntreeMedia) => envoyer({ data: input }),
     onSuccess: () => {
       invalider();
       toast.success("Média ajouté");
