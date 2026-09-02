@@ -45,7 +45,7 @@ const ContenuInput = z.object({
   id: z.string().uuid().optional(),
   titre: z.string().trim().max(160).default(""),
   texte: z.string().max(20_000).default(""),
-  reseau: z.enum(RESEAU_VALUES).default("linkedin"),
+  reseau: z.enum(RESEAU_VALUES).default("instagram"),
   statut: z.enum(STATUT_VALUES).default("brouillon"),
   tags: z.array(z.string().trim().max(40)).max(8).default([]),
   date_planifiee: z.string().datetime().nullable().default(null),
@@ -320,7 +320,7 @@ export const deleteMedia = createServerFn({ method: "POST" })
 
 const RedactionInput = z.object({
   idee: z.string().trim().min(5, "Décris ton idée en quelques mots de plus.").max(4000),
-  reseau: z.enum(RESEAU_VALUES).default("linkedin"),
+  reseau: z.enum(RESEAU_VALUES).default("instagram"),
   ton: z.string().trim().max(40).default(""),
   consignes: z.string().trim().max(2000).default(""),
 });
@@ -334,7 +334,7 @@ export const redigerContenu = createServerFn({ method: "POST" })
 
 const VarianteInput = z.object({
   texte: z.string().trim().min(10).max(20_000),
-  reseau: z.enum(RESEAU_VALUES).default("linkedin"),
+  reseau: z.enum(RESEAU_VALUES).default("instagram"),
   variante: z.enum(["raccourcir", "percutant", "storytelling"]),
 });
 
