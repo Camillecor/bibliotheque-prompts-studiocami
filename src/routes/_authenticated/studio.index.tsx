@@ -3,15 +3,20 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+  CalendarClock,
   CheckCircle2,
+  Copy,
   ImagePlus,
   Loader2,
+  Pencil,
   Plus,
+  Search,
   Sparkles,
   Trash2,
   Wand2,
   X,
 } from "lucide-react";
+
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { StudioTabs } from "@/components/StudioTabs";
@@ -22,7 +27,9 @@ import {
   TONS_POST,
   VARIANTES,
   formatDateHeure,
+  reseauConnu,
   reseauInfo,
+
   statutLabel,
   type ContenuRow,
   type ReseauValue,
@@ -75,7 +82,7 @@ type Brouillon = {
 const BROUILLON_VIDE: Brouillon = {
   titre: "",
   texte: "",
-  reseau: "linkedin",
+  reseau: "instagram",
   statut: "brouillon",
   tags: [],
   datePlanifiee: "",
@@ -102,6 +109,9 @@ function StudioContenusPage() {
   const [ton, setTon] = useState<string>("professionnel");
   const [nouveauTag, setNouveauTag] = useState("");
   const [selecteurMedias, setSelecteurMedias] = useState(false);
+  const [recherche, setRecherche] = useState("");
+  const [filtreStatut, setFiltreStatut] = useState<string>("tous");
+
 
   const fetchContenus = useServerFn(listContenus);
   const fetchMedias = useServerFn(listMedias);
@@ -169,6 +179,28 @@ function StudioContenusPage() {
     },
     onError: (error: Error) => toast.error(error.message),
   });
+  const mutationDupliquer = useMutation({
+    mutationFn: async (contenu: ContenuRow) =>
+      enregistrer({
+        data: {
+          titre: `${contenu.titre || "Sans titre"} (copie)`,
+          texte: contenu.texte,
+          reseau: contenu.reseau as ReseauValue,
+          statut: "brouillon" as StatutValue,
+          tags: contenu.tags ?? [],
+          date_planifiee: null,
+          date_publication: null,
+          prompt_id: null,
+          media_ids: contenu.medias.map((m) => m.id),
+        },
+      }),
+    onSuccess: () => {
+      invalider();
+      toast.success("Contenu dupliqué");
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+
 
   const mutationRediger = useMutation({
     mutationFn: async () =>
@@ -237,6 +269,136 @@ function StudioContenusPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contenuDemande, contenus]);
 
+  const contenusFiltres = useMemo(() => {
+    const q = recherche.trim().toLowerCase();
+    return contenus.filter((c) => {
+      if (filtreStatut !== "tous" && c.statut !== filtreStatut) return false;
+      if (!q) return true;
+      return (
+        c.titre.toLowerCase().includes(q) ||
+        c.texte.toLowerCase().includes(q) ||
+        (c.tags ?? []).some((t) => t.toLowerCase().includes(q))
+      );
+    });
+  }, [contenus, recherche, filtreStatut]);
+
+  const compte = (statut: string) => contenus.filter((c) => c.statut === statut).length;
+
+  const groupes = useMemo(
+    () =>
+      STATUTS.map((s) => ({
+        statut: s.value,
+        label: s.label,
+        items: contenusFiltres.filter((c) => c.statut === s.value),
+      })).filter((g) => g.items.length > 0),
+    [contenusFiltres],
+  );
+
+  const FILTRES = [
+    { value: "tous", label: "Tous", total: contenus.length },
+    ...STATUTS.map((s) => ({ value: s.value, label: s.label, total: compte(s.value) })),
+  ];
+
+  const CarteContenu = ({ contenu }: { contenu: ContenuRow }) => {
+    const info = reseauInfo(contenu.reseau);
+    const actif = brouillon.id === contenu.id;
+    const vignette = contenu.medias[0];
+    const tonsStatut: Record<string, string> = {
+      brouillon: "bg-secondary text-muted-foreground",
+      planifie: "bg-[color-mix(in_srgb,var(--info)_18%,white)] text-[var(--info)]",
+      publie: "bg-[color-mix(in_srgb,var(--success)_16%,white)] text-[var(--success)]",
+    };
+    return (
+      <div
+        className={[
+          "group relative overflow-hidden rounded-2xl border bg-card pl-3 transition",
+          actif
+            ? "border-[var(--coral)] bg-[color-mix(in_srgb,var(--coral)_6%,white)]"
+            : "border-border hover:border-[var(--info)]",
+        ].join(" ")}
+      >
+        <span
+          aria-hidden
+          className="absolute inset-y-0 left-0 w-1.5"
+          style={{ backgroundColor: info.couleur }}
+        />
+        <button
+          type="button"
+          onClick={() => chargerContenu(contenu)}
+          className="flex w-full items-start gap-3 p-3 text-left"
+        >
+          {vignette ? (
+            <img
+              src={vignette.url}
+              alt=""
+              className="h-11 w-11 shrink-0 rounded-xl object-cover"
+            />
+          ) : (
+            <span
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-[11px] font-bold text-white"
+              style={{ backgroundColor: info.couleur }}
+            >
+              {info.label.slice(0, 2).toUpperCase()}
+            </span>
+          )}
+          <span className="min-w-0 flex-1">
+            <span className="block text-[10px] font-bold uppercase tracking-wide" style={{ color: info.couleur }}>
+              {info.label}
+            </span>
+            <span className="mt-0.5 line-clamp-2 text-xs font-semibold text-primary">
+              {contenu.titre || "Sans titre"}
+            </span>
+            {contenu.texte ? (
+              <span className="mt-0.5 line-clamp-2 text-[11px] text-muted-foreground">
+                {contenu.texte}
+              </span>
+            ) : null}
+            <span className="mt-2 flex flex-wrap items-center gap-2">
+              <span
+                className={[
+                  "rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide",
+                  tonsStatut[contenu.statut] ?? "bg-secondary text-muted-foreground",
+                ].join(" ")}
+              >
+                {statutLabel(contenu.statut)}
+              </span>
+              {contenu.date_planifiee ? (
+                <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground">
+                  <CalendarClock className="h-3 w-3" />
+                  {formatDateHeure(contenu.date_planifiee)}
+                </span>
+              ) : null}
+            </span>
+          </span>
+        </button>
+        <div className="flex items-center gap-1 border-t border-border/70 px-2 py-1.5 opacity-100 transition lg:opacity-0 lg:group-hover:opacity-100 lg:group-focus-within:opacity-100">
+          <button
+            type="button"
+            onClick={() => chargerContenu(contenu)}
+            className="inline-flex min-h-9 items-center gap-1 rounded-full px-2 text-[11px] font-semibold text-primary transition hover:text-[var(--coral)]"
+          >
+            <Pencil className="h-3.5 w-3.5" /> Modifier
+          </button>
+          <button
+            type="button"
+            onClick={() => mutationDupliquer.mutate(contenu)}
+            className="inline-flex min-h-9 items-center gap-1 rounded-full px-2 text-[11px] font-semibold text-muted-foreground transition hover:text-[var(--info)]"
+          >
+            <Copy className="h-3.5 w-3.5" /> Dupliquer
+          </button>
+          <button
+            type="button"
+            onClick={() => mutationSupprimer.mutate(contenu.id)}
+            className="ml-auto inline-flex min-h-9 items-center gap-1 rounded-full px-2 text-[11px] font-semibold text-muted-foreground transition hover:text-destructive"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+            <span className="sr-only">Supprimer</span>
+          </button>
+        </div>
+      </div>
+    );
+  };
+
   const panneau = (
     <div className="flex h-full flex-col gap-3">
       <div className="flex items-center justify-between">
@@ -246,61 +408,66 @@ function StudioContenusPage() {
         </span>
       </div>
 
+      <div className="relative">
+        <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+        <input
+          value={recherche}
+          onChange={(event) => setRecherche(event.target.value)}
+          placeholder="Rechercher un contenu"
+          className="min-h-10 w-full rounded-full border border-border bg-muted pl-9 pr-3 text-xs text-primary outline-none transition focus:border-[var(--info)] focus:bg-card"
+        />
+      </div>
+
+      <div className="-mx-0.5 flex flex-wrap gap-1.5">
+        {FILTRES.map((filtre) => (
+          <button
+            key={filtre.value}
+            type="button"
+            onClick={() => setFiltreStatut(filtre.value)}
+            className={[
+              "inline-flex min-h-8 items-center gap-1 rounded-full border px-2.5 text-[11px] font-semibold transition",
+              filtreStatut === filtre.value
+                ? "border-transparent bg-primary text-primary-foreground"
+                : "border-border bg-card text-primary hover:border-[var(--coral)] hover:text-[var(--coral)]",
+            ].join(" ")}
+          >
+            {filtre.label}
+            <span className="opacity-70">{filtre.total}</span>
+          </button>
+        ))}
+      </div>
+
       {isLoading ? (
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <Loader2 className="h-4 w-4 animate-spin" /> Chargement…
         </div>
       ) : contenus.length === 0 ? (
-        <p className="text-xs text-muted-foreground">
-          Aucun contenu pour l'instant. Décris une idée et laisse Mario rédiger.
-        </p>
+        <div className="rounded-2xl border border-dashed border-border bg-card p-4 text-center">
+          <img src="/mario-fox-head.png" alt="" className="mx-auto h-12 w-12" />
+          <p className="mt-2 text-xs font-semibold text-primary">Aucun contenu pour l'instant</p>
+          <p className="mt-1 text-[11px] text-muted-foreground">
+            Décris une idée et laisse Mario rédiger ta première publication.
+          </p>
+        </div>
+      ) : groupes.length === 0 ? (
+        <p className="text-xs text-muted-foreground">Aucun contenu ne correspond à ta recherche.</p>
       ) : (
-        <ul className="flex flex-col gap-2 overflow-y-auto pr-1">
-          {contenus.map((contenu) => {
-            const info = reseauInfo(contenu.reseau);
-            return (
-              <li key={contenu.id}>
-                <div
-                  className={[
-                    "group rounded-2xl border p-3 transition",
-                    brouillon.id === contenu.id
-                      ? "border-[var(--coral)] bg-card"
-                      : "border-border bg-card hover:border-[var(--info)]",
-                  ].join(" ")}
-                >
-                  <button
-                    type="button"
-                    onClick={() => chargerContenu(contenu)}
-                    className="w-full text-left"
-                  >
-                    <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wide">
-                      <span style={{ color: info.couleur }}>{info.label}</span>
-                      <span className="text-muted-foreground">· {statutLabel(contenu.statut)}</span>
-                    </div>
-                    <p className="mt-1 line-clamp-2 text-xs font-semibold text-primary">
-                      {contenu.titre || "Sans titre"}
-                    </p>
-                    {contenu.date_planifiee ? (
-                      <p className="mt-1 text-[11px] text-muted-foreground">
-                        {formatDateHeure(contenu.date_planifiee)}
-                      </p>
-                    ) : null}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => mutationSupprimer.mutate(contenu.id)}
-                    className="mt-2 inline-flex items-center gap-1 text-[11px] font-semibold text-muted-foreground transition hover:text-destructive"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" /> Supprimer
-                  </button>
-                </div>
-              </li>
-            );
-          })}
-        </ul>
+        <div className="flex flex-col gap-4 overflow-y-auto pr-1">
+          {groupes.map((groupe) => (
+            <section key={groupe.statut} className="flex flex-col gap-2">
+              <h3 className="text-[10px] font-bold uppercase tracking-[0.12em] text-muted-foreground">
+                {groupe.label} · {groupe.items.length}
+              </h3>
+              {groupe.items.map((contenu) => (
+                <CarteContenu key={contenu.id} contenu={contenu} />
+              ))}
+            </section>
+          ))}
+        </div>
       )}
     </div>
   );
+
 
   return (
     <AppShell panel={panneau}>
@@ -390,6 +557,14 @@ function StudioContenusPage() {
               </button>
             ))}
           </div>
+
+          {!reseauConnu(brouillon.reseau) ? (
+            <p className="rounded-2xl border border-[color-mix(in_srgb,var(--coral)_35%,transparent)] bg-[color-mix(in_srgb,var(--coral)_10%,white)] px-3 py-2 text-[11px] font-semibold text-[var(--coral)]">
+              Ce contenu utilise « {reseau.label} », un réseau qui n'est plus proposé. Choisis
+              Instagram, LinkedIn ou Facebook avant d'enregistrer.
+            </p>
+          ) : null}
+
 
           <div>
             <textarea

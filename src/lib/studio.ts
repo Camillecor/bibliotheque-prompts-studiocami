@@ -2,20 +2,33 @@
 // Ce fichier est importable côté client comme côté serveur : aucune dépendance serveur ici.
 
 export const RESEAUX = [
-  { value: "linkedin", label: "LinkedIn", limite: 3000, couleur: "#0a66c2" },
   { value: "instagram", label: "Instagram", limite: 2200, couleur: "#e1306c" },
+  { value: "linkedin", label: "LinkedIn", limite: 3000, couleur: "#0a66c2" },
   { value: "facebook", label: "Facebook", limite: 5000, couleur: "#1877f2" },
-  { value: "x", label: "X", limite: 280, couleur: "#0f172a" },
-  { value: "newsletter", label: "Newsletter", limite: 12000, couleur: "#ff6b35" },
 ] as const;
 
 export type ReseauValue = (typeof RESEAUX)[number]["value"];
 
 export const RESEAU_VALUES = RESEAUX.map((r) => r.value) as [ReseauValue, ...ReseauValue[]];
 
-export function reseauInfo(value: string) {
-  return RESEAUX.find((r) => r.value === value) ?? RESEAUX[0];
+export type ReseauInfo = { value: string; label: string; limite: number; couleur: string };
+
+// Lecture tolérante : un contenu historique (X, newsletter…) garde son étiquette.
+export function reseauInfo(value: string): ReseauInfo {
+  const trouve = RESEAUX.find((r) => r.value === value);
+  if (trouve) return trouve;
+  return {
+    value,
+    label: value ? value.charAt(0).toUpperCase() + value.slice(1) : "Réseau",
+    limite: 3000,
+    couleur: "#62636f",
+  };
 }
+
+export function reseauConnu(value: string) {
+  return RESEAUX.some((r) => r.value === value);
+}
+
 
 export const STATUTS = [
   { value: "brouillon", label: "Brouillon" },
