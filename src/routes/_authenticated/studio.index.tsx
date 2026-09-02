@@ -27,7 +27,9 @@ import {
   TONS_POST,
   VARIANTES,
   formatDateHeure,
+  reseauConnu,
   reseauInfo,
+
   statutLabel,
   type ContenuRow,
   type ReseauValue,
