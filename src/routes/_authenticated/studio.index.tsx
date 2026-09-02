@@ -225,6 +225,18 @@ function StudioContenusPage() {
     return () => window.removeEventListener("keydown", fermer);
   }, [selecteurMedias]);
 
+  // Ouverture directe d'un contenu depuis le calendrier (/studio?contenu=id)
+  const { contenu: contenuDemande } = Route.useSearch();
+  const navigate = Route.useNavigate();
+  useEffect(() => {
+    if (!contenuDemande) return;
+    const cible = contenus.find((c) => c.id === contenuDemande);
+    if (!cible) return;
+    chargerContenu(cible);
+    void navigate({ search: {}, replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contenuDemande, contenus]);
+
   const panneau = (
     <div className="flex h-full flex-col gap-3">
       <div className="flex items-center justify-between">
