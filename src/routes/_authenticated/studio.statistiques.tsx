@@ -73,7 +73,7 @@ function StudioStatistiquesPage() {
   });
 
   const panneau = (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-3 max-lg:p-4">
       <h2 className="font-display text-sm font-bold text-primary">Prochaine publication</h2>
       {data?.prochaine ? (
         <div className="rounded-2xl border border-border bg-card p-3">

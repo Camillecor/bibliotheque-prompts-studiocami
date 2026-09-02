@@ -400,7 +400,7 @@ function StudioContenusPage() {
   };
 
   const panneau = (
-    <div className="flex h-full flex-col gap-3">
+    <div className="flex h-full flex-col gap-3 max-lg:p-4">
       <div className="flex items-center justify-between">
         <h2 className="font-display text-sm font-bold text-primary">Mes contenus</h2>
         <span className="rounded-full bg-secondary px-2 py-0.5 text-[11px] font-semibold text-primary">
