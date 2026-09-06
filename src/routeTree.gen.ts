@@ -17,6 +17,7 @@ import { Route as AuthenticatedFichesRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedGlossaireRouteImport } from './routes/_authenticated/glossaire'
 import { Route as AuthenticatedMesFichesRouteImport } from './routes/_authenticated/mes-fiches'
 import { Route as AuthenticatedOutilsRouteImport } from './routes/_authenticated/outils'
+import { Route as AuthenticatedProjetsRouteImport } from './routes/_authenticated/projets'
 import { Route as AuthenticatedStudioRouteImport } from './routes/_authenticated/studio'
 import { Route as ApiStudioVisuelRouteImport } from './routes/api/studio-visuel'
 import { Route as AuthenticatedOutilsIndexRouteImport } from './routes/_authenticated/outils.index'
@@ -64,6 +65,11 @@ const AuthenticatedMesFichesRoute = AuthenticatedMesFichesRouteImport.update({
 const AuthenticatedOutilsRoute = AuthenticatedOutilsRouteImport.update({
   id: '/outils',
   path: '/outils',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedProjetsRoute = AuthenticatedProjetsRouteImport.update({
+  id: '/projets',
+  path: '/projets',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedStudioRoute = AuthenticatedStudioRouteImport.update({
@@ -120,6 +126,7 @@ export interface FileRoutesByFullPath {
   '/glossaire': typeof AuthenticatedGlossaireRoute
   '/mes-fiches': typeof AuthenticatedMesFichesRoute
   '/outils': typeof AuthenticatedOutilsRouteWithChildren
+  '/projets': typeof AuthenticatedProjetsRoute
   '/studio': typeof AuthenticatedStudioRouteWithChildren
   '/api/studio-visuel': typeof ApiStudioVisuelRoute
   '/outils/$slug': typeof AuthenticatedOutilsSlugRoute
@@ -136,6 +143,7 @@ export interface FileRoutesByTo {
   '/fiches': typeof AuthenticatedFichesRoute
   '/glossaire': typeof AuthenticatedGlossaireRoute
   '/mes-fiches': typeof AuthenticatedMesFichesRoute
+  '/projets': typeof AuthenticatedProjetsRoute
   '/api/studio-visuel': typeof ApiStudioVisuelRoute
   '/outils/$slug': typeof AuthenticatedOutilsSlugRoute
   '/studio/calendrier': typeof AuthenticatedStudioCalendrierRoute
@@ -154,6 +162,7 @@ export interface FileRoutesById {
   '/_authenticated/glossaire': typeof AuthenticatedGlossaireRoute
   '/_authenticated/mes-fiches': typeof AuthenticatedMesFichesRoute
   '/_authenticated/outils': typeof AuthenticatedOutilsRouteWithChildren
+  '/_authenticated/projets': typeof AuthenticatedProjetsRoute
   '/_authenticated/studio': typeof AuthenticatedStudioRouteWithChildren
   '/api/studio-visuel': typeof ApiStudioVisuelRoute
   '/_authenticated/outils/$slug': typeof AuthenticatedOutilsSlugRoute
@@ -173,6 +182,7 @@ export interface FileRouteTypes {
     | '/glossaire'
     | '/mes-fiches'
     | '/outils'
+    | '/projets'
     | '/studio'
     | '/api/studio-visuel'
     | '/outils/$slug'
@@ -189,6 +199,7 @@ export interface FileRouteTypes {
     | '/fiches'
     | '/glossaire'
     | '/mes-fiches'
+    | '/projets'
     | '/api/studio-visuel'
     | '/outils/$slug'
     | '/studio/calendrier'
@@ -206,6 +217,7 @@ export interface FileRouteTypes {
     | '/_authenticated/glossaire'
     | '/_authenticated/mes-fiches'
     | '/_authenticated/outils'
+    | '/_authenticated/projets'
     | '/_authenticated/studio'
     | '/api/studio-visuel'
     | '/_authenticated/outils/$slug'
@@ -279,6 +291,13 @@ declare module '@tanstack/react-router' {
       path: '/outils'
       fullPath: '/outils'
       preLoaderRoute: typeof AuthenticatedOutilsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/projets': {
+      id: '/_authenticated/projets'
+      path: '/projets'
+      fullPath: '/projets'
+      preLoaderRoute: typeof AuthenticatedProjetsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/studio': {
@@ -376,6 +395,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedGlossaireRoute: typeof AuthenticatedGlossaireRoute
   AuthenticatedMesFichesRoute: typeof AuthenticatedMesFichesRoute
   AuthenticatedOutilsRoute: typeof AuthenticatedOutilsRouteWithChildren
+  AuthenticatedProjetsRoute: typeof AuthenticatedProjetsRoute
   AuthenticatedStudioRoute: typeof AuthenticatedStudioRouteWithChildren
 }
 
@@ -385,6 +405,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedGlossaireRoute: AuthenticatedGlossaireRoute,
   AuthenticatedMesFichesRoute: AuthenticatedMesFichesRoute,
   AuthenticatedOutilsRoute: AuthenticatedOutilsRouteWithChildren,
+  AuthenticatedProjetsRoute: AuthenticatedProjetsRoute,
   AuthenticatedStudioRoute: AuthenticatedStudioRouteWithChildren,
 }
 
