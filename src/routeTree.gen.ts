@@ -17,10 +17,13 @@ import { Route as AuthenticatedFichesRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedGlossaireRouteImport } from './routes/_authenticated/glossaire'
 import { Route as AuthenticatedMesFichesRouteImport } from './routes/_authenticated/mes-fiches'
 import { Route as AuthenticatedOutilsRouteImport } from './routes/_authenticated/outils'
+import { Route as AuthenticatedProjetsRouteImport } from './routes/_authenticated/projets'
 import { Route as AuthenticatedStudioRouteImport } from './routes/_authenticated/studio'
 import { Route as ApiStudioVisuelRouteImport } from './routes/api/studio-visuel'
 import { Route as AuthenticatedOutilsIndexRouteImport } from './routes/_authenticated/outils.index'
 import { Route as AuthenticatedOutilsSlugRouteImport } from './routes/_authenticated/outils.$slug'
+import { Route as AuthenticatedProjetsIndexRouteImport } from './routes/_authenticated/projets.index'
+import { Route as AuthenticatedProjetsTableauRouteImport } from './routes/_authenticated/projets.tableau'
 import { Route as AuthenticatedStudioIndexRouteImport } from './routes/_authenticated/studio.index'
 import { Route as AuthenticatedStudioCalendrierRouteImport } from './routes/_authenticated/studio.calendrier'
 import { Route as AuthenticatedStudioMediasRouteImport } from './routes/_authenticated/studio.medias'
@@ -66,6 +69,11 @@ const AuthenticatedOutilsRoute = AuthenticatedOutilsRouteImport.update({
   path: '/outils',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedProjetsRoute = AuthenticatedProjetsRouteImport.update({
+  id: '/projets',
+  path: '/projets',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedStudioRoute = AuthenticatedStudioRouteImport.update({
   id: '/studio',
   path: '/studio',
@@ -87,6 +95,18 @@ const AuthenticatedOutilsSlugRoute = AuthenticatedOutilsSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => AuthenticatedOutilsRoute,
 } as any)
+const AuthenticatedProjetsIndexRoute =
+  AuthenticatedProjetsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedProjetsRoute,
+  } as any)
+const AuthenticatedProjetsTableauRoute =
+  AuthenticatedProjetsTableauRouteImport.update({
+    id: '/tableau',
+    path: '/tableau',
+    getParentRoute: () => AuthenticatedProjetsRoute,
+  } as any)
 const AuthenticatedStudioIndexRoute =
   AuthenticatedStudioIndexRouteImport.update({
     id: '/',
@@ -120,13 +140,16 @@ export interface FileRoutesByFullPath {
   '/glossaire': typeof AuthenticatedGlossaireRoute
   '/mes-fiches': typeof AuthenticatedMesFichesRoute
   '/outils': typeof AuthenticatedOutilsRouteWithChildren
+  '/projets': typeof AuthenticatedProjetsRouteWithChildren
   '/studio': typeof AuthenticatedStudioRouteWithChildren
   '/api/studio-visuel': typeof ApiStudioVisuelRoute
   '/outils/$slug': typeof AuthenticatedOutilsSlugRoute
+  '/projets/tableau': typeof AuthenticatedProjetsTableauRoute
   '/studio/calendrier': typeof AuthenticatedStudioCalendrierRoute
   '/studio/medias': typeof AuthenticatedStudioMediasRoute
   '/studio/statistiques': typeof AuthenticatedStudioStatistiquesRoute
   '/outils/': typeof AuthenticatedOutilsIndexRoute
+  '/projets/': typeof AuthenticatedProjetsIndexRoute
   '/studio/': typeof AuthenticatedStudioIndexRoute
 }
 export interface FileRoutesByTo {
@@ -138,10 +161,12 @@ export interface FileRoutesByTo {
   '/mes-fiches': typeof AuthenticatedMesFichesRoute
   '/api/studio-visuel': typeof ApiStudioVisuelRoute
   '/outils/$slug': typeof AuthenticatedOutilsSlugRoute
+  '/projets/tableau': typeof AuthenticatedProjetsTableauRoute
   '/studio/calendrier': typeof AuthenticatedStudioCalendrierRoute
   '/studio/medias': typeof AuthenticatedStudioMediasRoute
   '/studio/statistiques': typeof AuthenticatedStudioStatistiquesRoute
   '/outils': typeof AuthenticatedOutilsIndexRoute
+  '/projets': typeof AuthenticatedProjetsIndexRoute
   '/studio': typeof AuthenticatedStudioIndexRoute
 }
 export interface FileRoutesById {
@@ -154,13 +179,16 @@ export interface FileRoutesById {
   '/_authenticated/glossaire': typeof AuthenticatedGlossaireRoute
   '/_authenticated/mes-fiches': typeof AuthenticatedMesFichesRoute
   '/_authenticated/outils': typeof AuthenticatedOutilsRouteWithChildren
+  '/_authenticated/projets': typeof AuthenticatedProjetsRouteWithChildren
   '/_authenticated/studio': typeof AuthenticatedStudioRouteWithChildren
   '/api/studio-visuel': typeof ApiStudioVisuelRoute
   '/_authenticated/outils/$slug': typeof AuthenticatedOutilsSlugRoute
+  '/_authenticated/projets/tableau': typeof AuthenticatedProjetsTableauRoute
   '/_authenticated/studio/calendrier': typeof AuthenticatedStudioCalendrierRoute
   '/_authenticated/studio/medias': typeof AuthenticatedStudioMediasRoute
   '/_authenticated/studio/statistiques': typeof AuthenticatedStudioStatistiquesRoute
   '/_authenticated/outils/': typeof AuthenticatedOutilsIndexRoute
+  '/_authenticated/projets/': typeof AuthenticatedProjetsIndexRoute
   '/_authenticated/studio/': typeof AuthenticatedStudioIndexRoute
 }
 export interface FileRouteTypes {
@@ -173,13 +201,16 @@ export interface FileRouteTypes {
     | '/glossaire'
     | '/mes-fiches'
     | '/outils'
+    | '/projets'
     | '/studio'
     | '/api/studio-visuel'
     | '/outils/$slug'
+    | '/projets/tableau'
     | '/studio/calendrier'
     | '/studio/medias'
     | '/studio/statistiques'
     | '/outils/'
+    | '/projets/'
     | '/studio/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -191,10 +222,12 @@ export interface FileRouteTypes {
     | '/mes-fiches'
     | '/api/studio-visuel'
     | '/outils/$slug'
+    | '/projets/tableau'
     | '/studio/calendrier'
     | '/studio/medias'
     | '/studio/statistiques'
     | '/outils'
+    | '/projets'
     | '/studio'
   id:
     | '__root__'
@@ -206,13 +239,16 @@ export interface FileRouteTypes {
     | '/_authenticated/glossaire'
     | '/_authenticated/mes-fiches'
     | '/_authenticated/outils'
+    | '/_authenticated/projets'
     | '/_authenticated/studio'
     | '/api/studio-visuel'
     | '/_authenticated/outils/$slug'
+    | '/_authenticated/projets/tableau'
     | '/_authenticated/studio/calendrier'
     | '/_authenticated/studio/medias'
     | '/_authenticated/studio/statistiques'
     | '/_authenticated/outils/'
+    | '/_authenticated/projets/'
     | '/_authenticated/studio/'
   fileRoutesById: FileRoutesById
 }
@@ -281,6 +317,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOutilsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/projets': {
+      id: '/_authenticated/projets'
+      path: '/projets'
+      fullPath: '/projets'
+      preLoaderRoute: typeof AuthenticatedProjetsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/studio': {
       id: '/_authenticated/studio'
       path: '/studio'
@@ -308,6 +351,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/outils/$slug'
       preLoaderRoute: typeof AuthenticatedOutilsSlugRouteImport
       parentRoute: typeof AuthenticatedOutilsRoute
+    }
+    '/_authenticated/projets/': {
+      id: '/_authenticated/projets/'
+      path: '/'
+      fullPath: '/projets/'
+      preLoaderRoute: typeof AuthenticatedProjetsIndexRouteImport
+      parentRoute: typeof AuthenticatedProjetsRoute
+    }
+    '/_authenticated/projets/tableau': {
+      id: '/_authenticated/projets/tableau'
+      path: '/tableau'
+      fullPath: '/projets/tableau'
+      preLoaderRoute: typeof AuthenticatedProjetsTableauRouteImport
+      parentRoute: typeof AuthenticatedProjetsRoute
     }
     '/_authenticated/studio/': {
       id: '/_authenticated/studio/'
@@ -353,6 +410,19 @@ const AuthenticatedOutilsRouteChildren: AuthenticatedOutilsRouteChildren = {
 const AuthenticatedOutilsRouteWithChildren =
   AuthenticatedOutilsRoute._addFileChildren(AuthenticatedOutilsRouteChildren)
 
+interface AuthenticatedProjetsRouteChildren {
+  AuthenticatedProjetsTableauRoute: typeof AuthenticatedProjetsTableauRoute
+  AuthenticatedProjetsIndexRoute: typeof AuthenticatedProjetsIndexRoute
+}
+
+const AuthenticatedProjetsRouteChildren: AuthenticatedProjetsRouteChildren = {
+  AuthenticatedProjetsTableauRoute: AuthenticatedProjetsTableauRoute,
+  AuthenticatedProjetsIndexRoute: AuthenticatedProjetsIndexRoute,
+}
+
+const AuthenticatedProjetsRouteWithChildren =
+  AuthenticatedProjetsRoute._addFileChildren(AuthenticatedProjetsRouteChildren)
+
 interface AuthenticatedStudioRouteChildren {
   AuthenticatedStudioCalendrierRoute: typeof AuthenticatedStudioCalendrierRoute
   AuthenticatedStudioMediasRoute: typeof AuthenticatedStudioMediasRoute
@@ -376,6 +446,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedGlossaireRoute: typeof AuthenticatedGlossaireRoute
   AuthenticatedMesFichesRoute: typeof AuthenticatedMesFichesRoute
   AuthenticatedOutilsRoute: typeof AuthenticatedOutilsRouteWithChildren
+  AuthenticatedProjetsRoute: typeof AuthenticatedProjetsRouteWithChildren
   AuthenticatedStudioRoute: typeof AuthenticatedStudioRouteWithChildren
 }
 
@@ -385,6 +456,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedGlossaireRoute: AuthenticatedGlossaireRoute,
   AuthenticatedMesFichesRoute: AuthenticatedMesFichesRoute,
   AuthenticatedOutilsRoute: AuthenticatedOutilsRouteWithChildren,
+  AuthenticatedProjetsRoute: AuthenticatedProjetsRouteWithChildren,
   AuthenticatedStudioRoute: AuthenticatedStudioRouteWithChildren,
 }
 
