@@ -167,8 +167,15 @@ export function AppShell({ children, panel }: { children: ReactNode; panel?: Rea
             label="Studio"
             active={pathname.startsWith("/studio")}
           />
+          <RailButton
+            to="/projets"
+            icon={ListChecks}
+            label="Projets"
+            active={pathname.startsWith("/projets")}
+          />
 
         </nav>
+
       </aside>
 
       {/* Contenu principal */}
