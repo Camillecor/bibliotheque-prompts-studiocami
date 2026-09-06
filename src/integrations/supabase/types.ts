@@ -219,6 +219,42 @@ export type Database = {
         }
         Relationships: []
       }
+      projets: {
+        Row: {
+          archive: boolean
+          couleur: string
+          created_at: string
+          icone: string
+          id: string
+          nom: string
+          ordre: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          archive?: boolean
+          couleur?: string
+          created_at?: string
+          icone?: string
+          id?: string
+          nom: string
+          ordre?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          archive?: boolean
+          couleur?: string
+          created_at?: string
+          icone?: string
+          id?: string
+          nom?: string
+          ordre?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       prompts: {
         Row: {
           alerte_pii: boolean
@@ -272,6 +308,102 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      taches: {
+        Row: {
+          contenu_id: string | null
+          created_at: string
+          echeance: string | null
+          etiquettes: string[]
+          fiche_id: string | null
+          id: string
+          note: string
+          ordre: number
+          parent_id: string | null
+          priorite: number
+          projet_id: string | null
+          prompt_id: string | null
+          statut: string
+          termine_le: string | null
+          titre: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          contenu_id?: string | null
+          created_at?: string
+          echeance?: string | null
+          etiquettes?: string[]
+          fiche_id?: string | null
+          id?: string
+          note?: string
+          ordre?: number
+          parent_id?: string | null
+          priorite?: number
+          projet_id?: string | null
+          prompt_id?: string | null
+          statut?: string
+          termine_le?: string | null
+          titre: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          contenu_id?: string | null
+          created_at?: string
+          echeance?: string | null
+          etiquettes?: string[]
+          fiche_id?: string | null
+          id?: string
+          note?: string
+          ordre?: number
+          parent_id?: string | null
+          priorite?: number
+          projet_id?: string | null
+          prompt_id?: string | null
+          statut?: string
+          termine_le?: string | null
+          titre?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "taches_contenu_id_fkey"
+            columns: ["contenu_id"]
+            isOneToOne: false
+            referencedRelation: "contenus"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "taches_fiche_id_fkey"
+            columns: ["fiche_id"]
+            isOneToOne: false
+            referencedRelation: "fiches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "taches_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "taches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "taches_projet_id_fkey"
+            columns: ["projet_id"]
+            isOneToOne: false
+            referencedRelation: "projets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "taches_prompt_id_fkey"
+            columns: ["prompt_id"]
+            isOneToOne: false
+            referencedRelation: "prompts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
