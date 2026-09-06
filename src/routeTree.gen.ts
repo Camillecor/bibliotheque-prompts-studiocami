@@ -23,6 +23,7 @@ import { Route as ApiStudioVisuelRouteImport } from './routes/api/studio-visuel'
 import { Route as AuthenticatedOutilsIndexRouteImport } from './routes/_authenticated/outils.index'
 import { Route as AuthenticatedOutilsSlugRouteImport } from './routes/_authenticated/outils.$slug'
 import { Route as AuthenticatedProjetsIndexRouteImport } from './routes/_authenticated/projets.index'
+import { Route as AuthenticatedProjetsTableauRouteImport } from './routes/_authenticated/projets.tableau'
 import { Route as AuthenticatedStudioIndexRouteImport } from './routes/_authenticated/studio.index'
 import { Route as AuthenticatedStudioCalendrierRouteImport } from './routes/_authenticated/studio.calendrier'
 import { Route as AuthenticatedStudioMediasRouteImport } from './routes/_authenticated/studio.medias'
@@ -100,6 +101,12 @@ const AuthenticatedProjetsIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedProjetsRoute,
   } as any)
+const AuthenticatedProjetsTableauRoute =
+  AuthenticatedProjetsTableauRouteImport.update({
+    id: '/tableau',
+    path: '/tableau',
+    getParentRoute: () => AuthenticatedProjetsRoute,
+  } as any)
 const AuthenticatedStudioIndexRoute =
   AuthenticatedStudioIndexRouteImport.update({
     id: '/',
@@ -137,6 +144,7 @@ export interface FileRoutesByFullPath {
   '/studio': typeof AuthenticatedStudioRouteWithChildren
   '/api/studio-visuel': typeof ApiStudioVisuelRoute
   '/outils/$slug': typeof AuthenticatedOutilsSlugRoute
+  '/projets/tableau': typeof AuthenticatedProjetsTableauRoute
   '/studio/calendrier': typeof AuthenticatedStudioCalendrierRoute
   '/studio/medias': typeof AuthenticatedStudioMediasRoute
   '/studio/statistiques': typeof AuthenticatedStudioStatistiquesRoute
@@ -153,6 +161,7 @@ export interface FileRoutesByTo {
   '/mes-fiches': typeof AuthenticatedMesFichesRoute
   '/api/studio-visuel': typeof ApiStudioVisuelRoute
   '/outils/$slug': typeof AuthenticatedOutilsSlugRoute
+  '/projets/tableau': typeof AuthenticatedProjetsTableauRoute
   '/studio/calendrier': typeof AuthenticatedStudioCalendrierRoute
   '/studio/medias': typeof AuthenticatedStudioMediasRoute
   '/studio/statistiques': typeof AuthenticatedStudioStatistiquesRoute
@@ -174,6 +183,7 @@ export interface FileRoutesById {
   '/_authenticated/studio': typeof AuthenticatedStudioRouteWithChildren
   '/api/studio-visuel': typeof ApiStudioVisuelRoute
   '/_authenticated/outils/$slug': typeof AuthenticatedOutilsSlugRoute
+  '/_authenticated/projets/tableau': typeof AuthenticatedProjetsTableauRoute
   '/_authenticated/studio/calendrier': typeof AuthenticatedStudioCalendrierRoute
   '/_authenticated/studio/medias': typeof AuthenticatedStudioMediasRoute
   '/_authenticated/studio/statistiques': typeof AuthenticatedStudioStatistiquesRoute
@@ -195,6 +205,7 @@ export interface FileRouteTypes {
     | '/studio'
     | '/api/studio-visuel'
     | '/outils/$slug'
+    | '/projets/tableau'
     | '/studio/calendrier'
     | '/studio/medias'
     | '/studio/statistiques'
@@ -211,6 +222,7 @@ export interface FileRouteTypes {
     | '/mes-fiches'
     | '/api/studio-visuel'
     | '/outils/$slug'
+    | '/projets/tableau'
     | '/studio/calendrier'
     | '/studio/medias'
     | '/studio/statistiques'
@@ -231,6 +243,7 @@ export interface FileRouteTypes {
     | '/_authenticated/studio'
     | '/api/studio-visuel'
     | '/_authenticated/outils/$slug'
+    | '/_authenticated/projets/tableau'
     | '/_authenticated/studio/calendrier'
     | '/_authenticated/studio/medias'
     | '/_authenticated/studio/statistiques'
@@ -346,6 +359,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProjetsIndexRouteImport
       parentRoute: typeof AuthenticatedProjetsRoute
     }
+    '/_authenticated/projets/tableau': {
+      id: '/_authenticated/projets/tableau'
+      path: '/tableau'
+      fullPath: '/projets/tableau'
+      preLoaderRoute: typeof AuthenticatedProjetsTableauRouteImport
+      parentRoute: typeof AuthenticatedProjetsRoute
+    }
     '/_authenticated/studio/': {
       id: '/_authenticated/studio/'
       path: '/'
@@ -391,10 +411,12 @@ const AuthenticatedOutilsRouteWithChildren =
   AuthenticatedOutilsRoute._addFileChildren(AuthenticatedOutilsRouteChildren)
 
 interface AuthenticatedProjetsRouteChildren {
+  AuthenticatedProjetsTableauRoute: typeof AuthenticatedProjetsTableauRoute
   AuthenticatedProjetsIndexRoute: typeof AuthenticatedProjetsIndexRoute
 }
 
 const AuthenticatedProjetsRouteChildren: AuthenticatedProjetsRouteChildren = {
+  AuthenticatedProjetsTableauRoute: AuthenticatedProjetsTableauRoute,
   AuthenticatedProjetsIndexRoute: AuthenticatedProjetsIndexRoute,
 }
 
