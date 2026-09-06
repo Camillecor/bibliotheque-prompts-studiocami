@@ -22,6 +22,7 @@ import { Route as AuthenticatedStudioRouteImport } from './routes/_authenticated
 import { Route as ApiStudioVisuelRouteImport } from './routes/api/studio-visuel'
 import { Route as AuthenticatedOutilsIndexRouteImport } from './routes/_authenticated/outils.index'
 import { Route as AuthenticatedOutilsSlugRouteImport } from './routes/_authenticated/outils.$slug'
+import { Route as AuthenticatedProjetsIndexRouteImport } from './routes/_authenticated/projets.index'
 import { Route as AuthenticatedStudioIndexRouteImport } from './routes/_authenticated/studio.index'
 import { Route as AuthenticatedStudioCalendrierRouteImport } from './routes/_authenticated/studio.calendrier'
 import { Route as AuthenticatedStudioMediasRouteImport } from './routes/_authenticated/studio.medias'
@@ -93,6 +94,12 @@ const AuthenticatedOutilsSlugRoute = AuthenticatedOutilsSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => AuthenticatedOutilsRoute,
 } as any)
+const AuthenticatedProjetsIndexRoute =
+  AuthenticatedProjetsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedProjetsRoute,
+  } as any)
 const AuthenticatedStudioIndexRoute =
   AuthenticatedStudioIndexRouteImport.update({
     id: '/',
@@ -126,7 +133,7 @@ export interface FileRoutesByFullPath {
   '/glossaire': typeof AuthenticatedGlossaireRoute
   '/mes-fiches': typeof AuthenticatedMesFichesRoute
   '/outils': typeof AuthenticatedOutilsRouteWithChildren
-  '/projets': typeof AuthenticatedProjetsRoute
+  '/projets': typeof AuthenticatedProjetsRouteWithChildren
   '/studio': typeof AuthenticatedStudioRouteWithChildren
   '/api/studio-visuel': typeof ApiStudioVisuelRoute
   '/outils/$slug': typeof AuthenticatedOutilsSlugRoute
@@ -134,6 +141,7 @@ export interface FileRoutesByFullPath {
   '/studio/medias': typeof AuthenticatedStudioMediasRoute
   '/studio/statistiques': typeof AuthenticatedStudioStatistiquesRoute
   '/outils/': typeof AuthenticatedOutilsIndexRoute
+  '/projets/': typeof AuthenticatedProjetsIndexRoute
   '/studio/': typeof AuthenticatedStudioIndexRoute
 }
 export interface FileRoutesByTo {
@@ -143,13 +151,13 @@ export interface FileRoutesByTo {
   '/fiches': typeof AuthenticatedFichesRoute
   '/glossaire': typeof AuthenticatedGlossaireRoute
   '/mes-fiches': typeof AuthenticatedMesFichesRoute
-  '/projets': typeof AuthenticatedProjetsRoute
   '/api/studio-visuel': typeof ApiStudioVisuelRoute
   '/outils/$slug': typeof AuthenticatedOutilsSlugRoute
   '/studio/calendrier': typeof AuthenticatedStudioCalendrierRoute
   '/studio/medias': typeof AuthenticatedStudioMediasRoute
   '/studio/statistiques': typeof AuthenticatedStudioStatistiquesRoute
   '/outils': typeof AuthenticatedOutilsIndexRoute
+  '/projets': typeof AuthenticatedProjetsIndexRoute
   '/studio': typeof AuthenticatedStudioIndexRoute
 }
 export interface FileRoutesById {
@@ -162,7 +170,7 @@ export interface FileRoutesById {
   '/_authenticated/glossaire': typeof AuthenticatedGlossaireRoute
   '/_authenticated/mes-fiches': typeof AuthenticatedMesFichesRoute
   '/_authenticated/outils': typeof AuthenticatedOutilsRouteWithChildren
-  '/_authenticated/projets': typeof AuthenticatedProjetsRoute
+  '/_authenticated/projets': typeof AuthenticatedProjetsRouteWithChildren
   '/_authenticated/studio': typeof AuthenticatedStudioRouteWithChildren
   '/api/studio-visuel': typeof ApiStudioVisuelRoute
   '/_authenticated/outils/$slug': typeof AuthenticatedOutilsSlugRoute
@@ -170,6 +178,7 @@ export interface FileRoutesById {
   '/_authenticated/studio/medias': typeof AuthenticatedStudioMediasRoute
   '/_authenticated/studio/statistiques': typeof AuthenticatedStudioStatistiquesRoute
   '/_authenticated/outils/': typeof AuthenticatedOutilsIndexRoute
+  '/_authenticated/projets/': typeof AuthenticatedProjetsIndexRoute
   '/_authenticated/studio/': typeof AuthenticatedStudioIndexRoute
 }
 export interface FileRouteTypes {
@@ -190,6 +199,7 @@ export interface FileRouteTypes {
     | '/studio/medias'
     | '/studio/statistiques'
     | '/outils/'
+    | '/projets/'
     | '/studio/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -199,13 +209,13 @@ export interface FileRouteTypes {
     | '/fiches'
     | '/glossaire'
     | '/mes-fiches'
-    | '/projets'
     | '/api/studio-visuel'
     | '/outils/$slug'
     | '/studio/calendrier'
     | '/studio/medias'
     | '/studio/statistiques'
     | '/outils'
+    | '/projets'
     | '/studio'
   id:
     | '__root__'
@@ -225,6 +235,7 @@ export interface FileRouteTypes {
     | '/_authenticated/studio/medias'
     | '/_authenticated/studio/statistiques'
     | '/_authenticated/outils/'
+    | '/_authenticated/projets/'
     | '/_authenticated/studio/'
   fileRoutesById: FileRoutesById
 }
@@ -328,6 +339,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOutilsSlugRouteImport
       parentRoute: typeof AuthenticatedOutilsRoute
     }
+    '/_authenticated/projets/': {
+      id: '/_authenticated/projets/'
+      path: '/'
+      fullPath: '/projets/'
+      preLoaderRoute: typeof AuthenticatedProjetsIndexRouteImport
+      parentRoute: typeof AuthenticatedProjetsRoute
+    }
     '/_authenticated/studio/': {
       id: '/_authenticated/studio/'
       path: '/'
@@ -372,6 +390,17 @@ const AuthenticatedOutilsRouteChildren: AuthenticatedOutilsRouteChildren = {
 const AuthenticatedOutilsRouteWithChildren =
   AuthenticatedOutilsRoute._addFileChildren(AuthenticatedOutilsRouteChildren)
 
+interface AuthenticatedProjetsRouteChildren {
+  AuthenticatedProjetsIndexRoute: typeof AuthenticatedProjetsIndexRoute
+}
+
+const AuthenticatedProjetsRouteChildren: AuthenticatedProjetsRouteChildren = {
+  AuthenticatedProjetsIndexRoute: AuthenticatedProjetsIndexRoute,
+}
+
+const AuthenticatedProjetsRouteWithChildren =
+  AuthenticatedProjetsRoute._addFileChildren(AuthenticatedProjetsRouteChildren)
+
 interface AuthenticatedStudioRouteChildren {
   AuthenticatedStudioCalendrierRoute: typeof AuthenticatedStudioCalendrierRoute
   AuthenticatedStudioMediasRoute: typeof AuthenticatedStudioMediasRoute
@@ -395,7 +424,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedGlossaireRoute: typeof AuthenticatedGlossaireRoute
   AuthenticatedMesFichesRoute: typeof AuthenticatedMesFichesRoute
   AuthenticatedOutilsRoute: typeof AuthenticatedOutilsRouteWithChildren
-  AuthenticatedProjetsRoute: typeof AuthenticatedProjetsRoute
+  AuthenticatedProjetsRoute: typeof AuthenticatedProjetsRouteWithChildren
   AuthenticatedStudioRoute: typeof AuthenticatedStudioRouteWithChildren
 }
 
@@ -405,7 +434,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedGlossaireRoute: AuthenticatedGlossaireRoute,
   AuthenticatedMesFichesRoute: AuthenticatedMesFichesRoute,
   AuthenticatedOutilsRoute: AuthenticatedOutilsRouteWithChildren,
-  AuthenticatedProjetsRoute: AuthenticatedProjetsRoute,
+  AuthenticatedProjetsRoute: AuthenticatedProjetsRouteWithChildren,
   AuthenticatedStudioRoute: AuthenticatedStudioRouteWithChildren,
 }
 
