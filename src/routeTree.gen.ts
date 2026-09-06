@@ -17,6 +17,7 @@ import { Route as AuthenticatedFichesRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedGlossaireRouteImport } from './routes/_authenticated/glossaire'
 import { Route as AuthenticatedMesFichesRouteImport } from './routes/_authenticated/mes-fiches'
 import { Route as AuthenticatedOutilsRouteImport } from './routes/_authenticated/outils'
+import { Route as AuthenticatedPomodoroRouteImport } from './routes/_authenticated/pomodoro'
 import { Route as AuthenticatedProjetsRouteImport } from './routes/_authenticated/projets'
 import { Route as AuthenticatedStudioRouteImport } from './routes/_authenticated/studio'
 import { Route as ApiStudioVisuelRouteImport } from './routes/api/studio-visuel'
@@ -67,6 +68,11 @@ const AuthenticatedMesFichesRoute = AuthenticatedMesFichesRouteImport.update({
 const AuthenticatedOutilsRoute = AuthenticatedOutilsRouteImport.update({
   id: '/outils',
   path: '/outils',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPomodoroRoute = AuthenticatedPomodoroRouteImport.update({
+  id: '/pomodoro',
+  path: '/pomodoro',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedProjetsRoute = AuthenticatedProjetsRouteImport.update({
@@ -140,6 +146,7 @@ export interface FileRoutesByFullPath {
   '/glossaire': typeof AuthenticatedGlossaireRoute
   '/mes-fiches': typeof AuthenticatedMesFichesRoute
   '/outils': typeof AuthenticatedOutilsRouteWithChildren
+  '/pomodoro': typeof AuthenticatedPomodoroRoute
   '/projets': typeof AuthenticatedProjetsRouteWithChildren
   '/studio': typeof AuthenticatedStudioRouteWithChildren
   '/api/studio-visuel': typeof ApiStudioVisuelRoute
@@ -159,6 +166,7 @@ export interface FileRoutesByTo {
   '/fiches': typeof AuthenticatedFichesRoute
   '/glossaire': typeof AuthenticatedGlossaireRoute
   '/mes-fiches': typeof AuthenticatedMesFichesRoute
+  '/pomodoro': typeof AuthenticatedPomodoroRoute
   '/api/studio-visuel': typeof ApiStudioVisuelRoute
   '/outils/$slug': typeof AuthenticatedOutilsSlugRoute
   '/projets/tableau': typeof AuthenticatedProjetsTableauRoute
@@ -179,6 +187,7 @@ export interface FileRoutesById {
   '/_authenticated/glossaire': typeof AuthenticatedGlossaireRoute
   '/_authenticated/mes-fiches': typeof AuthenticatedMesFichesRoute
   '/_authenticated/outils': typeof AuthenticatedOutilsRouteWithChildren
+  '/_authenticated/pomodoro': typeof AuthenticatedPomodoroRoute
   '/_authenticated/projets': typeof AuthenticatedProjetsRouteWithChildren
   '/_authenticated/studio': typeof AuthenticatedStudioRouteWithChildren
   '/api/studio-visuel': typeof ApiStudioVisuelRoute
@@ -201,6 +210,7 @@ export interface FileRouteTypes {
     | '/glossaire'
     | '/mes-fiches'
     | '/outils'
+    | '/pomodoro'
     | '/projets'
     | '/studio'
     | '/api/studio-visuel'
@@ -220,6 +230,7 @@ export interface FileRouteTypes {
     | '/fiches'
     | '/glossaire'
     | '/mes-fiches'
+    | '/pomodoro'
     | '/api/studio-visuel'
     | '/outils/$slug'
     | '/projets/tableau'
@@ -239,6 +250,7 @@ export interface FileRouteTypes {
     | '/_authenticated/glossaire'
     | '/_authenticated/mes-fiches'
     | '/_authenticated/outils'
+    | '/_authenticated/pomodoro'
     | '/_authenticated/projets'
     | '/_authenticated/studio'
     | '/api/studio-visuel'
@@ -315,6 +327,13 @@ declare module '@tanstack/react-router' {
       path: '/outils'
       fullPath: '/outils'
       preLoaderRoute: typeof AuthenticatedOutilsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/pomodoro': {
+      id: '/_authenticated/pomodoro'
+      path: '/pomodoro'
+      fullPath: '/pomodoro'
+      preLoaderRoute: typeof AuthenticatedPomodoroRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/projets': {
@@ -446,6 +465,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedGlossaireRoute: typeof AuthenticatedGlossaireRoute
   AuthenticatedMesFichesRoute: typeof AuthenticatedMesFichesRoute
   AuthenticatedOutilsRoute: typeof AuthenticatedOutilsRouteWithChildren
+  AuthenticatedPomodoroRoute: typeof AuthenticatedPomodoroRoute
   AuthenticatedProjetsRoute: typeof AuthenticatedProjetsRouteWithChildren
   AuthenticatedStudioRoute: typeof AuthenticatedStudioRouteWithChildren
 }
@@ -456,6 +476,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedGlossaireRoute: AuthenticatedGlossaireRoute,
   AuthenticatedMesFichesRoute: AuthenticatedMesFichesRoute,
   AuthenticatedOutilsRoute: AuthenticatedOutilsRouteWithChildren,
+  AuthenticatedPomodoroRoute: AuthenticatedPomodoroRoute,
   AuthenticatedProjetsRoute: AuthenticatedProjetsRouteWithChildren,
   AuthenticatedStudioRoute: AuthenticatedStudioRouteWithChildren,
 }

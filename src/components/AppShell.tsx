@@ -2,7 +2,7 @@ import { useState, type ReactNode } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { BookOpen, Clapperboard, FileText, FolderOpen, Library, ListChecks, Menu, Plus, SlidersHorizontal, Wrench, X } from "lucide-react";
+import { BookOpen, Clapperboard, FileText, FolderOpen, Library, ListChecks, Menu, Plus, SlidersHorizontal, Timer, Wrench, X } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -22,6 +22,7 @@ const NAV_ITEMS = [
   { to: "/outils", icon: Wrench, label: "Outils" },
   { to: "/studio", icon: Clapperboard, label: "Studio" },
   { to: "/projets", icon: ListChecks, label: "Projets" },
+  { to: "/pomodoro", icon: Timer, label: "Pomodoro" },
 
 ];
 
@@ -172,6 +173,12 @@ export function AppShell({ children, panel }: { children: ReactNode; panel?: Rea
             icon={ListChecks}
             label="Projets"
             active={pathname.startsWith("/projets")}
+          />
+          <RailButton
+            to="/pomodoro"
+            icon={Timer}
+            label="Pomodoro"
+            active={pathname.startsWith("/pomodoro")}
           />
 
         </nav>
