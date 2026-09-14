@@ -1,0 +1,1 @@
+UPDATE public.veille_items SET favori = false WHERE favori = true;

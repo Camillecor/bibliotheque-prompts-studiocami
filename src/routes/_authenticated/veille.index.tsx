@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { VeilleTabs } from "@/components/VeilleTabs";
 import { CarteVeille } from "@/components/veille/CarteVeille";
+import { ChipsFiltre } from "@/components/veille/ChipsFiltre";
 import { PanneauSources } from "@/components/veille/PanneauSources";
 import { FILTRES_VEILLE, type FiltreVeille, type VeilleItemRow } from "@/lib/veille";
 import {
@@ -166,23 +167,11 @@ function VeillePage() {
                 className="cami-input w-full pl-9"
               />
             </div>
-            <div className="flex flex-wrap gap-1.5">
-              {FILTRES_VEILLE.map((option) => (
-                <button
-                  key={option.value}
-                  type="button"
-                  onClick={() => setFiltre(option.value)}
-                  className={[
-                    "inline-flex min-h-11 items-center rounded-full px-3.5 text-xs font-semibold transition",
-                    filtre === option.value
-                      ? "bg-primary text-primary-foreground"
-                      : "border border-border bg-card text-primary hover:border-[var(--coral)] hover:text-[var(--coral)]",
-                  ].join(" ")}
-                >
-                  {option.label}
-                </button>
-              ))}
-            </div>
+            <ChipsFiltre
+              options={FILTRES_VEILLE}
+              valeur={filtre}
+              onChange={(valeur) => setFiltre(valeur as FiltreVeille)}
+            />
           </div>
         </header>
 
