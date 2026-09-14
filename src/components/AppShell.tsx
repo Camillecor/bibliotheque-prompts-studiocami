@@ -2,14 +2,22 @@ import { useState, type ReactNode } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { BookOpen, Clapperboard, FileText, FolderOpen, Library, ListChecks, Menu, Plus, Rss, SlidersHorizontal, Timer, Wrench, X } from "lucide-react";
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+  BookOpen,
+  Clapperboard,
+  FileText,
+  FolderOpen,
+  Library,
+  ListChecks,
+  Menu,
+  Plus,
+  Rss,
+  SlidersHorizontal,
+  Timer,
+  Wrench,
+  X,
+} from "lucide-react";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { listPrompts } from "@/lib/mario.functions";
 import logoAsset from "@/assets/studio-cami-logo.svg.asset.json";
 
@@ -24,12 +32,7 @@ const NAV_ITEMS = [
   { to: "/projets", icon: ListChecks, label: "Projets" },
   { to: "/veille", icon: Rss, label: "Veille IA" },
   { to: "/pomodoro", icon: Timer, label: "Pomodoro" },
-
 ];
-
-
-
-
 
 // Précharge silencieusement la bibliothèque dès qu'on est sur l'app (peu importe l'écran),
 // pour que le clic sur "Bibliothèque" retrouve les données déjà en cache React Query
@@ -132,12 +135,7 @@ export function AppShell({ children, panel }: { children: ReactNode; panel?: Rea
             active={pathname === "/"}
             labelClassName="w-16"
           />
-          <RailButton
-            to="/fiches"
-            icon={FileText}
-            label="Fiches"
-            active={pathname === "/fiches"}
-          />
+          <RailButton to="/fiches" icon={FileText} label="Fiches" active={pathname === "/fiches"} />
           <RailButton
             to="/mes-fiches"
             icon={FolderOpen}
@@ -145,7 +143,6 @@ export function AppShell({ children, panel }: { children: ReactNode; panel?: Rea
             active={pathname.startsWith("/mes-fiches")}
           />
           <RailButton
-
             to="/bibliotheque"
             icon={Library}
             label="Bibliothèque"
@@ -187,9 +184,7 @@ export function AppShell({ children, panel }: { children: ReactNode; panel?: Rea
             label="Pomodoro"
             active={pathname.startsWith("/pomodoro")}
           />
-
         </nav>
-
       </aside>
 
       {/* Contenu principal */}
@@ -219,8 +214,7 @@ export function AppShell({ children, panel }: { children: ReactNode; panel?: Rea
               </SheetHeader>
               <nav className="flex flex-col gap-1 p-3">
                 {NAV_ITEMS.map((item) => {
-                  const actif =
-                    item.to === "/" ? pathname === "/" : pathname.startsWith(item.to);
+                  const actif = item.to === "/" ? pathname === "/" : pathname.startsWith(item.to);
                   return (
                     <Link
                       key={item.to}
@@ -242,7 +236,11 @@ export function AppShell({ children, panel }: { children: ReactNode; panel?: Rea
             </SheetContent>
           </Sheet>
 
-          <Link to="/" aria-label="Studio Cami — accueil" className="flex h-11 shrink-0 items-center">
+          <Link
+            to="/"
+            aria-label="Studio Cami — accueil"
+            className="flex h-11 shrink-0 items-center"
+          >
             <img src={logoAsset.url} alt="Studio Cami" className="w-9" />
           </Link>
 
@@ -282,5 +280,3 @@ export function AppShell({ children, panel }: { children: ReactNode; panel?: Rea
     </div>
   );
 }
-
-
