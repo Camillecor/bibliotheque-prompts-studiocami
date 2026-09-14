@@ -149,26 +149,26 @@ function VeilleBibliothequePage() {
   return (
     <AppShell panel={<PanneauSources />}>
       <div className="mx-auto flex w-full max-w-4xl flex-col gap-5 px-4 py-6 lg:px-8">
-        <header className="flex flex-col gap-3">
-          <div className="flex flex-wrap items-end justify-between gap-3">
-            <div>
-              <h1 className="font-display text-2xl font-bold text-primary sm:text-3xl">
-                Mes articles
-              </h1>
-              <p className="text-xs text-muted-foreground lg:text-sm">
+        <div className="flex flex-col gap-3">
+          <EnTetePage
+            titre="Mes articles"
+            description={
+              <>
                 {favoris.length} article{favoris.length > 1 ? "s" : ""} gardé
                 {favoris.length > 1 ? "s" : ""} · {nbSources} source{nbSources > 1 ? "s" : ""}
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={() => setTri(tri === "recent" ? "source" : "recent")}
-              className="cami-btn-secondary"
-            >
-              <ArrowDownWideNarrow className="h-4 w-4" />
-              {tri === "recent" ? "Plus récents d'abord" : "Par source"}
-            </button>
-          </div>
+              </>
+            }
+            actions={
+              <button
+                type="button"
+                onClick={() => setTri(tri === "recent" ? "source" : "recent")}
+                className="cami-btn-secondary"
+              >
+                <ArrowDownWideNarrow className="h-4 w-4" />
+                {tri === "recent" ? "Plus récents d'abord" : "Par source"}
+              </button>
+            }
+          />
           <VeilleTabs />
 
           {favoris.length > 0 ? (
