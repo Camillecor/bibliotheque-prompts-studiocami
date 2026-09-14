@@ -1,3 +1,4 @@
+import { EnTetePage } from "@/components/EnTetePage";
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
