@@ -405,6 +405,24 @@ export type Database = {
           },
         ]
       }
+      veille_config: {
+        Row: {
+          cle: string
+          created_at: string
+          valeur: string
+        }
+        Insert: {
+          cle: string
+          created_at?: string
+          valeur: string
+        }
+        Update: {
+          cle?: string
+          created_at?: string
+          valeur?: string
+        }
+        Relationships: []
+      }
       veille_items: {
         Row: {
           created_at: string
