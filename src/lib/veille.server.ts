@@ -269,3 +269,139 @@ export async function chercherWeb(themes: string[]): Promise<ItemResume[]> {
 }
 
 export const LIMITE_ITEMS_RUN = MAX_ITEMS_PAR_RUN;
+
+/* ------------------------------------------------------------------ run */
+
+// Un seul passage à la fois : le verrou est une ligne `veille_runs` en cours,
+// avec expiration au bout de 15 minutes pour ne jamais rester bloqué.
+const DUREE_VERROU_MS = 15 * 60 * 1000;
+
+export async function executerVeille(userId: string): Promise<{
+  statut: "ok" | "occupe" | "echec";
+  nb_items: number;
+  message: string;
+}> {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+  const { data: enCours } = await supabaseAdmin
+    .from("veille_runs")
+    .select("id, demarre_le")
+    .eq("user_id", userId)
+    .eq("statut", "en_cours")
+    .order("demarre_le", { ascending: false })
+    .limit(1);
+
+  const verrou = enCours?.[0];
+  if (verrou && Date.now() - new Date(verrou.demarre_le).getTime() < DUREE_VERROU_MS) {
+    return { statut: "occupe", nb_items: 0, message: "Une veille est déjà en cours." };
+  }
+  if (verrou) {
+    await supabaseAdmin
+      .from("veille_runs")
+      .update({ statut: "echec", termine_le: new Date().toISOString(), message: "Interrompue." })
+      .eq("id", verrou.id);
+  }
+
+  const { data: run } = await supabaseAdmin
+    .from("veille_runs")
+    .insert({ user_id: userId, statut: "en_cours" })
+    .select("id")
+    .single();
+  const runId = run?.id;
+
+  try {
+    const [{ data: sources }, { data: themes }] = await Promise.all([
+      supabaseAdmin
+        .from("veille_sources")
+        .select("id, nom, url")
+        .eq("user_id", userId)
+        .eq("actif", true)
+        .limit(30),
+      supabaseAdmin
+        .from("veille_themes")
+        .select("libelle")
+        .eq("user_id", userId)
+        .eq("actif", true)
+        .limit(20),
+    ]);
+
+    const listeThemes = (themes ?? []).map((t) => t.libelle);
+
+    const flux = await Promise.all((sources ?? []).map((source) => lireFlux(source)));
+    const bruts = flux.flat();
+
+    // Déduplication : on écarte ce qui est déjà en base avant d'appeler l'IA.
+    const urls = bruts.map((item) => item.url);
+    const deja = new Set<string>();
+    for (let i = 0; i < urls.length; i += 100) {
+      const { data } = await supabaseAdmin
+        .from("veille_items")
+        .select("url")
+        .eq("user_id", userId)
+        .in("url", urls.slice(i, i + 100));
+      for (const ligne of data ?? []) deja.add(ligne.url);
+    }
+    const nouveaux = bruts.filter((item) => !deja.has(item.url)).slice(0, MAX_ITEMS_PAR_RUN);
+
+    const [resumesRss, resumesWeb] = await Promise.all([
+      resumerItems(nouveaux, listeThemes),
+      chercherWeb(listeThemes).catch((erreur) => {
+        console.error("[veille] recherche web indisponible", erreur);
+        return [] as ItemResume[];
+      }),
+    ]);
+
+    const parUrl = new Map<string, ItemResume>();
+    for (const item of [...resumesRss, ...resumesWeb]) {
+      if (!deja.has(item.url)) parUrl.set(item.url, item);
+    }
+    const aInserer = [...parUrl.values()].slice(0, MAX_ITEMS_PAR_RUN);
+
+    if (aInserer.length > 0) {
+      const { error } = await supabaseAdmin.from("veille_items").upsert(
+        aInserer.map((item) => ({
+          user_id: userId,
+          titre: item.titre,
+          resume: item.resume,
+          url: item.url,
+          source: item.source,
+          publie_le: item.publie_le,
+          tags: item.tags,
+          origine: item.origine,
+        })),
+        { onConflict: "user_id,url", ignoreDuplicates: true },
+      );
+      if (error) console.error("[veille] insertion partielle", error.message);
+    }
+
+    const maintenant = new Date().toISOString();
+    if ((sources ?? []).length > 0) {
+      await supabaseAdmin
+        .from("veille_sources")
+        .update({ derniere_lecture: maintenant })
+        .eq("user_id", userId)
+        .in(
+          "id",
+          (sources ?? []).map((s) => s.id),
+        );
+    }
+    if (runId) {
+      await supabaseAdmin
+        .from("veille_runs")
+        .update({ statut: "ok", termine_le: maintenant, nb_items: aInserer.length })
+        .eq("id", runId);
+    }
+
+    return { statut: "ok", nb_items: aInserer.length, message: "" };
+  } catch (erreur) {
+    const message = erreur instanceof Error ? erreur.message : "Erreur inconnue";
+    console.error("[veille] run échoué", message);
+    if (runId) {
+      await supabaseAdmin
+        .from("veille_runs")
+        .update({ statut: "echec", termine_le: new Date().toISOString(), message })
+        .eq("id", runId);
+    }
+    return { statut: "echec", nb_items: 0, message };
+  }
+}
