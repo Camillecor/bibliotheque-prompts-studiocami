@@ -1,9 +1,9 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Rss, Star } from "lucide-react";
+import { Library, Rss } from "lucide-react";
 
 const ONGLETS = [
   { to: "/veille", label: "Fil d'actus", icon: Rss, exact: true },
-  { to: "/veille/favoris", label: "Mes favoris", icon: Star, exact: false },
+  { to: "/veille/favoris", label: "Articles", icon: Library, exact: false },
 ] as const;
 
 export function VeilleTabs() {
