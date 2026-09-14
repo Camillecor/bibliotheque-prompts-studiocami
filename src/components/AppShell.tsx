@@ -175,6 +175,12 @@ export function AppShell({ children, panel }: { children: ReactNode; panel?: Rea
             active={pathname.startsWith("/projets")}
           />
           <RailButton
+            to="/veille"
+            icon={Rss}
+            label="Veille IA"
+            active={pathname.startsWith("/veille")}
+          />
+          <RailButton
             to="/pomodoro"
             icon={Timer}
             label="Pomodoro"
