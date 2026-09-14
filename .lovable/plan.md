@@ -18,7 +18,7 @@ Le fil d'actus reste inchangé : l'étoile orange y sert toujours à envoyer un 
 
 ## Détails techniques
 
-- Renommer l'onglet `Mes favoris` en `Ma bibliothèque` dans `src/components/VeilleTabs.tsx` (icône `Library`), route inchangée : `/veille/favoris`.
+- Renommer l'onglet `Mes favoris` en `Articles` dans `src/components/VeilleTabs.tsx` (icône `Library`), route inchangée : `/veille/favoris`.
 - Réécrire `src/routes/_authenticated/veille.favoris.tsx` : même requête `listVeilleItems` (clé `veille-items`, cache partagé avec le fil), filtrage `favori === true` côté client, puis recherche / filtres tag + source / tri / regroupement par mois via `useMemo`.
 - Extraire les pastilles de filtre déjà utilisées dans `veille.index.tsx` en un petit composant partagé `src/components/veille/ChipsFiltre.tsx` pour garder un style identique sur les deux pages.
 - Regroupement par mois calculé sur `publie_le ?? created_at`, libellés via `toLocaleDateString("fr-FR", { month: "long", year: "numeric" })`.
