@@ -29,6 +29,7 @@ import { Route as AuthenticatedStudioIndexRouteImport } from './routes/_authenti
 import { Route as AuthenticatedStudioCalendrierRouteImport } from './routes/_authenticated/studio.calendrier'
 import { Route as AuthenticatedStudioMediasRouteImport } from './routes/_authenticated/studio.medias'
 import { Route as AuthenticatedStudioStatistiquesRouteImport } from './routes/_authenticated/studio.statistiques'
+import { Route as ApiPublicVeilleCronRouteImport } from './routes/api/public/veille-cron'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -137,6 +138,11 @@ const AuthenticatedStudioStatistiquesRoute =
     path: '/statistiques',
     getParentRoute: () => AuthenticatedStudioRoute,
   } as any)
+const ApiPublicVeilleCronRoute = ApiPublicVeilleCronRouteImport.update({
+  id: '/api/public/veille-cron',
+  path: '/api/public/veille-cron',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -155,6 +161,7 @@ export interface FileRoutesByFullPath {
   '/studio/calendrier': typeof AuthenticatedStudioCalendrierRoute
   '/studio/medias': typeof AuthenticatedStudioMediasRoute
   '/studio/statistiques': typeof AuthenticatedStudioStatistiquesRoute
+  '/api/public/veille-cron': typeof ApiPublicVeilleCronRoute
   '/outils/': typeof AuthenticatedOutilsIndexRoute
   '/projets/': typeof AuthenticatedProjetsIndexRoute
   '/studio/': typeof AuthenticatedStudioIndexRoute
@@ -173,6 +180,7 @@ export interface FileRoutesByTo {
   '/studio/calendrier': typeof AuthenticatedStudioCalendrierRoute
   '/studio/medias': typeof AuthenticatedStudioMediasRoute
   '/studio/statistiques': typeof AuthenticatedStudioStatistiquesRoute
+  '/api/public/veille-cron': typeof ApiPublicVeilleCronRoute
   '/outils': typeof AuthenticatedOutilsIndexRoute
   '/projets': typeof AuthenticatedProjetsIndexRoute
   '/studio': typeof AuthenticatedStudioIndexRoute
@@ -196,6 +204,7 @@ export interface FileRoutesById {
   '/_authenticated/studio/calendrier': typeof AuthenticatedStudioCalendrierRoute
   '/_authenticated/studio/medias': typeof AuthenticatedStudioMediasRoute
   '/_authenticated/studio/statistiques': typeof AuthenticatedStudioStatistiquesRoute
+  '/api/public/veille-cron': typeof ApiPublicVeilleCronRoute
   '/_authenticated/outils/': typeof AuthenticatedOutilsIndexRoute
   '/_authenticated/projets/': typeof AuthenticatedProjetsIndexRoute
   '/_authenticated/studio/': typeof AuthenticatedStudioIndexRoute
@@ -219,6 +228,7 @@ export interface FileRouteTypes {
     | '/studio/calendrier'
     | '/studio/medias'
     | '/studio/statistiques'
+    | '/api/public/veille-cron'
     | '/outils/'
     | '/projets/'
     | '/studio/'
@@ -237,6 +247,7 @@ export interface FileRouteTypes {
     | '/studio/calendrier'
     | '/studio/medias'
     | '/studio/statistiques'
+    | '/api/public/veille-cron'
     | '/outils'
     | '/projets'
     | '/studio'
@@ -259,6 +270,7 @@ export interface FileRouteTypes {
     | '/_authenticated/studio/calendrier'
     | '/_authenticated/studio/medias'
     | '/_authenticated/studio/statistiques'
+    | '/api/public/veille-cron'
     | '/_authenticated/outils/'
     | '/_authenticated/projets/'
     | '/_authenticated/studio/'
@@ -269,6 +281,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   ApiStudioVisuelRoute: typeof ApiStudioVisuelRoute
+  ApiPublicVeilleCronRoute: typeof ApiPublicVeilleCronRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -413,6 +426,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStudioStatistiquesRouteImport
       parentRoute: typeof AuthenticatedStudioRoute
     }
+    '/api/public/veille-cron': {
+      id: '/api/public/veille-cron'
+      path: '/api/public/veille-cron'
+      fullPath: '/api/public/veille-cron'
+      preLoaderRoute: typeof ApiPublicVeilleCronRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -489,6 +509,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   ApiStudioVisuelRoute: ApiStudioVisuelRoute,
+  ApiPublicVeilleCronRoute: ApiPublicVeilleCronRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
