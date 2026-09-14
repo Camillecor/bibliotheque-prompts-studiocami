@@ -24,6 +24,8 @@ type Outil = {
   notes?: Notes;
   perso?: boolean;
   id?: string;
+  // Outils sans fiche détaillée : la carte ouvre directement le site officiel.
+  url?: string;
 };
 type SectionCategorie = { categorie: string; outils: Outil[] };
 type FAQ = { question: string; reponse: string };
