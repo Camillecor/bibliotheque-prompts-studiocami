@@ -799,7 +799,7 @@ function OutilsPage() {
           ),
       }))
       .filter((section) => section.outils.length > 0);
-  }, [recherche, sectionsCombinees]);
+  }, [recherche, sectionsCombinees, ongletFavoris, favoris]);
 
   const [nouveauNom, setNouveauNom] = useState("");
   const [nouvelleCategorie, setNouvelleCategorie] = useState<string>(CATEGORIES_LABELS[0] ?? "");
