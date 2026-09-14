@@ -27,9 +27,7 @@ export function ChipsFiltre({
           {typeof option.compte === "number" ? (
             <span
               className={
-                valeur === option.value
-                  ? "text-primary-foreground/70"
-                  : "text-muted-foreground"
+                valeur === option.value ? "text-primary-foreground/70" : "text-muted-foreground"
               }
             >
               {option.compte}
