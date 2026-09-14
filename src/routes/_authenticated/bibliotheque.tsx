@@ -429,30 +429,30 @@ function LibraryPage() {
         </div>
       ) : (
         <>
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-3 md:px-6">
-            <h1 className="font-display text-2xl font-bold text-primary sm:text-3xl">
-              Bibliothèque de prompts
-            </h1>
-            <div className="relative w-full sm:w-auto">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
-              <input
-                value={recherche}
-                onChange={(event) => setRecherche(event.target.value)}
-                placeholder="Recherche"
-                aria-label="Rechercher un prompt"
-                className="h-11 w-full rounded-full border border-border bg-muted pl-9 pr-4 text-sm text-primary outline-none transition focus:border-[var(--info)] focus:bg-card sm:h-auto sm:w-56 sm:py-2 sm:pr-12 sm:text-xs"
-              />
-              <span className="absolute right-3 top-1/2 hidden -translate-y-1/2 rounded border border-border bg-card px-1.5 py-0.5 text-[10px] font-bold text-muted-foreground sm:inline">
-                ⌘K
-              </span>
-            </div>
-          </div>
-
           <div className="px-4 py-6 md:px-6 md:py-8">
-            <p className="mb-4 text-sm text-muted-foreground">
-              {prompts.length} résultat{prompts.length > 1 ? "s" : ""} sur {(data ?? []).length}{" "}
-              prompt{(data ?? []).length > 1 ? "s" : ""}
-            </p>
+            <EnTetePage
+              className="mb-6"
+              titre="Bibliothèque de prompts"
+              description={
+                <>
+                  {prompts.length} résultat{prompts.length > 1 ? "s" : ""} sur {(data ?? []).length}{" "}
+                  prompt{(data ?? []).length > 1 ? "s" : ""}
+                </>
+              }
+              actions={
+                <div className="relative w-full sm:w-auto">
+                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <input
+                    value={recherche}
+                    onChange={(event) => setRecherche(event.target.value)}
+                    placeholder="Recherche"
+                    aria-label="Rechercher un prompt"
+                    className="cami-input w-full pl-9 sm:w-56"
+                  />
+                </div>
+              }
+            />
+
 
             {isLoading ? (
               <div className="mt-4 flex justify-center">
