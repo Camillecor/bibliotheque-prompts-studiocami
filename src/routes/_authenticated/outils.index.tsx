@@ -628,34 +628,34 @@ function OutilsPage() {
   return (
     <AppShell>
       <div ref={hautDePageRef} aria-hidden="true" className="h-px" />
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-3 md:px-6">
-        <h2 className="text-base font-semibold sm:text-lg">Outils</h2>
-        <div className="relative w-full sm:w-auto">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
-          <input
-            value={recherche}
-            onChange={(event) => setRecherche(event.target.value)}
-            placeholder="Rechercher un outil"
-            aria-label="Rechercher un outil"
-            className="h-11 w-full rounded-full border border-border bg-muted pl-9 pr-4 text-sm text-primary outline-none transition focus:border-[var(--info)] focus:bg-card sm:h-auto sm:w-64 sm:py-2 sm:text-xs"
-          />
-        </div>
-      </div>
-
       <div className="px-4 py-6 md:px-6 md:py-8">
-        <div className="mb-6 max-w-2xl">
-          <h1 className="font-display text-2xl font-bold text-primary sm:text-3xl">
-            Mes outils IA
-          </h1>
-          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-            {totalOutils} outils que j'utilise vraiment, classés par usage — pour retrouver le bon
-            réflexe en un clic.
-            {recherche.trim() ? (
-              <span className="ml-1 font-semibold text-primary">
-                {resultatsCount} résultat{resultatsCount > 1 ? "s" : ""} pour « {recherche} »
-              </span>
-            ) : null}
-          </p>
+        <div className="mb-6">
+          <EnTetePage
+            titre="Mes outils IA"
+            description={
+              <>
+                {totalOutils} outils que j'utilise vraiment, classés par usage — pour retrouver le
+                bon réflexe en un clic.
+                {recherche.trim() ? (
+                  <span className="ml-1 font-semibold text-primary">
+                    {resultatsCount} résultat{resultatsCount > 1 ? "s" : ""} pour « {recherche} »
+                  </span>
+                ) : null}
+              </>
+            }
+            actions={
+              <div className="relative w-full sm:w-auto">
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <input
+                  value={recherche}
+                  onChange={(event) => setRecherche(event.target.value)}
+                  placeholder="Rechercher un outil"
+                  aria-label="Rechercher un outil"
+                  className="cami-input w-full pl-9 sm:w-64"
+                />
+              </div>
+            }
+          />
         </div>
 
         <form onSubmit={ajouterOutil} className="cami-card mb-8 space-y-2 p-3 sm:p-4">
