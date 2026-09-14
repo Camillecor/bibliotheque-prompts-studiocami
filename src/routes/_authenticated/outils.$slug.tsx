@@ -95,7 +95,7 @@ function OutilDetailPage() {
           </span>
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-start justify-between gap-3">
-              <h1 className="text-2xl font-bold text-primary sm:text-3xl">{o.nom}</h1>
+              <h1 className="font-display text-2xl font-bold text-primary sm:text-3xl">{o.nom}</h1>
               <span className="flex shrink-0 items-baseline gap-1 rounded-2xl bg-primary px-3 py-1.5 text-primary-foreground">
                 <span className="text-xl font-bold">{formatNote(global)}</span>
                 <span className="text-xs opacity-60">/10</span>

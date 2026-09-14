@@ -626,7 +626,7 @@ function OutilsPage() {
 
       <div className="px-4 py-6 md:px-6 md:py-8">
         <div className="mb-6 max-w-2xl">
-          <h1 className="text-2xl font-bold text-primary sm:text-3xl">Mes outils IA</h1>
+          <h1 className="font-display text-2xl font-bold text-primary sm:text-3xl">Mes outils IA</h1>
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
             {totalOutils} outils que j'utilise vraiment, classés par usage — pour retrouver le
             bon réflexe en un clic.

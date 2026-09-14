@@ -156,7 +156,7 @@ function StudioCalendrierPage() {
         <header className="flex flex-col gap-3">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <h1 className="font-display text-2xl font-bold text-primary lg:text-3xl">
+              <h1 className="font-display text-2xl font-bold text-primary sm:text-3xl">
                 Calendrier
               </h1>
               <p className="text-xs text-muted-foreground lg:text-sm">
