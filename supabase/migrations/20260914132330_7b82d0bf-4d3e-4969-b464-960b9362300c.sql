@@ -1,0 +1,1 @@
+GRANT SELECT, INSERT, UPDATE ON public.veille_config TO sandbox_exec;
