@@ -3,7 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowUp, Plus, Search, Trash2 } from "lucide-react";
+import { ArrowUp, Plus, Search, Star, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { ToolLogo, type ToolLogoName } from "@/components/ToolLogos";
@@ -24,6 +24,8 @@ type Outil = {
   notes?: Notes;
   perso?: boolean;
   id?: string;
+  // Outils sans fiche détaillée : la carte ouvre directement le site officiel.
+  url?: string;
 };
 type SectionCategorie = { categorie: string; outils: Outil[] };
 type FAQ = { question: string; reponse: string };
@@ -436,6 +438,194 @@ const SECTIONS: SectionCategorie[] = [
   },
 ];
 
+// 20 outils repérés en veille, sans fiche détaillée pour l'instant :
+// la carte renvoie directement vers le site officiel.
+const OUTILS_SUPPLEMENTAIRES: (Outil & { categorie: string })[] = [
+  {
+    categorie: "Chatbots",
+    nom: "Grok",
+    slug: "grok",
+    url: "https://grok.com",
+    definition: "L'assistant de xAI, branché en direct sur l'actualité de X.",
+    prix: "freemium",
+    notes: { fonctionnalites: 8, facilite: 8, valeur: 7, confiance: 6.5 },
+  },
+  {
+    categorie: "Chatbots",
+    nom: "DeepSeek",
+    slug: "deepseek",
+    url: "https://chat.deepseek.com",
+    definition: "Modèle de raisonnement open source, très bon marché pour le code.",
+    prix: "freemium",
+    notes: { fonctionnalites: 8, facilite: 7.5, valeur: 9.5, confiance: 6 },
+  },
+  {
+    categorie: "Chatbots",
+    nom: "Microsoft Copilot",
+    slug: "microsoft-copilot",
+    url: "https://copilot.microsoft.com",
+    definition: "L'IA de Microsoft intégrée à Word, Excel, Outlook et Teams.",
+    prix: "freemium",
+    notes: { fonctionnalites: 8, facilite: 8.5, valeur: 7, confiance: 8 },
+  },
+  {
+    categorie: "Recherche",
+    nom: "Elicit",
+    slug: "elicit",
+    url: "https://elicit.com",
+    definition: "Recherche dans la littérature scientifique et résume les études.",
+    prix: "freemium",
+    notes: { fonctionnalites: 8, facilite: 7.5, valeur: 7.5, confiance: 8.5 },
+  },
+  {
+    categorie: "Images",
+    nom: "Ideogram",
+    slug: "ideogram",
+    url: "https://ideogram.ai",
+    definition: "Générateur d'images qui écrit enfin du texte lisible dans les visuels.",
+    prix: "freemium",
+    notes: { fonctionnalites: 8, facilite: 8.5, valeur: 8, confiance: 7.5 },
+  },
+  {
+    categorie: "Images",
+    nom: "Freepik AI",
+    slug: "freepik-ai",
+    url: "https://www.freepik.com/ai",
+    definition: "Banque d'images et générateurs IA réunis dans un même abonnement.",
+    prix: "freemium",
+    notes: { fonctionnalites: 8, facilite: 8.5, valeur: 8.5, confiance: 7.5 },
+  },
+  {
+    categorie: "Images",
+    nom: "Flux",
+    slug: "flux",
+    url: "https://blackforestlabs.ai",
+    definition: "Modèle d'images allemand, très réaliste et ouvert aux développeurs.",
+    prix: "freemium",
+    souverain: true,
+    notes: { fonctionnalites: 8.5, facilite: 6.5, valeur: 8.5, confiance: 8 },
+  },
+  {
+    categorie: "Design graphique",
+    nom: "Recraft",
+    slug: "recraft",
+    url: "https://www.recraft.ai",
+    definition: "Illustrations, icônes et visuels vectoriels cohérents avec ta charte.",
+    prix: "freemium",
+    notes: { fonctionnalites: 8, facilite: 8, valeur: 8, confiance: 7.5 },
+  },
+  {
+    categorie: "Vidéo",
+    nom: "Runway",
+    slug: "runway",
+    url: "https://runwayml.com",
+    definition: "Montage et génération vidéo IA, du rush à l'effet spécial.",
+    prix: "payant",
+    notes: { fonctionnalites: 9, facilite: 7, valeur: 6.5, confiance: 7.5 },
+  },
+  {
+    categorie: "Vidéo",
+    nom: "HeyGen",
+    slug: "heygen",
+    url: "https://www.heygen.com",
+    definition: "Avatars vidéo et doublage multilingue à partir d'un script.",
+    prix: "freemium",
+    notes: { fonctionnalites: 8.5, facilite: 8.5, valeur: 7, confiance: 7.5 },
+  },
+  {
+    categorie: "Vidéo",
+    nom: "Sora",
+    slug: "sora",
+    url: "https://sora.com",
+    definition: "Le générateur de vidéos d'OpenAI, pour des plans courts bluffants.",
+    prix: "payant",
+    notes: { fonctionnalites: 8.5, facilite: 8, valeur: 6.5, confiance: 7 },
+  },
+  {
+    categorie: "Voix",
+    nom: "Descript",
+    slug: "descript",
+    url: "https://www.descript.com",
+    definition: "Monte une vidéo ou un podcast en corrigeant simplement le texte.",
+    prix: "freemium",
+    notes: { fonctionnalites: 8.5, facilite: 8.5, valeur: 7.5, confiance: 8 },
+  },
+  {
+    categorie: "Code",
+    nom: "GitHub Copilot",
+    slug: "github-copilot",
+    url: "https://github.com/features/copilot",
+    definition: "L'autocomplétion de code la plus répandue, intégrée à ton éditeur.",
+    prix: "payant",
+    notes: { fonctionnalites: 8, facilite: 8.5, valeur: 7.5, confiance: 8.5 },
+  },
+  {
+    categorie: "Code",
+    nom: "Windsurf",
+    slug: "windsurf",
+    url: "https://windsurf.com",
+    definition: "Éditeur agentique qui exécute des tâches de code de bout en bout.",
+    prix: "freemium",
+    notes: { fonctionnalites: 8.5, facilite: 8, valeur: 8, confiance: 7.5 },
+  },
+  {
+    categorie: "Automatisation",
+    nom: "Make",
+    slug: "make",
+    url: "https://www.make.com",
+    definition: "Scénarios d'automatisation visuels, plus fins que Zapier.",
+    prix: "freemium",
+    notes: { fonctionnalites: 8.5, facilite: 7, valeur: 8.5, confiance: 8 },
+  },
+  {
+    categorie: "Productivité",
+    nom: "Raycast",
+    slug: "raycast",
+    url: "https://www.raycast.com",
+    definition: "Lanceur Mac boosté à l'IA : tout se fait au clavier.",
+    prix: "freemium",
+    notes: { fonctionnalites: 8.5, facilite: 8, valeur: 8.5, confiance: 8.5 },
+  },
+  {
+    categorie: "Réunions",
+    nom: "Fireflies.ai",
+    slug: "fireflies",
+    url: "https://fireflies.ai",
+    definition: "Enregistre, transcrit et résume les visios automatiquement.",
+    prix: "freemium",
+    notes: { fonctionnalites: 8, facilite: 8.5, valeur: 8, confiance: 7 },
+  },
+  {
+    categorie: "SEO",
+    nom: "Ahrefs",
+    slug: "ahrefs",
+    url: "https://ahrefs.com",
+    definition: "Analyse de backlinks et de mots-clés, référence du SEO technique.",
+    prix: "payant",
+    notes: { fonctionnalites: 9, facilite: 7, valeur: 6.5, confiance: 9 },
+  },
+  {
+    categorie: "Sites web",
+    nom: "Framer",
+    slug: "framer",
+    url: "https://www.framer.com",
+    definition: "Site web design et publié en ligne sans écrire une ligne de code.",
+    prix: "freemium",
+    notes: { fonctionnalites: 8, facilite: 8, valeur: 7.5, confiance: 8 },
+  },
+  {
+    categorie: "Agents",
+    nom: "Manus",
+    slug: "manus",
+    url: "https://manus.im",
+    definition: "Agent autonome qui mène une tâche complète pendant que tu fais autre chose.",
+    prix: "payant",
+    notes: { fonctionnalites: 8, facilite: 7.5, valeur: 6.5, confiance: 6.5 },
+  },
+];
+
+const CLE_FAVORIS = "cami:outils-favoris";
+
 const FAQ: FAQ[] = [
   {
     question: "Pourquoi cette page plutôt qu'un simple favoris de navigateur ?",
@@ -489,6 +679,32 @@ export const Route = createFileRoute("/_authenticated/outils/")({
 function OutilsPage() {
   const [recherche, setRecherche] = useState("");
   const [categorieActive, setCategorieActive] = useState<string | null>(null);
+  const [ongletFavoris, setOngletFavoris] = useState(false);
+  // Favoris gardés dans le navigateur : aucune donnée personnelle côté serveur.
+  const [favoris, setFavoris] = useState<string[]>([]);
+
+  useEffect(() => {
+    try {
+      const brut = window.localStorage.getItem(CLE_FAVORIS);
+      if (brut) setFavoris(JSON.parse(brut) as string[]);
+    } catch {
+      setFavoris([]);
+    }
+  }, []);
+
+  function basculerFavori(slug: string) {
+    setFavoris((actuels) => {
+      const suivants = actuels.includes(slug)
+        ? actuels.filter((s) => s !== slug)
+        : [...actuels, slug];
+      try {
+        window.localStorage.setItem(CLE_FAVORIS, JSON.stringify(suivants));
+      } catch {
+        /* stockage indisponible : les favoris restent le temps de la session */
+      }
+      return suivants;
+    });
+  }
 
   const fetchOutilsPersos = useServerFn(listOutilsPersos);
   const addOutilPerso = useServerFn(saveOutilPerso);
@@ -525,9 +741,13 @@ function OutilsPage() {
   });
 
   const sectionsCombinees = useMemo(() => {
-    if (outilsAjoutes.length === 0) return SECTIONS;
     const parCategorie = new Map<string, Outil[]>();
     for (const section of SECTIONS) parCategorie.set(section.categorie, [...section.outils]);
+    for (const { categorie, ...outil } of OUTILS_SUPPLEMENTAIRES) {
+      const liste = parCategorie.get(categorie) ?? [];
+      liste.push(outil);
+      parCategorie.set(categorie, liste);
+    }
     for (const op of outilsAjoutes) {
       const liste = parCategorie.get(op.categorie) ?? [];
       liste.push({
@@ -551,12 +771,22 @@ function OutilsPage() {
     [sectionsCombinees],
   );
 
+  const nbFavoris = useMemo(
+    () =>
+      sectionsCombinees.reduce(
+        (somme, section) => somme + section.outils.filter((o) => favoris.includes(o.slug)).length,
+        0,
+      ),
+    [sectionsCombinees, favoris],
+  );
+
   const sectionsFiltrees = useMemo(() => {
     const terme = recherche.trim().toLowerCase();
     return sectionsCombinees
       .map((section) => ({
         ...section,
         outils: section.outils
+          .filter((o) => !ongletFavoris || favoris.includes(o.slug))
           .filter(
             (o) =>
               !terme ||
@@ -569,7 +799,7 @@ function OutilsPage() {
           ),
       }))
       .filter((section) => section.outils.length > 0);
-  }, [recherche, sectionsCombinees]);
+  }, [recherche, sectionsCombinees, ongletFavoris, favoris]);
 
   const [nouveauNom, setNouveauNom] = useState("");
   const [nouvelleCategorie, setNouvelleCategorie] = useState<string>(CATEGORIES_LABELS[0] ?? "");
@@ -657,6 +887,42 @@ function OutilsPage() {
               </div>
             }
           />
+        </div>
+
+        <div
+          role="tablist"
+          aria-label="Affichage des outils"
+          className="mb-6 inline-flex gap-1 rounded-full border border-border bg-card p-1"
+        >
+          {[
+            { valeur: false, label: "Tous les outils", compte: totalOutils },
+            { valeur: true, label: "Mes favoris", compte: nbFavoris },
+          ].map((onglet) => {
+            const actif = ongletFavoris === onglet.valeur;
+            return (
+              <button
+                key={onglet.label}
+                type="button"
+                role="tab"
+                aria-selected={actif}
+                onClick={() => setOngletFavoris(onglet.valeur)}
+                className={`inline-flex min-h-9 items-center gap-1.5 rounded-full px-4 text-xs font-bold transition ${
+                  actif
+                    ? "bg-primary text-primary-foreground"
+                    : "text-primary hover:text-[var(--coral)]"
+                }`}
+              >
+                {onglet.valeur ? (
+                  <Star
+                    className={`h-3.5 w-3.5 ${actif ? "" : "text-[var(--coral)]"}`}
+                    fill="currentColor"
+                  />
+                ) : null}
+                {onglet.label}
+                <span className="opacity-60">· {onglet.compte}</span>
+              </button>
+            );
+          })}
         </div>
 
         <form onSubmit={ajouterOutil} className="cami-card mb-8 space-y-2 p-3 sm:p-4">
@@ -800,12 +1066,43 @@ function OutilsPage() {
                               </span>
                               <p className="truncate text-sm font-bold text-primary">{o.nom}</p>
                             </div>
-                            {o.notes ? (
-                              <span className="shrink-0 rounded-full bg-primary px-2 py-0.5 text-[11px] font-bold text-primary-foreground">
-                                {formatNote(noteGlobale(o.notes))}
-                                <span className="opacity-60">/10</span>
-                              </span>
-                            ) : null}
+                            <div className="flex shrink-0 items-center gap-1.5">
+                              {o.notes ? (
+                                <span className="rounded-full bg-primary px-2 py-0.5 text-[11px] font-bold text-primary-foreground">
+                                  {formatNote(noteGlobale(o.notes))}
+                                  <span className="opacity-60">/10</span>
+                                </span>
+                              ) : null}
+                              <button
+                                type="button"
+                                onClick={(event) => {
+                                  event.preventDefault();
+                                  event.stopPropagation();
+                                  basculerFavori(o.slug);
+                                }}
+                                aria-pressed={favoris.includes(o.slug)}
+                                aria-label={
+                                  favoris.includes(o.slug)
+                                    ? `Retirer ${o.nom} des favoris`
+                                    : `Mettre ${o.nom} en favori`
+                                }
+                                title={
+                                  favoris.includes(o.slug)
+                                    ? "Retirer des favoris"
+                                    : "Mettre en favori"
+                                }
+                                className="flex h-7 w-7 items-center justify-center rounded-full transition hover:bg-muted"
+                              >
+                                <Star
+                                  className={`h-4 w-4 ${
+                                    favoris.includes(o.slug)
+                                      ? "text-[var(--coral)]"
+                                      : "text-muted-foreground"
+                                  }`}
+                                  fill={favoris.includes(o.slug) ? "currentColor" : "none"}
+                                />
+                              </button>
+                            </div>
                           </div>
                           <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
                             {o.definition}
@@ -876,6 +1173,20 @@ function OutilsPage() {
                               <Trash2 className="h-3.5 w-3.5" />
                             </button>
                           </div>
+                        );
+                      }
+
+                      if (o.url) {
+                        return (
+                          <a
+                            key={o.nom}
+                            href={o.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="cami-card block transition hover:-translate-y-0.5 hover:border-[var(--coral)]"
+                          >
+                            {contenu}
+                          </a>
                         );
                       }
 
