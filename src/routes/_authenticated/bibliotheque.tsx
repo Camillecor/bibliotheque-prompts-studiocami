@@ -438,7 +438,9 @@ function LibraryPage() {
       ) : (
         <>
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-3 md:px-6">
-            <h2 className="text-base font-semibold sm:text-lg">Bibliothèque de prompts</h2>
+            <h1 className="font-display text-2xl font-bold text-primary sm:text-3xl">
+              Bibliothèque de prompts
+            </h1>
             <div className="relative w-full sm:w-auto">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
               <input
