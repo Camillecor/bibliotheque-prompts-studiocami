@@ -889,6 +889,42 @@ function OutilsPage() {
           />
         </div>
 
+        <div
+          role="tablist"
+          aria-label="Affichage des outils"
+          className="mb-6 inline-flex gap-1 rounded-full border border-border bg-card p-1"
+        >
+          {[
+            { valeur: false, label: "Tous les outils", compte: totalOutils },
+            { valeur: true, label: "Mes favoris", compte: nbFavoris },
+          ].map((onglet) => {
+            const actif = ongletFavoris === onglet.valeur;
+            return (
+              <button
+                key={onglet.label}
+                type="button"
+                role="tab"
+                aria-selected={actif}
+                onClick={() => setOngletFavoris(onglet.valeur)}
+                className={`inline-flex min-h-9 items-center gap-1.5 rounded-full px-4 text-xs font-bold transition ${
+                  actif
+                    ? "bg-primary text-primary-foreground"
+                    : "text-primary hover:text-[var(--coral)]"
+                }`}
+              >
+                {onglet.valeur ? (
+                  <Star
+                    className={`h-3.5 w-3.5 ${actif ? "" : "text-[var(--coral)]"}`}
+                    fill="currentColor"
+                  />
+                ) : null}
+                {onglet.label}
+                <span className="opacity-60">· {onglet.compte}</span>
+              </button>
+            );
+          })}
+        </div>
+
         <form onSubmit={ajouterOutil} className="cami-card mb-8 space-y-2 p-3 sm:p-4">
           <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
             Ajouter un outil
