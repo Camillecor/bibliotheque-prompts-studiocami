@@ -715,9 +715,13 @@ function OutilsPage() {
   });
 
   const sectionsCombinees = useMemo(() => {
-    if (outilsAjoutes.length === 0) return SECTIONS;
     const parCategorie = new Map<string, Outil[]>();
     for (const section of SECTIONS) parCategorie.set(section.categorie, [...section.outils]);
+    for (const { categorie, ...outil } of OUTILS_SUPPLEMENTAIRES) {
+      const liste = parCategorie.get(categorie) ?? [];
+      liste.push(outil);
+      parCategorie.set(categorie, liste);
+    }
     for (const op of outilsAjoutes) {
       const liste = parCategorie.get(op.categorie) ?? [];
       liste.push({
