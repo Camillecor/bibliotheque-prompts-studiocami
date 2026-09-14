@@ -189,7 +189,8 @@ const SECTIONS: SectionCategorie[] = [
         nom: "Claude Code",
         slug: "claude-code",
         logo: "ClaudeCode",
-        definition: "Agent IA en ligne de commande : code, débogue et gère les projets dans le terminal.",
+        definition:
+          "Agent IA en ligne de commande : code, débogue et gère les projets dans le terminal.",
         prix: "freemium",
         notes: { fonctionnalites: 9, facilite: 7, valeur: 8, confiance: 8.5 },
       },
@@ -225,7 +226,8 @@ const SECTIONS: SectionCategorie[] = [
         nom: "Lovable",
         slug: "lovable",
         logo: "Lovable",
-        definition: "Génère une app web complète à partir d'une conversation, code et déploiement inclus.",
+        definition:
+          "Génère une app web complète à partir d'une conversation, code et déploiement inclus.",
         prix: "freemium",
         mcp: true,
         notes: { fonctionnalites: 8, facilite: 8.5, valeur: 7, confiance: 7 },
@@ -475,7 +477,8 @@ export const Route = createFileRoute("/_authenticated/outils/")({
       { title: "Outils IA — Studio Cami IA" },
       {
         name: "description",
-        content: "Les outils IA utilisés chez Studio Cami, classés par usage, avec prix et disponibilité MCP.",
+        content:
+          "Les outils IA utilisés chez Studio Cami, classés par usage, avec prix et disponibilité MCP.",
       },
     ],
   }),
@@ -497,8 +500,13 @@ function OutilsPage() {
   });
 
   const ajout = useMutation({
-    mutationFn: (input: { nom: string; slug: string; definition: string; prix: Prix; categorie: string }) =>
-      addOutilPerso({ data: input }),
+    mutationFn: (input: {
+      nom: string;
+      slug: string;
+      definition: string;
+      prix: Prix;
+      categorie: string;
+    }) => addOutilPerso({ data: input }),
     onSuccess: (row) => {
       toast.success(`« ${row.nom} » ajouté aux outils.`);
       queryClient.invalidateQueries({ queryKey: ["outils_persos"] });
@@ -521,7 +529,14 @@ function OutilsPage() {
     for (const section of SECTIONS) parCategorie.set(section.categorie, [...section.outils]);
     for (const op of outilsAjoutes) {
       const liste = parCategorie.get(op.categorie) ?? [];
-      liste.push({ nom: op.nom, slug: op.slug, definition: op.definition, prix: op.prix, id: op.id, perso: true });
+      liste.push({
+        nom: op.nom,
+        slug: op.slug,
+        definition: op.definition,
+        prix: op.prix,
+        id: op.id,
+        perso: true,
+      });
       parCategorie.set(op.categorie, liste);
     }
     return CATEGORIES_LABELS.map((categorie) => ({
@@ -570,7 +585,10 @@ function OutilsPage() {
       return;
     }
 
-    const slugBase = nom.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    const slugBase = nom
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "");
     const slug = `perso-${slugBase || "outil"}-${Date.now().toString(36)}`;
 
     ajout.mutate({ nom, slug, definition, prix: nouveauPrix, categorie: nouvelleCategorie });
@@ -626,10 +644,12 @@ function OutilsPage() {
 
       <div className="px-4 py-6 md:px-6 md:py-8">
         <div className="mb-6 max-w-2xl">
-          <h1 className="font-display text-2xl font-bold text-primary sm:text-3xl">Mes outils IA</h1>
+          <h1 className="font-display text-2xl font-bold text-primary sm:text-3xl">
+            Mes outils IA
+          </h1>
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-            {totalOutils} outils que j'utilise vraiment, classés par usage — pour retrouver le
-            bon réflexe en un clic.
+            {totalOutils} outils que j'utilise vraiment, classés par usage — pour retrouver le bon
+            réflexe en un clic.
             {recherche.trim() ? (
               <span className="ml-1 font-semibold text-primary">
                 {resultatsCount} résultat{resultatsCount > 1 ? "s" : ""} pour « {recherche} »
@@ -734,7 +754,6 @@ function OutilsPage() {
             );
           })}
         </nav>
-
 
         {sectionsAffichees.length === 0 ? (
           <div className="cami-block-resume text-center text-sm text-muted-foreground">

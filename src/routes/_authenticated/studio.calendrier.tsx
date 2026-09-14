@@ -283,7 +283,6 @@ function StudioCalendrierPage() {
                         );
                       })}
                     </div>
-
                   </div>
                 );
               })}

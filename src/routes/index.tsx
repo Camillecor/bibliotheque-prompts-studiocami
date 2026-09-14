@@ -43,14 +43,18 @@ import {
   suggererIdeesMario,
 } from "@/lib/mario.functions";
 
-
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024; // 5 Mo
 const IMAGE_SIGNATURES: { mediaType: "image/png" | "image/jpeg"; bytes: number[] }[] = [
   { mediaType: "image/png", bytes: [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a] },
   { mediaType: "image/jpeg", bytes: [0xff, 0xd8, 0xff] },
 ];
 
-type ImageAttachment = { mediaType: "image/png" | "image/jpeg"; base64: string; previewUrl: string; name: string };
+type ImageAttachment = {
+  mediaType: "image/png" | "image/jpeg";
+  base64: string;
+  previewUrl: string;
+  name: string;
+};
 
 // Sécurité : le nom de fichier et le type MIME déclarés par le navigateur ne sont pas fiables
 // (un exécutable renommé en .png passerait ce filtre). On relit les premiers octets du fichier
@@ -115,8 +119,7 @@ const POOL_SUGGESTIONS = [
     titre: "Écrire un communiqué de presse",
     description: "clair, factuel et prêt à diffuser…",
     tags: ["Presse", "Communiqué"],
-    prefill:
-      "Un prompt pour écrire un communiqué de presse clair, factuel et prêt à diffuser.",
+    prefill: "Un prompt pour écrire un communiqué de presse clair, factuel et prêt à diffuser.",
   },
   {
     titre: "Préparer un entretien annuel",
@@ -184,11 +187,7 @@ function mulberry32(seed: number) {
   };
 }
 
-function tirerSuggestions(
-  pool: readonly Suggestion[],
-  seed: string,
-  n: number,
-): SuggestionIdee[] {
+function tirerSuggestions(pool: readonly Suggestion[], seed: string, n: number): SuggestionIdee[] {
   const random = mulberry32(hashSeed(seed));
   const copie = [...pool];
   for (let i = copie.length - 1; i > 0; i -= 1) {
@@ -204,7 +203,6 @@ function tirerSuggestions(
 }
 
 const CLE_USAGES = "mario_suggestions_usages";
-
 
 function useTypewriterPlaceholder(phrases: readonly string[], active: boolean) {
   const [text, setText] = useState("");
@@ -282,11 +280,7 @@ function GeneratorPage() {
   });
   const suggestionsSecours = useMemo<SuggestionIdee[]>(
     () =>
-      tirerSuggestions(
-        POOL_SUGGESTIONS,
-        `${new Date().toISOString().slice(0, 10)}-${usages}`,
-        3,
-      ),
+      tirerSuggestions(POOL_SUGGESTIONS, `${new Date().toISOString().slice(0, 10)}-${usages}`, 3),
     [usages],
   );
   const [suggestions, setSuggestions] = useState<SuggestionIdee[]>(suggestionsSecours);
@@ -310,7 +304,6 @@ function GeneratorPage() {
   const [typeEdit, setTypeEdit] = useState<TypePromptValue>("standard");
   const [motsClesEdit, setMotsClesEdit] = useState("");
   const [dateEdit, setDateEdit] = useState(() => new Date().toISOString().slice(0, 10));
-
 
   useEffect(() => {
     if (result) {
@@ -385,8 +378,7 @@ function GeneratorPage() {
   function soumettreReponse(reponseForcee?: string) {
     if (generation.isPending) return;
 
-    const reponse =
-      reponseForcee !== undefined ? reponseForcee : reponseCourante.trim();
+    const reponse = reponseForcee !== undefined ? reponseForcee : reponseCourante.trim();
 
     // En mode normal (pas forcé), on refuse une réponse vide.
     if (reponseForcee === undefined && reponse === "") return;
@@ -400,9 +392,7 @@ function GeneratorPage() {
         .map((q, i) => `Q${i + 1}: ${q}\nR${i + 1}: ${nouvellesReponses[i] ?? ""}`)
         .join("\n");
       const bloc = `Précisions apportées en échangeant avec Mario :\n${echange}`;
-      const combine = autresInstructions.trim()
-        ? `${autresInstructions.trim()}\n\n${bloc}`
-        : bloc;
+      const combine = autresInstructions.trim() ? `${autresInstructions.trim()}\n\n${bloc}` : bloc;
       setAutresInstructions(combine);
       generation.mutate(combine);
     }
@@ -419,7 +409,6 @@ function GeneratorPage() {
   function passerQuestion() {
     soumettreReponse("");
   }
-
 
   const sauvegarde = useMutation({
     mutationFn: async () => {
@@ -453,7 +442,6 @@ function GeneratorPage() {
   });
 
   const peutGenerer = idee.trim().length >= 5 && !generation.isPending;
-
 
   // Panneau contextuel : historique récent, lu depuis le cache React Query déjà préchargé.
   const fetchPrompts = useServerFn(listPrompts);
@@ -524,9 +512,7 @@ function GeneratorPage() {
     const liste = prompts ?? [];
     const total = liste.length;
     const limite7j = Date.now() - 7 * 24 * 60 * 60 * 1000;
-    const cetteSemaine = liste.filter(
-      (p) => new Date(p.date_ajout).getTime() >= limite7j,
-    ).length;
+    const cetteSemaine = liste.filter((p) => new Date(p.date_ajout).getTime() >= limite7j).length;
     const metierComptes = new Map<string, number>();
     for (const p of liste) {
       metierComptes.set(p.metier, (metierComptes.get(p.metier) ?? 0) + 1);
@@ -568,7 +554,6 @@ function GeneratorPage() {
     rafraichirSuggestions();
   }
 
-
   return (
     <AppShell
       panel={
@@ -602,9 +587,7 @@ function GeneratorPage() {
                     <li key={item.id}>
                       <button
                         type="button"
-                        onClick={() =>
-                          navigate({ to: "/bibliotheque", search: { id: item.id } })
-                        }
+                        onClick={() => navigate({ to: "/bibliotheque", search: { id: item.id } })}
                         className="w-full truncate rounded-lg px-2 py-1.5 text-left text-xs text-primary transition hover:bg-muted"
                       >
                         {item.titre}
@@ -651,7 +634,6 @@ function GeneratorPage() {
         ].join(" ")}
       >
         <div className="mx-auto w-full max-w-[820px]">
-
           <form
             className="cami-card-hero relative w-full"
             onSubmit={(event) => {
@@ -663,370 +645,422 @@ function GeneratorPage() {
               if (peutGenerer) demandeQuestions.mutate();
             }}
           >
-
-          {phase === "questions" ? (
-            <div className="mb-4 space-y-3">
-              <div className="flex justify-end">
-                <p className="max-w-[85%] rounded-2xl bg-[var(--coral)] px-3.5 py-2 text-sm text-white">
-                  {idee}
-                </p>
-              </div>
-              {questions.slice(0, reponses.length + 1).map((question, index) => (
-                <div key={question} className="space-y-2">
-                  <div className="flex items-start gap-2">
-                    <img src="/mario-fox-head.png" alt="" aria-hidden="true" className="h-10 w-10 shrink-0" />
-                    <p
-                      className={[
-                        "max-w-[85%] rounded-2xl px-3.5 py-2 text-sm",
-                        index === reponses.length
-                          ? "bg-secondary font-semibold text-primary"
-                          : "bg-muted text-muted-foreground",
-                      ].join(" ")}
-                    >
-                      {question}
-                    </p>
-                  </div>
-                  {reponses[index] ? (
-                    <div className="flex justify-end">
-                      <p className="max-w-[85%] rounded-2xl bg-[var(--coral)] px-3.5 py-1.5 text-xs text-white">
-                        {reponses[index]}
+            {phase === "questions" ? (
+              <div className="mb-4 space-y-3">
+                <div className="flex justify-end">
+                  <p className="max-w-[85%] rounded-2xl bg-[var(--coral)] px-3.5 py-2 text-sm text-white">
+                    {idee}
+                  </p>
+                </div>
+                {questions.slice(0, reponses.length + 1).map((question, index) => (
+                  <div key={question} className="space-y-2">
+                    <div className="flex items-start gap-2">
+                      <img
+                        src="/mario-fox-head.png"
+                        alt=""
+                        aria-hidden="true"
+                        className="h-10 w-10 shrink-0"
+                      />
+                      <p
+                        className={[
+                          "max-w-[85%] rounded-2xl px-3.5 py-2 text-sm",
+                          index === reponses.length
+                            ? "bg-secondary font-semibold text-primary"
+                            : "bg-muted text-muted-foreground",
+                        ].join(" ")}
+                      >
+                        {question}
                       </p>
                     </div>
-                  ) : null}
-                </div>
-              ))}
-            </div>
-          ) : null}
+                    {reponses[index] ? (
+                      <div className="flex justify-end">
+                        <p className="max-w-[85%] rounded-2xl bg-[var(--coral)] px-3.5 py-1.5 text-xs text-white">
+                          {reponses[index]}
+                        </p>
+                      </div>
+                    ) : null}
+                  </div>
+                ))}
+              </div>
+            ) : null}
 
-          <textarea
-            rows={2}
-            value={phase === "questions" ? reponseCourante : idee}
-            onChange={(event) =>
-              phase === "questions"
-                ? setReponseCourante(event.target.value)
-                : setIdee(event.target.value)
-            }
-            onKeyDown={(event) => {
-              if (
-                phase === "questions" &&
-                event.key === "Enter" &&
-                !event.shiftKey &&
-                !event.nativeEvent.isComposing
-              ) {
-                event.preventDefault();
-                envoyerReponse();
-              }
-            }}
-            placeholder={phase === "questions" ? "Ta réponse…" : placeholderAnime}
-            className="min-h-[70px] w-full resize-none border-0 bg-transparent text-base text-primary outline-none placeholder:text-sm placeholder:text-muted-foreground md:text-lg"
-          />
-
-          {phase === "questions" ? (
-            <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:justify-end">
-              <button
-                type="button"
-                onClick={passerQuestion}
-                disabled={generation.isPending}
-                className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full border border-border bg-card px-4 text-xs font-medium text-muted-foreground transition hover:border-[var(--coral)] hover:text-primary disabled:opacity-50 sm:w-auto"
-              >
-                Question suivante
-              </button>
-              <button
-                type="button"
-                onClick={repondreJeNeSaisPas}
-                disabled={generation.isPending}
-                className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full border border-border bg-card px-4 text-xs font-medium text-muted-foreground transition hover:border-[var(--coral)] hover:text-primary disabled:opacity-50 sm:w-auto"
-              >
-                Je ne sais pas
-              </button>
-            </div>
-          ) : null}
-
-
-
-          {motsClesOuvert ? (
-            <input
-              value={motsCles}
-              onChange={(event) => setMotsCles(event.target.value)}
-              placeholder="Mots-clés, séparés par une virgule (optionnel)"
-              className="mt-1 w-full border-0 bg-transparent text-sm text-muted-foreground outline-none placeholder:text-muted-foreground/70"
-            />
-          ) : null}
-
-          {autresInstructionsOuvert ? (
             <textarea
               rows={2}
-              value={autresInstructions}
-              onChange={(event) => setAutresInstructions(event.target.value)}
-              placeholder="Autres instructions à respecter (optionnel)"
-              className="mt-1 w-full resize-none border-0 bg-transparent text-sm text-muted-foreground outline-none placeholder:text-muted-foreground/70"
+              value={phase === "questions" ? reponseCourante : idee}
+              onChange={(event) =>
+                phase === "questions"
+                  ? setReponseCourante(event.target.value)
+                  : setIdee(event.target.value)
+              }
+              onKeyDown={(event) => {
+                if (
+                  phase === "questions" &&
+                  event.key === "Enter" &&
+                  !event.shiftKey &&
+                  !event.nativeEvent.isComposing
+                ) {
+                  event.preventDefault();
+                  envoyerReponse();
+                }
+              }}
+              placeholder={phase === "questions" ? "Ta réponse…" : placeholderAnime}
+              className="min-h-[70px] w-full resize-none border-0 bg-transparent text-base text-primary outline-none placeholder:text-sm placeholder:text-muted-foreground md:text-lg"
             />
-          ) : null}
 
-          {image ? (
-            <div className="mt-2 inline-flex items-center gap-2 rounded-2xl border border-border bg-muted px-3 py-2">
-              <img src={image.previewUrl} alt="" className="h-8 w-8 rounded-lg object-cover" />
-              <span className="max-w-[10rem] truncate text-xs text-muted-foreground">{image.name}</span>
+            {phase === "questions" ? (
+              <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:justify-end">
+                <button
+                  type="button"
+                  onClick={passerQuestion}
+                  disabled={generation.isPending}
+                  className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full border border-border bg-card px-4 text-xs font-medium text-muted-foreground transition hover:border-[var(--coral)] hover:text-primary disabled:opacity-50 sm:w-auto"
+                >
+                  Question suivante
+                </button>
+                <button
+                  type="button"
+                  onClick={repondreJeNeSaisPas}
+                  disabled={generation.isPending}
+                  className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full border border-border bg-card px-4 text-xs font-medium text-muted-foreground transition hover:border-[var(--coral)] hover:text-primary disabled:opacity-50 sm:w-auto"
+                >
+                  Je ne sais pas
+                </button>
+              </div>
+            ) : null}
+
+            {motsClesOuvert ? (
+              <input
+                value={motsCles}
+                onChange={(event) => setMotsCles(event.target.value)}
+                placeholder="Mots-clés, séparés par une virgule (optionnel)"
+                className="mt-1 w-full border-0 bg-transparent text-sm text-muted-foreground outline-none placeholder:text-muted-foreground/70"
+              />
+            ) : null}
+
+            {autresInstructionsOuvert ? (
+              <textarea
+                rows={2}
+                value={autresInstructions}
+                onChange={(event) => setAutresInstructions(event.target.value)}
+                placeholder="Autres instructions à respecter (optionnel)"
+                className="mt-1 w-full resize-none border-0 bg-transparent text-sm text-muted-foreground outline-none placeholder:text-muted-foreground/70"
+              />
+            ) : null}
+
+            {image ? (
+              <div className="mt-2 inline-flex items-center gap-2 rounded-2xl border border-border bg-muted px-3 py-2">
+                <img src={image.previewUrl} alt="" className="h-8 w-8 rounded-lg object-cover" />
+                <span className="max-w-[10rem] truncate text-xs text-muted-foreground">
+                  {image.name}
+                </span>
+                <button
+                  type="button"
+                  aria-label="Retirer l'image"
+                  onClick={() => setImage(null)}
+                  className="rounded-full p-0.5 text-muted-foreground transition hover:text-[var(--coral)]"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            ) : null}
+
+            <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-border pt-4">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    type="button"
+                    className="cami-select-pill inline-flex w-fit items-center gap-1.5"
+                  >
+                    Type : {TYPES_PROMPT.find((t) => t.value === typePrompt)?.label ?? "Auto"}
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="start"
+                  className="w-[min(20rem,calc(100vw-2rem))] rounded-3xl border border-white/60 bg-white/75 p-2 shadow-2xl backdrop-blur-xl"
+                >
+                  <button
+                    type="button"
+                    onClick={() => setTypePrompt("")}
+                    className="flex w-full items-center justify-between gap-2 rounded-2xl px-3 py-2 text-left text-sm font-semibold text-primary transition hover:bg-secondary"
+                  >
+                    Type : Auto
+                    {typePrompt === "" ? <Check className="h-4 w-4 text-[var(--coral)]" /> : null}
+                  </button>
+                  <div className="my-1 h-px bg-border" />
+                  {TYPES_PROMPT.map((item) => (
+                    <button
+                      key={item.value}
+                      type="button"
+                      onClick={() => setTypePrompt(item.value)}
+                      className="flex w-full flex-col items-start gap-0.5 rounded-2xl px-3 py-2 text-left transition hover:bg-secondary"
+                    >
+                      <span className="flex w-full items-center justify-between gap-2 text-sm font-semibold text-primary">
+                        {item.label}
+                        {typePrompt === item.value ? (
+                          <Check className="h-4 w-4 text-[var(--coral)]" />
+                        ) : null}
+                      </span>
+                      <span className="text-xs text-muted-foreground">{item.description}</span>
+                    </button>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              <select
+                id="ton"
+                value={ton}
+                onChange={(event) => setTon(event.target.value as TonValue)}
+                className="cami-select-pill"
+                aria-label="Ton du prompt"
+              >
+                {TONS.map((item) => (
+                  <option key={item.value} value={item.value}>
+                    Ton : {item.label}
+                  </option>
+                ))}
+              </select>
+              <select
+                id="modele"
+                value={modele}
+                onChange={(event) => setModele(event.target.value as ModeleValue)}
+                className="cami-select-pill"
+                aria-label="Modèle Claude"
+              >
+                {MODELES.map((item) => (
+                  <option key={item.value} value={item.value}>
+                    {item.label}
+                  </option>
+                ))}
+              </select>
               <button
                 type="button"
-                aria-label="Retirer l'image"
-                onClick={() => setImage(null)}
-                className="rounded-full p-0.5 text-muted-foreground transition hover:text-[var(--coral)]"
+                onClick={() => setMotsClesOuvert((v) => !v)}
+                aria-pressed={motsClesOuvert}
+                title="Ajouter des mots-clés"
+                className={[
+                  "cami-icon-btn",
+                  motsClesOuvert ? "bg-secondary text-[var(--primary-dark)]" : "",
+                ].join(" ")}
               >
-                <X className="h-3.5 w-3.5" />
+                <Hash className="h-4 w-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setAutresInstructionsOuvert((v) => !v)}
+                aria-pressed={autresInstructionsOuvert}
+                title="Ajouter d'autres instructions"
+                className={[
+                  "cami-icon-btn",
+                  autresInstructionsOuvert ? "bg-secondary text-[var(--primary-dark)]" : "",
+                ].join(" ")}
+              >
+                <ListPlus className="h-4 w-4" />
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/png,image/jpeg"
+                onChange={handleImageChange}
+                className="hidden"
+              />
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={imageEnCours}
+                aria-pressed={!!image}
+                title="Joindre une image (PNG ou JPG, 5 Mo max)"
+                className={[
+                  "cami-icon-btn",
+                  image ? "bg-secondary text-[var(--primary-dark)]" : "",
+                ].join(" ")}
+              >
+                {imageEnCours ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <ImagePlus className="h-4 w-4" />
+                )}
+              </button>
+              <button
+                type="submit"
+                disabled={
+                  phase === "questions"
+                    ? reponseCourante.trim().length === 0 || generation.isPending
+                    : !peutGenerer || demandeQuestions.isPending
+                }
+                aria-label={phase === "questions" ? "Envoyer ma réponse" : "Générer le prompt"}
+                className="cami-submit-btn ml-auto shrink-0 h-11 w-11 md:ml-0 md:h-10 md:w-10 lg:ml-auto"
+              >
+                {generation.isPending || demandeQuestions.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin md:h-5 md:w-5" />
+                ) : (
+                  <ArrowUp className="h-4 w-4 md:h-5 md:w-5" />
+                )}
               </button>
             </div>
-          ) : null}
+          </form>
 
-          <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-border pt-4">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button
-                  type="button"
-                  className="cami-select-pill inline-flex w-fit items-center gap-1.5"
-                >
-                  Type :{" "}
-                  {TYPES_PROMPT.find((t) => t.value === typePrompt)?.label ?? "Auto"}
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                align="start"
-                className="w-[min(20rem,calc(100vw-2rem))] rounded-3xl border border-white/60 bg-white/75 p-2 shadow-2xl backdrop-blur-xl"
+          <div
+            className={[
+              "mt-6 grid grid-cols-1 gap-2.5 transition-opacity sm:grid-cols-3",
+              suggestionsChargement ? "opacity-50" : "",
+            ].join(" ")}
+            aria-busy={suggestionsChargement}
+          >
+            {suggestions.map((s) => (
+              <button
+                key={s.titre}
+                type="button"
+                onClick={() => setIdee(s.prefill)}
+                disabled={suggestionsChargement}
+                className="rounded-2xl border border-border bg-card p-3.5 text-left transition hover:-translate-y-0.5 hover:border-[var(--coral)]"
               >
-                <button
-                  type="button"
-                  onClick={() => setTypePrompt("")}
-                  className="flex w-full items-center justify-between gap-2 rounded-2xl px-3 py-2 text-left text-sm font-semibold text-primary transition hover:bg-secondary"
-                >
-                  Type : Auto
-                  {typePrompt === "" ? <Check className="h-4 w-4 text-[var(--coral)]" /> : null}
-                </button>
-                <div className="my-1 h-px bg-border" />
-                {TYPES_PROMPT.map((item) => (
-                  <button
-                    key={item.value}
-                    type="button"
-                    onClick={() => setTypePrompt(item.value)}
-                    className="flex w-full flex-col items-start gap-0.5 rounded-2xl px-3 py-2 text-left transition hover:bg-secondary"
-                  >
-                    <span className="flex w-full items-center justify-between gap-2 text-sm font-semibold text-primary">
-                      {item.label}
-                      {typePrompt === item.value ? (
-                        <Check className="h-4 w-4 text-[var(--coral)]" />
-                      ) : null}
+                <p className="text-sm font-bold text-primary">{s.titre}</p>
+                <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                  {s.description}
+                </p>
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {s.tags.map((tag: string) => (
+                    <span key={tag} className="cami-pill">
+                      {tag}
                     </span>
-                    <span className="text-xs text-muted-foreground">{item.description}</span>
-                  </button>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            <select
-              id="ton"
-              value={ton}
-              onChange={(event) => setTon(event.target.value as TonValue)}
-              className="cami-select-pill"
-              aria-label="Ton du prompt"
-            >
-              {TONS.map((item) => (
-                <option key={item.value} value={item.value}>
-                  Ton : {item.label}
-                </option>
-              ))}
-            </select>
-            <select
-              id="modele"
-              value={modele}
-              onChange={(event) => setModele(event.target.value as ModeleValue)}
-              className="cami-select-pill"
-              aria-label="Modèle Claude"
-            >
-              {MODELES.map((item) => (
-                <option key={item.value} value={item.value}>
-                  {item.label}
-                </option>
-              ))}
-            </select>
-            <button
-              type="button"
-              onClick={() => setMotsClesOuvert((v) => !v)}
-              aria-pressed={motsClesOuvert}
-              title="Ajouter des mots-clés"
-              className={[
-                "cami-icon-btn",
-                motsClesOuvert ? "bg-secondary text-[var(--primary-dark)]" : "",
-              ].join(" ")}
-            >
-              <Hash className="h-4 w-4" />
-            </button>
-            <button
-              type="button"
-              onClick={() => setAutresInstructionsOuvert((v) => !v)}
-              aria-pressed={autresInstructionsOuvert}
-              title="Ajouter d'autres instructions"
-              className={[
-                "cami-icon-btn",
-                autresInstructionsOuvert ? "bg-secondary text-[var(--primary-dark)]" : "",
-              ].join(" ")}
-            >
-              <ListPlus className="h-4 w-4" />
-            </button>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/png,image/jpeg"
-              onChange={handleImageChange}
-              className="hidden"
-            />
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={imageEnCours}
-              aria-pressed={!!image}
-              title="Joindre une image (PNG ou JPG, 5 Mo max)"
-              className={[
-                "cami-icon-btn",
-                image ? "bg-secondary text-[var(--primary-dark)]" : "",
-              ].join(" ")}
-            >
-              {imageEnCours ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <ImagePlus className="h-4 w-4" />
-              )}
-            </button>
-            <button
-              type="submit"
-              disabled={
-                phase === "questions"
-                  ? reponseCourante.trim().length === 0 || generation.isPending
-                  : !peutGenerer || demandeQuestions.isPending
-              }
-              aria-label={phase === "questions" ? "Envoyer ma réponse" : "Générer le prompt"}
-              className="cami-submit-btn ml-auto shrink-0 h-11 w-11 md:ml-0 md:h-10 md:w-10 lg:ml-auto"
-            >
-              {generation.isPending || demandeQuestions.isPending ? (
-
-                <Loader2 className="h-4 w-4 animate-spin md:h-5 md:w-5" />
-              ) : (
-                <ArrowUp className="h-4 w-4 md:h-5 md:w-5" />
-              )}
-            </button>
+                  ))}
+                </div>
+              </button>
+            ))}
           </div>
-        </form>
+        </div>
+      </div>
 
-            <div
-              className={[
-                "mt-6 grid grid-cols-1 gap-2.5 transition-opacity sm:grid-cols-3",
-                suggestionsChargement ? "opacity-50" : "",
-              ].join(" ")}
-              aria-busy={suggestionsChargement}
-            >
-              {suggestions.map((s) => (
-                <button
-                  key={s.titre}
-                  type="button"
-                  onClick={() => setIdee(s.prefill)}
-                  disabled={suggestionsChargement}
-                  className="rounded-2xl border border-border bg-card p-3.5 text-left transition hover:-translate-y-0.5 hover:border-[var(--coral)]"
+      {result ? (
+        <div
+          ref={resultRef}
+          id="prompt-genere"
+          className="mx-auto mt-10 max-w-5xl scroll-mt-20 space-y-8 px-4 md:mt-16 md:px-6"
+        >
+          <PromptView
+            editable
+            onPromptChange={(prompt) =>
+              setResult((precedent) => (precedent ? { ...precedent, prompt } : precedent))
+            }
+            data={{
+              titre: titreEdit || result.titre_prompt,
+              metier: metierEdit,
+              type_prompt: typeEdit,
+              mots_cles: result.mots_cles,
+              complexite: result.complexite,
+              prompt: result.prompt,
+              note: result.note,
+              etapes_lancement: result.etapes_lancement,
+              alerte_pii: result.alerte_pii,
+            }}
+          />
+
+          <div className="space-y-4">
+            <h3 className="flex items-center gap-3 text-lg font-bold">
+              <span className="cami-step-badge bg-[var(--coral)]">3</span>
+              Je range mon nouveau prompt dans ma bibliothèque
+            </h3>
+            <div className="grid gap-3.5 sm:grid-cols-2">
+              <div className="cami-card p-4 sm:col-span-2">
+                <label
+                  htmlFor="titre-edit"
+                  className="mb-2 block text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground"
                 >
-                  <p className="text-sm font-bold text-primary">{s.titre}</p>
-                  <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                    {s.description}
-                  </p>
-                  <div className="mt-2 flex flex-wrap gap-1.5">
-                    {s.tags.map((tag: string) => (
-                      <span key={tag} className="cami-pill">
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                </button>
-              ))}
+                  Titre
+                </label>
+                <input
+                  id="titre-edit"
+                  value={titreEdit}
+                  onChange={(event) => setTitreEdit(event.target.value)}
+                  className="cami-input"
+                />
+              </div>
+              <div className="cami-card p-4">
+                <label
+                  htmlFor="metier-edit"
+                  className="mb-2 block text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground"
+                >
+                  Métier
+                </label>
+                <select
+                  id="metier-edit"
+                  value={metierEdit}
+                  onChange={(event) => setMetierEdit(event.target.value)}
+                  className="cami-input"
+                >
+                  {METIERS.map((item) => (
+                    <option key={item} value={item}>
+                      {item}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="cami-card p-4">
+                <label
+                  htmlFor="type-edit"
+                  className="mb-2 block text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground"
+                >
+                  Type
+                </label>
+                <select
+                  id="type-edit"
+                  value={typeEdit}
+                  onChange={(event) => setTypeEdit(event.target.value as TypePromptValue)}
+                  className="cami-input"
+                >
+                  {TYPES_PROMPT.map((item) => (
+                    <option key={item.value} value={item.value}>
+                      {item.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="cami-card p-4">
+                <label
+                  htmlFor="mots-edit"
+                  className="mb-2 block text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground"
+                >
+                  Mots-clés
+                </label>
+                <input
+                  id="mots-edit"
+                  value={motsClesEdit}
+                  onChange={(event) => setMotsClesEdit(event.target.value)}
+                  className="cami-input"
+                />
+              </div>
+              <div className="cami-card p-4">
+                <label
+                  htmlFor="date-edit"
+                  className="mb-2 block text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground"
+                >
+                  Date
+                </label>
+                <input
+                  id="date-edit"
+                  type="date"
+                  value={dateEdit}
+                  onChange={(event) => setDateEdit(event.target.value)}
+                  className="cami-input"
+                />
+              </div>
+              <button
+                type="button"
+                className="cami-save-btn w-full sm:col-span-2 px-5 py-3 text-sm mb-5"
+                disabled={sauvegarde.isPending}
+                onClick={() => sauvegarde.mutate()}
+              >
+                {sauvegarde.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Save className="h-4 w-4" />
+                )}
+                Sauvegarder dans ma bibliothèque
+              </button>
             </div>
           </div>
         </div>
-
-
-        {result ? (
-          <div
-            ref={resultRef}
-            id="prompt-genere"
-            className="mx-auto mt-10 max-w-5xl scroll-mt-20 space-y-8 px-4 md:mt-16 md:px-6"
-          >
-
-            <PromptView
-              editable
-              onPromptChange={(prompt) =>
-                setResult((precedent) => (precedent ? { ...precedent, prompt } : precedent))
-              }
-              data={{
-                titre: titreEdit || result.titre_prompt,
-                metier: metierEdit,
-                type_prompt: typeEdit,
-                mots_cles: result.mots_cles,
-                complexite: result.complexite,
-                prompt: result.prompt,
-                note: result.note,
-                etapes_lancement: result.etapes_lancement,
-                alerte_pii: result.alerte_pii,
-              }}
-            />
-
-
-            <div className="space-y-4">
-              <h3 className="flex items-center gap-3 text-lg font-bold">
-                <span className="cami-step-badge bg-[var(--coral)]">3</span>
-                Je range mon nouveau prompt dans ma bibliothèque
-              </h3>
-              <div className="grid gap-3.5 sm:grid-cols-2">
-                <div className="cami-card p-4 sm:col-span-2">
-                  <label htmlFor="titre-edit" className="mb-2 block text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
-                    Titre
-                  </label>
-                  <input id="titre-edit" value={titreEdit} onChange={(event) => setTitreEdit(event.target.value)} className="cami-input" />
-                </div>
-                <div className="cami-card p-4">
-                  <label htmlFor="metier-edit" className="mb-2 block text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
-                    Métier
-                  </label>
-                  <select id="metier-edit" value={metierEdit} onChange={(event) => setMetierEdit(event.target.value)} className="cami-input">
-                    {METIERS.map((item) => (<option key={item} value={item}>{item}</option>))}
-                  </select>
-                </div>
-                <div className="cami-card p-4">
-                  <label htmlFor="type-edit" className="mb-2 block text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
-                    Type
-                  </label>
-                  <select id="type-edit" value={typeEdit} onChange={(event) => setTypeEdit(event.target.value as TypePromptValue)} className="cami-input">
-                    {TYPES_PROMPT.map((item) => (<option key={item.value} value={item.value}>{item.label}</option>))}
-                  </select>
-                </div>
-                <div className="cami-card p-4">
-                  <label htmlFor="mots-edit" className="mb-2 block text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
-                    Mots-clés
-                  </label>
-                  <input id="mots-edit" value={motsClesEdit} onChange={(event) => setMotsClesEdit(event.target.value)} className="cami-input" />
-                </div>
-                <div className="cami-card p-4">
-                  <label htmlFor="date-edit" className="mb-2 block text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
-                    Date
-                  </label>
-                  <input id="date-edit" type="date" value={dateEdit} onChange={(event) => setDateEdit(event.target.value)} className="cami-input" />
-                </div>
-                <button
-                  type="button"
-                  className="cami-save-btn w-full sm:col-span-2 px-5 py-3 text-sm mb-5"
-                  disabled={sauvegarde.isPending}
-                  onClick={() => sauvegarde.mutate()}
-                >
-                  {sauvegarde.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-                  Sauvegarder dans ma bibliothèque
-                </button>
-              </div>
-            </div>
-          </div>
-        ) : null}
+      ) : null}
     </AppShell>
   );
 }

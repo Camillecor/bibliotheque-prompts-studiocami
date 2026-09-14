@@ -22,13 +22,7 @@ import {
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { PromptView } from "@/components/PromptView";
-import {
-  METIERS,
-  TYPES_PROMPT,
-  formatDateFr,
-  labelTypePrompt,
-  type PromptRow,
-} from "@/lib/mario";
+import { METIERS, TYPES_PROMPT, formatDateFr, labelTypePrompt, type PromptRow } from "@/lib/mario";
 import { deletePrompt, listPrompts, toggleFavori } from "@/lib/mario.functions";
 
 // Mots-clés désignant un type de livrable, mis en avant dans le titre.
@@ -153,7 +147,7 @@ const ICONES_METIER: Record<string, typeof Sparkles> = {
   Juridique: Scale,
   Produit: Package,
   "Support client": Headphones,
-  "Opérations": Layers,
+  Opérations: Layers,
   "Direction générale": Building2,
   Autre: Sparkles,
 };
@@ -223,7 +217,8 @@ function LibraryPage() {
           (prompt.mots_cles ?? []).some((mot) => mot.toLowerCase().includes(terme));
         const matchMetier = metierFiltre.length === 0 || metierFiltre.includes(prompt.metier);
         const matchType =
-          typeFiltre.length === 0 || (prompt.type_prompt ? typeFiltre.includes(prompt.type_prompt) : false);
+          typeFiltre.length === 0 ||
+          (prompt.type_prompt ? typeFiltre.includes(prompt.type_prompt) : false);
         const matchComplexite = !complexiteFiltre || prompt.complexite === complexiteFiltre;
         const matchFavori = !favorisUniquement || Boolean(prompt.favori);
         return matchTerme && matchMetier && matchType && matchComplexite && matchFavori;
@@ -300,7 +295,6 @@ function LibraryPage() {
         <span>Favoris uniquement</span>
       </label>
 
-
       {filtresActifs ? (
         <button
           type="button"
@@ -331,9 +325,7 @@ function LibraryPage() {
       </div>
 
       <div className="border-t border-border pt-5">
-        <p className="text-xs font-bold uppercase tracking-[0.08em] text-muted-foreground">
-          Type
-        </p>
+        <p className="text-xs font-bold uppercase tracking-[0.08em] text-muted-foreground">Type</p>
         <div className="mt-3 space-y-2">
           {(typeListeOuverte ? TYPES_PROMPT : TYPES_PROMPT.slice(0, 6)).map((item) => (
             <label key={item.value} className="flex cursor-pointer items-center gap-2 text-sm">
@@ -458,10 +450,9 @@ function LibraryPage() {
 
           <div className="px-4 py-6 md:px-6 md:py-8">
             <p className="mb-4 text-sm text-muted-foreground">
-              {prompts.length} résultat{prompts.length > 1 ? "s" : ""} sur{" "}
-              {(data ?? []).length} prompt{(data ?? []).length > 1 ? "s" : ""}
+              {prompts.length} résultat{prompts.length > 1 ? "s" : ""} sur {(data ?? []).length}{" "}
+              prompt{(data ?? []).length > 1 ? "s" : ""}
             </p>
-
 
             {isLoading ? (
               <div className="mt-4 flex justify-center">
@@ -534,7 +525,6 @@ function LibraryPage() {
                   </button>
                 ))}
               </div>
-
             )}
           </div>
         </>

@@ -65,7 +65,9 @@ function SOMMAIRE(o: ToolDetail): { id: string; label: string }[] {
 function StatCard({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-2xl border border-border bg-muted p-3">
-      <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-muted-foreground">{label}</p>
+      <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
+        {label}
+      </p>
       <p className="mt-1 text-sm font-bold text-primary">{value}</p>
     </div>
   );
@@ -245,13 +247,16 @@ function OutilDetailPage() {
         {/* Fonctionnalités */}
         <section id="fonctionnalites" className="mt-10 scroll-mt-24">
           <h2 className="text-xl font-bold text-primary">
-            Fonctionnalités clés <span className="text-muted-foreground">{o.fonctionnalites.length}</span>
+            Fonctionnalités clés{" "}
+            <span className="text-muted-foreground">{o.fonctionnalites.length}</span>
           </h2>
           <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
             {o.fonctionnalites.map((f) => (
               <div key={f.titre} className="cami-card">
                 <p className="text-sm font-bold text-primary">{f.titre}</p>
-                <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">{f.description}</p>
+                <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
+                  {f.description}
+                </p>
               </div>
             ))}
           </div>
@@ -323,7 +328,9 @@ function OutilDetailPage() {
             {o.limites.map((l) => (
               <div key={l.titre} className="cami-card">
                 <p className="text-sm font-bold text-primary">{l.titre}</p>
-                <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">{l.description}</p>
+                <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
+                  {l.description}
+                </p>
               </div>
             ))}
           </div>
@@ -354,7 +361,9 @@ function OutilDetailPage() {
                 color: o.mcp.disponible ? "var(--primary)" : "var(--muted-foreground)",
               }}
             >
-              {o.mcp.disponible ? `✓ MCP disponible${o.mcp.officiel ? " · Officiel" : ""}` : "MCP indisponible"}
+              {o.mcp.disponible
+                ? `✓ MCP disponible${o.mcp.officiel ? " · Officiel" : ""}`
+                : "MCP indisponible"}
             </span>
             <p className="mt-2.5 text-sm leading-relaxed text-foreground">{o.mcp.note}</p>
             {o.mcp.lien ? (
