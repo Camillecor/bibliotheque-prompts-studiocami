@@ -1066,12 +1066,43 @@ function OutilsPage() {
                               </span>
                               <p className="truncate text-sm font-bold text-primary">{o.nom}</p>
                             </div>
-                            {o.notes ? (
-                              <span className="shrink-0 rounded-full bg-primary px-2 py-0.5 text-[11px] font-bold text-primary-foreground">
-                                {formatNote(noteGlobale(o.notes))}
-                                <span className="opacity-60">/10</span>
-                              </span>
-                            ) : null}
+                            <div className="flex shrink-0 items-center gap-1.5">
+                              {o.notes ? (
+                                <span className="rounded-full bg-primary px-2 py-0.5 text-[11px] font-bold text-primary-foreground">
+                                  {formatNote(noteGlobale(o.notes))}
+                                  <span className="opacity-60">/10</span>
+                                </span>
+                              ) : null}
+                              <button
+                                type="button"
+                                onClick={(event) => {
+                                  event.preventDefault();
+                                  event.stopPropagation();
+                                  basculerFavori(o.slug);
+                                }}
+                                aria-pressed={favoris.includes(o.slug)}
+                                aria-label={
+                                  favoris.includes(o.slug)
+                                    ? `Retirer ${o.nom} des favoris`
+                                    : `Mettre ${o.nom} en favori`
+                                }
+                                title={
+                                  favoris.includes(o.slug)
+                                    ? "Retirer des favoris"
+                                    : "Mettre en favori"
+                                }
+                                className="flex h-7 w-7 items-center justify-center rounded-full transition hover:bg-muted"
+                              >
+                                <Star
+                                  className={`h-4 w-4 ${
+                                    favoris.includes(o.slug)
+                                      ? "text-[var(--coral)]"
+                                      : "text-muted-foreground"
+                                  }`}
+                                  fill={favoris.includes(o.slug) ? "currentColor" : "none"}
+                                />
+                              </button>
+                            </div>
                           </div>
                           <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
                             {o.definition}
