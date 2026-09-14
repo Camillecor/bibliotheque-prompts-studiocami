@@ -1176,6 +1176,20 @@ function OutilsPage() {
                         );
                       }
 
+                      if (o.url) {
+                        return (
+                          <a
+                            key={o.nom}
+                            href={o.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="cami-card block transition hover:-translate-y-0.5 hover:border-[var(--coral)]"
+                          >
+                            {contenu}
+                          </a>
+                        );
+                      }
+
                       return (
                         <Link
                           key={o.nom}
