@@ -4,7 +4,7 @@ Transformer l'onglet "Mes favoris" en véritable bibliothèque des articles gard
 
 ## Ce que tu verras
 
-Un onglet "Ma bibliothèque" dans la Veille IA, qui rassemble tous les articles étoilés :
+Un onglet "Articles" dans la Veille IA, qui rassemble tous les articles étoilés :
 
 - **Une barre de recherche** sur le titre, le résumé, la source et les mots-clés.
 - **Des filtres rapides par thème** (Outil, Modèle, Pratique, Marketing, Étude, Réglementation) et **par source**, affichés en pastilles avec le nombre d'articles.
