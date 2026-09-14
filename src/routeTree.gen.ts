@@ -31,6 +31,7 @@ import { Route as AuthenticatedStudioCalendrierRouteImport } from './routes/_aut
 import { Route as AuthenticatedStudioMediasRouteImport } from './routes/_authenticated/studio.medias'
 import { Route as AuthenticatedStudioStatistiquesRouteImport } from './routes/_authenticated/studio.statistiques'
 import { Route as AuthenticatedVeilleIndexRouteImport } from './routes/_authenticated/veille.index'
+import { Route as AuthenticatedVeilleFavorisRouteImport } from './routes/_authenticated/veille.favoris'
 import { Route as ApiPublicVeilleCronRouteImport } from './routes/api/public/veille-cron'
 
 const IndexRoute = IndexRouteImport.update({
@@ -151,6 +152,12 @@ const AuthenticatedVeilleIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedVeilleRoute,
   } as any)
+const AuthenticatedVeilleFavorisRoute =
+  AuthenticatedVeilleFavorisRouteImport.update({
+    id: '/favoris',
+    path: '/favoris',
+    getParentRoute: () => AuthenticatedVeilleRoute,
+  } as any)
 const ApiPublicVeilleCronRoute = ApiPublicVeilleCronRouteImport.update({
   id: '/api/public/veille-cron',
   path: '/api/public/veille-cron',
@@ -175,6 +182,7 @@ export interface FileRoutesByFullPath {
   '/studio/calendrier': typeof AuthenticatedStudioCalendrierRoute
   '/studio/medias': typeof AuthenticatedStudioMediasRoute
   '/studio/statistiques': typeof AuthenticatedStudioStatistiquesRoute
+  '/veille/favoris': typeof AuthenticatedVeilleFavorisRoute
   '/api/public/veille-cron': typeof ApiPublicVeilleCronRoute
   '/outils/': typeof AuthenticatedOutilsIndexRoute
   '/projets/': typeof AuthenticatedProjetsIndexRoute
@@ -195,6 +203,7 @@ export interface FileRoutesByTo {
   '/studio/calendrier': typeof AuthenticatedStudioCalendrierRoute
   '/studio/medias': typeof AuthenticatedStudioMediasRoute
   '/studio/statistiques': typeof AuthenticatedStudioStatistiquesRoute
+  '/veille/favoris': typeof AuthenticatedVeilleFavorisRoute
   '/api/public/veille-cron': typeof ApiPublicVeilleCronRoute
   '/outils': typeof AuthenticatedOutilsIndexRoute
   '/projets': typeof AuthenticatedProjetsIndexRoute
@@ -221,6 +230,7 @@ export interface FileRoutesById {
   '/_authenticated/studio/calendrier': typeof AuthenticatedStudioCalendrierRoute
   '/_authenticated/studio/medias': typeof AuthenticatedStudioMediasRoute
   '/_authenticated/studio/statistiques': typeof AuthenticatedStudioStatistiquesRoute
+  '/_authenticated/veille/favoris': typeof AuthenticatedVeilleFavorisRoute
   '/api/public/veille-cron': typeof ApiPublicVeilleCronRoute
   '/_authenticated/outils/': typeof AuthenticatedOutilsIndexRoute
   '/_authenticated/projets/': typeof AuthenticatedProjetsIndexRoute
@@ -247,6 +257,7 @@ export interface FileRouteTypes {
     | '/studio/calendrier'
     | '/studio/medias'
     | '/studio/statistiques'
+    | '/veille/favoris'
     | '/api/public/veille-cron'
     | '/outils/'
     | '/projets/'
@@ -267,6 +278,7 @@ export interface FileRouteTypes {
     | '/studio/calendrier'
     | '/studio/medias'
     | '/studio/statistiques'
+    | '/veille/favoris'
     | '/api/public/veille-cron'
     | '/outils'
     | '/projets'
@@ -292,6 +304,7 @@ export interface FileRouteTypes {
     | '/_authenticated/studio/calendrier'
     | '/_authenticated/studio/medias'
     | '/_authenticated/studio/statistiques'
+    | '/_authenticated/veille/favoris'
     | '/api/public/veille-cron'
     | '/_authenticated/outils/'
     | '/_authenticated/projets/'
@@ -463,6 +476,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedVeilleIndexRouteImport
       parentRoute: typeof AuthenticatedVeilleRoute
     }
+    '/_authenticated/veille/favoris': {
+      id: '/_authenticated/veille/favoris'
+      path: '/favoris'
+      fullPath: '/veille/favoris'
+      preLoaderRoute: typeof AuthenticatedVeilleFavorisRouteImport
+      parentRoute: typeof AuthenticatedVeilleRoute
+    }
     '/api/public/veille-cron': {
       id: '/api/public/veille-cron'
       path: '/api/public/veille-cron'
@@ -517,10 +537,12 @@ const AuthenticatedStudioRouteWithChildren =
   AuthenticatedStudioRoute._addFileChildren(AuthenticatedStudioRouteChildren)
 
 interface AuthenticatedVeilleRouteChildren {
+  AuthenticatedVeilleFavorisRoute: typeof AuthenticatedVeilleFavorisRoute
   AuthenticatedVeilleIndexRoute: typeof AuthenticatedVeilleIndexRoute
 }
 
 const AuthenticatedVeilleRouteChildren: AuthenticatedVeilleRouteChildren = {
+  AuthenticatedVeilleFavorisRoute: AuthenticatedVeilleFavorisRoute,
   AuthenticatedVeilleIndexRoute: AuthenticatedVeilleIndexRoute,
 }
 
