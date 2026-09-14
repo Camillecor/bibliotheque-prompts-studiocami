@@ -92,8 +92,7 @@ const SECTIONS: SectionLettre[] = [
       },
       {
         nom: "Array (tableau)",
-        definition:
-          "Structure de données ordonnée regroupant plusieurs valeurs sous un seul nom.",
+        definition: "Structure de données ordonnée regroupant plusieurs valeurs sous un seul nom.",
         niveau: "debutant",
       },
       {
@@ -165,8 +164,7 @@ const SECTIONS: SectionLettre[] = [
       },
       {
         nom: "Chain-of-Thought (CoT)",
-        definition:
-          "Technique demandant au modèle d'expliciter ses étapes de raisonnement.",
+        definition: "Technique demandant au modèle d'expliciter ses étapes de raisonnement.",
       },
       {
         nom: "Chatbot",
@@ -284,13 +282,11 @@ const SECTIONS: SectionLettre[] = [
     termes: [
       {
         nom: "Few-shot prompting",
-        definition:
-          "Technique fournissant 2 à 10 exemples avant la tâche réelle.",
+        definition: "Technique fournissant 2 à 10 exemples avant la tâche réelle.",
       },
       {
         nom: "Fine-tuning",
-        definition:
-          "Réentraînement sur un dataset spécialisé pour améliorer les performances.",
+        definition: "Réentraînement sur un dataset spécialisé pour améliorer les performances.",
       },
       {
         nom: "Fonction",
@@ -304,8 +300,7 @@ const SECTIONS: SectionLettre[] = [
       },
       {
         nom: "Funnel de conversion",
-        definition:
-          "Parcours structuré en étapes menant un prospect de la découverte à l'achat.",
+        definition: "Parcours structuré en étapes menant un prospect de la découverte à l'achat.",
         niveau: "avance",
       },
     ],
@@ -356,8 +351,7 @@ const SECTIONS: SectionLettre[] = [
     termes: [
       {
         nom: "Hallucination",
-        definition:
-          "Phénomène où le LLM génère des informations fausses avec confiance.",
+        definition: "Phénomène où le LLM génère des informations fausses avec confiance.",
       },
     ],
   },
@@ -384,13 +378,11 @@ const SECTIONS: SectionLettre[] = [
       },
       {
         nom: "Inference",
-        definition:
-          "Phase d'utilisation d'un modèle entraîné pour générer des réponses.",
+        definition: "Phase d'utilisation d'un modèle entraîné pour générer des réponses.",
       },
       {
         nom: "Instruction prompting",
-        definition:
-          "Formulation explicite d'une tâche sous forme d'instruction directe.",
+        definition: "Formulation explicite d'une tâche sous forme d'instruction directe.",
       },
       {
         nom: "Intelligence artificielle (IA)",
@@ -409,8 +401,7 @@ const SECTIONS: SectionLettre[] = [
     termes: [
       {
         nom: "Jailbreak",
-        definition:
-          "Technique visant à contourner les guardrails via des prompts manipulatoires.",
+        definition: "Technique visant à contourner les guardrails via des prompts manipulatoires.",
       },
       {
         nom: "JSON mode",
@@ -423,8 +414,7 @@ const SECTIONS: SectionLettre[] = [
     termes: [
       {
         nom: "KPI (indicateur clé de performance)",
-        definition:
-          "Métrique chiffrée permettant de mesurer l'atteinte d'un objectif business.",
+        definition: "Métrique chiffrée permettant de mesurer l'atteinte d'un objectif business.",
         niveau: "debutant",
       },
     ],
@@ -557,8 +547,7 @@ const SECTIONS: SectionLettre[] = [
       },
       {
         nom: "Output parsing",
-        definition:
-          "Extraction et structuration des données depuis la réponse brute.",
+        definition: "Extraction et structuration des données depuis la réponse brute.",
       },
       {
         nom: "Overfitting (surapprentissage)",
@@ -613,18 +602,15 @@ const SECTIONS: SectionLettre[] = [
       },
       {
         nom: "Prompt engineering",
-        definition:
-          "Discipline consistant à concevoir, tester et optimiser les instructions.",
+        definition: "Discipline consistant à concevoir, tester et optimiser les instructions.",
       },
       {
         nom: "Prompt injection",
-        definition:
-          "Attaque injectant des instructions malveillantes dans un contenu.",
+        definition: "Attaque injectant des instructions malveillantes dans un contenu.",
       },
       {
         nom: "Prompt template",
-        definition:
-          "Structure réutilisable avec variables à substituer dynamiquement.",
+        definition: "Structure réutilisable avec variables à substituer dynamiquement.",
       },
     ],
   },
@@ -637,8 +623,7 @@ const SECTIONS: SectionLettre[] = [
       },
       {
         nom: "ReAct",
-        definition:
-          "Framework alternant raisonnement explicite et action concrète.",
+        definition: "Framework alternant raisonnement explicite et action concrète.",
       },
       {
         nom: "Réseau de neurones",
@@ -654,8 +639,7 @@ const SECTIONS: SectionLettre[] = [
       },
       {
         nom: "RLHF",
-        definition:
-          "Technique d'entraînement par renforcement à partir de retours humains.",
+        definition: "Technique d'entraînement par renforcement à partir de retours humains.",
       },
       {
         nom: "Role prompting",
@@ -721,8 +705,7 @@ const SECTIONS: SectionLettre[] = [
     termes: [
       {
         nom: "Temperature",
-        definition:
-          "Paramètre contrôlant la créativité et la variabilité des sorties.",
+        definition: "Paramètre contrôlant la créativité et la variabilité des sorties.",
       },
       {
         nom: "Token",
@@ -738,8 +721,7 @@ const SECTIONS: SectionLettre[] = [
       },
       {
         nom: "Tree of Thoughts (ToT)",
-        definition:
-          "Extension du CoT explorant plusieurs branches en parallèle.",
+        definition: "Extension du CoT explorant plusieurs branches en parallèle.",
       },
       {
         nom: "TypeScript",
@@ -754,8 +736,7 @@ const SECTIONS: SectionLettre[] = [
     termes: [
       {
         nom: "User prompt",
-        definition:
-          "Message envoyé par l'utilisateur dans une conversation avec le LLM.",
+        definition: "Message envoyé par l'utilisateur dans une conversation avec le LLM.",
       },
       {
         nom: "Upscaling",
@@ -780,8 +761,7 @@ const SECTIONS: SectionLettre[] = [
       },
       {
         nom: "Vectorisation",
-        definition:
-          "Transformation d'un texte en embedding pour recherche sémantique.",
+        definition: "Transformation d'un texte en embedding pour recherche sémantique.",
       },
       {
         nom: "Vibecoding",
@@ -897,8 +877,7 @@ function GlossairePage() {
       .map((section) => ({
         ...section,
         termes: section.termes.filter(
-          (t) =>
-            t.nom.toLowerCase().includes(terme) || t.definition.toLowerCase().includes(terme),
+          (t) => t.nom.toLowerCase().includes(terme) || t.definition.toLowerCase().includes(terme),
         ),
       }))
       .filter((section) => section.termes.length > 0);
@@ -1007,7 +986,7 @@ function GlossairePage() {
 
       <div className="px-4 py-6 md:px-6 md:py-8">
         <div className="mb-6 max-w-2xl">
-          <h1 className="text-2xl font-bold text-primary sm:text-3xl">
+          <h1 className="font-display text-2xl font-bold text-primary sm:text-3xl">
             Glossaire du prompt engineering
           </h1>
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
@@ -1105,7 +1084,11 @@ function GlossairePage() {
             {sectionsFiltrees.map((section, sectionIndex) => {
               const role = ROLES[sectionIndex % ROLES.length];
               return (
-                <section key={section.lettre} id={`lettre-${section.lettre}`} className="scroll-mt-24">
+                <section
+                  key={section.lettre}
+                  id={`lettre-${section.lettre}`}
+                  className="scroll-mt-24"
+                >
                   <div className="mb-3 flex items-center gap-3">
                     <span
                       className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold"
@@ -1133,8 +1116,7 @@ function GlossairePage() {
                                   t.niveau === "debutant"
                                     ? "color-mix(in srgb, var(--success) 14%, white)"
                                     : "color-mix(in srgb, var(--coral) 14%, white)",
-                                color:
-                                  t.niveau === "debutant" ? "var(--success)" : "var(--coral)",
+                                color: t.niveau === "debutant" ? "var(--success)" : "var(--coral)",
                               }}
                             >
                               {t.niveau === "debutant" ? "Débutant" : "Avancé"}

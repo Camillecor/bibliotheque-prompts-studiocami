@@ -29,7 +29,6 @@ import {
   formatDateHeure,
   reseauConnu,
   reseauInfo,
-
   statutLabel,
   type ContenuRow,
   type ReseauValue,
@@ -112,7 +111,6 @@ function StudioContenusPage() {
   const [recherche, setRecherche] = useState("");
   const [filtreStatut, setFiltreStatut] = useState<string>("tous");
 
-
   const fetchContenus = useServerFn(listContenus);
   const fetchMedias = useServerFn(listMedias);
   const enregistrer = useServerFn(saveContenu);
@@ -154,7 +152,8 @@ function StudioContenusPage() {
           titre: valeurs.titre || valeurs.texte.split("\n")[0]?.slice(0, 120) || "Sans titre",
           texte: valeurs.texte,
           reseau: valeurs.reseau,
-          statut: valeurs.datePlanifiee && valeurs.statut === "brouillon" ? "planifie" : valeurs.statut,
+          statut:
+            valeurs.datePlanifiee && valeurs.statut === "brouillon" ? "planifie" : valeurs.statut,
           tags: valeurs.tags,
           date_planifiee: inputVersIso(valeurs.datePlanifiee),
           date_publication: null,
@@ -201,7 +200,6 @@ function StudioContenusPage() {
     onError: (error: Error) => toast.error(error.message),
   });
 
-
   const mutationRediger = useMutation({
     mutationFn: async () =>
       rediger({ data: { idee, reseau: brouillon.reseau, ton, consignes: "" } }),
@@ -219,7 +217,13 @@ function StudioContenusPage() {
 
   const mutationVariante = useMutation({
     mutationFn: async (variante: string) =>
-      reecrire({ data: { texte: brouillon.texte, reseau: brouillon.reseau, variante: variante as "raccourcir" } }),
+      reecrire({
+        data: {
+          texte: brouillon.texte,
+          reseau: brouillon.reseau,
+          variante: variante as "raccourcir",
+        },
+      }),
     onSuccess: (resultat) => {
       setBrouillon((etat) => ({ ...etat, texte: resultat.texte }));
       toast.success("Nouvelle version proposée");
@@ -328,11 +332,7 @@ function StudioContenusPage() {
           className="flex w-full items-start gap-3 p-3 text-left"
         >
           {vignette ? (
-            <img
-              src={vignette.url}
-              alt=""
-              className="h-11 w-11 shrink-0 rounded-xl object-cover"
-            />
+            <img src={vignette.url} alt="" className="h-11 w-11 shrink-0 rounded-xl object-cover" />
           ) : (
             <span
               className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-[11px] font-bold text-white"
@@ -342,7 +342,10 @@ function StudioContenusPage() {
             </span>
           )}
           <span className="min-w-0 flex-1">
-            <span className="block text-[10px] font-bold uppercase tracking-wide" style={{ color: info.couleur }}>
+            <span
+              className="block text-[10px] font-bold uppercase tracking-wide"
+              style={{ color: info.couleur }}
+            >
               {info.label}
             </span>
             <span className="mt-0.5 line-clamp-2 text-xs font-semibold text-primary">
@@ -468,14 +471,13 @@ function StudioContenusPage() {
     </div>
   );
 
-
   return (
     <AppShell panel={panneau}>
       <div className="mx-auto flex w-full max-w-3xl flex-col gap-5 px-4 py-6 lg:px-8">
         <header className="flex flex-col gap-3">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <h1 className="font-display text-2xl font-bold text-primary lg:text-3xl">Studio</h1>
+              <h1 className="font-display text-2xl font-bold text-primary sm:text-3xl">Studio</h1>
               <p className="text-xs text-muted-foreground lg:text-sm">
                 Rédige, illustre et planifie tes publications.
               </p>
@@ -535,7 +537,6 @@ function StudioContenusPage() {
               Générer le post
             </button>
           </div>
-
         </section>
 
         {/* Éditeur */}
@@ -571,7 +572,6 @@ function StudioContenusPage() {
               Instagram, LinkedIn ou Facebook avant d'enregistrer.
             </p>
           ) : null}
-
 
           <div>
             <textarea

@@ -154,7 +154,9 @@ function MesFichesPage() {
               <Library className="h-5 w-5" />
             </span>
             <div>
-              <h1 className="text-xl font-bold text-[var(--primary)]">Bibliothèque de fiches</h1>
+              <h1 className="font-display text-2xl font-bold text-primary sm:text-3xl">
+                Bibliothèque de fiches
+              </h1>
               <p className="text-xs text-muted-foreground">
                 Toutes tes fiches de reconstruction enregistrées.
               </p>

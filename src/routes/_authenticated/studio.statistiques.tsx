@@ -117,7 +117,7 @@ function StudioStatistiquesPage() {
       <div className="mx-auto flex w-full max-w-4xl flex-col gap-5 px-4 py-6 lg:px-8">
         <header className="flex flex-col gap-3">
           <div>
-            <h1 className="font-display text-2xl font-bold text-primary lg:text-3xl">
+            <h1 className="font-display text-2xl font-bold text-primary sm:text-3xl">
               Statistiques
             </h1>
             <p className="text-xs text-muted-foreground lg:text-sm">
@@ -204,7 +204,9 @@ function StudioStatistiquesPage() {
               </section>
 
               <section className="cami-card p-4">
-                <h2 className="font-display text-sm font-bold text-primary">Thèmes les plus utilisés</h2>
+                <h2 className="font-display text-sm font-bold text-primary">
+                  Thèmes les plus utilisés
+                </h2>
                 {data.parTag.length === 0 ? (
                   <p className="mt-3 text-xs text-muted-foreground">
                     Ajoute des hashtags à tes contenus pour voir apparaître tes thèmes.
@@ -215,12 +217,7 @@ function StudioStatistiquesPage() {
                       <BarChart data={data.parTag} layout="vertical">
                         <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
                         <XAxis type="number" allowDecimals={false} tick={{ fontSize: 11 }} />
-                        <YAxis
-                          type="category"
-                          dataKey="tag"
-                          width={90}
-                          tick={{ fontSize: 11 }}
-                        />
+                        <YAxis type="category" dataKey="tag" width={90} tick={{ fontSize: 11 }} />
                         <Tooltip />
                         <Bar dataKey="total" fill="var(--violet)" radius={[0, 6, 6, 0]} />
                       </BarChart>

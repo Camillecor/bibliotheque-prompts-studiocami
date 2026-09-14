@@ -2,16 +2,7 @@ import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  CalendarClock,
-  Check,
-  Flag,
-  Loader2,
-  Plus,
-  Sparkles,
-  Trash2,
-  X,
-} from "lucide-react";
+import { CalendarClock, Check, Flag, Loader2, Plus, Sparkles, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
@@ -306,7 +297,12 @@ function ProjetsListePage() {
   const detail = toutes.find((tache) => tache.id === tacheOuverte) ?? null;
 
   const titre = vue
-    ? { aujourdhui: "Aujourd'hui", semaine: "Cette semaine", retard: "En retard", termine: "Terminé" }[vue]
+    ? {
+        aujourdhui: "Aujourd'hui",
+        semaine: "Cette semaine",
+        retard: "En retard",
+        termine: "Terminé",
+      }[vue]
     : projetActif
       ? (projetsParId.get(projetActif)?.nom ?? "Projet")
       : "Toutes mes tâches";
@@ -370,8 +366,8 @@ function ProjetsListePage() {
             <Sparkles className="mx-auto h-6 w-6 text-[var(--coral)]" />
             <p className="mt-3 text-sm font-semibold text-primary">Aucune tâche ici</p>
             <p className="mt-1 text-sm text-muted-foreground">
-              Ajoute une tâche ci-dessus, ou demande à Mario de découper un objectif dans le
-              panneau de droite.
+              Ajoute une tâche ci-dessus, ou demande à Mario de découper un objectif dans le panneau
+              de droite.
             </p>
           </div>
         ) : (

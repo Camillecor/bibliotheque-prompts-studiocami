@@ -27,10 +27,9 @@ import {
   type FicheRow,
 } from "@/lib/fiches.functions";
 
-
 export const Route = createFileRoute("/_authenticated/fiches")({
   validateSearch: (search: Record<string, unknown>): { fiche?: string } => {
-    const id = typeof search['fiche'] === "string" ? search['fiche'] : "";
+    const id = typeof search["fiche"] === "string" ? search["fiche"] : "";
     const estUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
     return estUuid ? { fiche: id } : {};
   },
@@ -64,9 +63,13 @@ function premiereLigneTitre(markdown: string) {
   return "";
 }
 
-type ImageJointe = { mediaType: "image/png" | "image/jpeg"; base64: string; previewUrl: string; name: string };
+type ImageJointe = {
+  mediaType: "image/png" | "image/jpeg";
+  base64: string;
+  previewUrl: string;
+  name: string;
+};
 const MAX_IMAGES = 4;
-
 
 /* ------------------------------------------------------------------ */
 /* Rendu markdown minimal (titres, tableaux, listes, gras, code)       */
@@ -91,12 +94,19 @@ function Inline({ texte }: { texte: string }) {
           );
         if (m === "[Observé]" || m === "[Déduit]" || m === "[Hypothèse]") {
           const couleur =
-            m === "[Observé]" ? "var(--info)" : m === "[Déduit]" ? "var(--primary)" : "var(--coral)";
+            m === "[Observé]"
+              ? "var(--info)"
+              : m === "[Déduit]"
+                ? "var(--primary)"
+                : "var(--coral)";
           return (
             <span
               key={i}
               className="mr-1 inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide"
-              style={{ color: couleur, backgroundColor: `color-mix(in srgb, ${couleur} 12%, transparent)` }}
+              style={{
+                color: couleur,
+                backgroundColor: `color-mix(in srgb, ${couleur} 12%, transparent)`,
+              }}
             >
               {m.slice(1, -1)}
             </span>
@@ -152,7 +162,10 @@ function SchemaEtapes({ items }: { items: string[] }) {
                 {outil ? (
                   <span
                     className="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide"
-                    style={{ color: couleur, backgroundColor: `color-mix(in srgb, ${couleur} 12%, transparent)` }}
+                    style={{
+                      color: couleur,
+                      backgroundColor: `color-mix(in srgb, ${couleur} 12%, transparent)`,
+                    }}
                   >
                     {outil}
                   </span>
@@ -180,7 +193,6 @@ function FicheMarkdown({ markdown }: { markdown: string }) {
   let i = 0;
   let cle = 0;
   let sectionCourante = "";
-
 
   while (i < lignes.length) {
     const ligne = lignes[i] ?? "";
@@ -227,7 +239,10 @@ function FicheMarkdown({ markdown }: { markdown: string }) {
             <thead className="bg-secondary">
               <tr>
                 {entete.map((c, j) => (
-                  <th key={j} className="px-3 py-2 text-xs font-semibold uppercase tracking-wide text-[var(--primary)]">
+                  <th
+                    key={j}
+                    className="px-3 py-2 text-xs font-semibold uppercase tracking-wide text-[var(--primary)]"
+                  >
                     <Inline texte={c} />
                   </th>
                 ))}
@@ -521,15 +536,14 @@ function FichesPage() {
     } as Parameters<typeof ameliorerFiche>[0]);
   }
 
-
   const panneau = (
     <div className="space-y-4 p-4">
       <div>
         <p className="text-sm font-semibold text-[var(--primary)]">Comment ça marche</p>
         <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-          Envoie ce qui t'a marquée : une capture d'écran, un lien, ou juste une description.
-          Tu récupères une fiche en huit sections pour reconstruire le mécanisme avec ta stack
-          (React, Lovable, Claude API, Make, Notion, Supabase).
+          Envoie ce qui t'a marquée : une capture d'écran, un lien, ou juste une description. Tu
+          récupères une fiche en huit sections pour reconstruire le mécanisme avec ta stack (React,
+          Lovable, Claude API, Make, Notion, Supabase).
         </p>
       </div>
       <div className="space-y-2 rounded-2xl bg-secondary p-3">
@@ -537,16 +551,15 @@ function FichesPage() {
           Étiquettes
         </p>
         <p className="text-xs text-muted-foreground">
-          <span className="font-semibold text-[var(--info)]">Observé</span> : visible dans ce que
-          tu envoies.
+          <span className="font-semibold text-[var(--info)]">Observé</span> : visible dans ce que tu
+          envoies.
         </p>
         <p className="text-xs text-muted-foreground">
-          <span className="font-semibold text-[var(--primary)]">Déduit</span> : conséquence
-          logique.
+          <span className="font-semibold text-[var(--primary)]">Déduit</span> : conséquence logique.
         </p>
         <p className="text-xs text-muted-foreground">
-          <span className="font-semibold text-[var(--coral)]">Hypothèse</span> : pari raisonnable,
-          à vérifier.
+          <span className="font-semibold text-[var(--coral)]">Hypothèse</span> : pari raisonnable, à
+          vérifier.
         </p>
       </div>
 
@@ -555,7 +568,10 @@ function FichesPage() {
           <p className="text-xs font-semibold uppercase tracking-wide text-[var(--primary)]">
             Mes fiches ({fiches.length})
           </p>
-          <Link to="/mes-fiches" className="text-xs font-semibold text-[var(--info)] hover:underline">
+          <Link
+            to="/mes-fiches"
+            className="text-xs font-semibold text-[var(--info)] hover:underline"
+          >
             Tout voir
           </Link>
         </div>
@@ -599,7 +615,6 @@ function FichesPage() {
           </ul>
         )}
       </div>
-
     </div>
   );
 
@@ -612,7 +627,9 @@ function FichesPage() {
               <FileText className="h-5 w-5" />
             </span>
             <div>
-              <h1 className="text-xl font-bold text-[var(--primary)]">Fiches de reconstruction</h1>
+              <h1 className="font-display text-2xl font-bold text-primary sm:text-3xl">
+                Fiches de reconstruction
+              </h1>
               <p className="text-xs text-muted-foreground">
                 Une fonctionnalité observée, un plan pour la rebâtir toi-même.
               </p>
@@ -626,7 +643,10 @@ function FichesPage() {
 
         <section className="cami-card mt-6 space-y-4 p-4 lg:p-5">
           <div className="space-y-1.5">
-            <label htmlFor="fiche-description" className="text-xs font-semibold uppercase tracking-wide text-[var(--primary)]">
+            <label
+              htmlFor="fiche-description"
+              className="text-xs font-semibold uppercase tracking-wide text-[var(--primary)]"
+            >
               La fonctionnalité qui t'a marquée
             </label>
             <textarea
@@ -641,7 +661,10 @@ function FichesPage() {
 
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="space-y-1.5">
-              <label htmlFor="fiche-titre" className="text-xs font-semibold uppercase tracking-wide text-[var(--primary)]">
+              <label
+                htmlFor="fiche-titre"
+                className="text-xs font-semibold uppercase tracking-wide text-[var(--primary)]"
+              >
                 Titre de la fiche
               </label>
               <input
@@ -655,7 +678,10 @@ function FichesPage() {
             </div>
 
             <div className="space-y-1.5">
-              <label htmlFor="fiche-lien" className="text-xs font-semibold uppercase tracking-wide text-[var(--primary)]">
+              <label
+                htmlFor="fiche-lien"
+                className="text-xs font-semibold uppercase tracking-wide text-[var(--primary)]"
+              >
                 Lien (optionnel)
               </label>
               <input
@@ -713,7 +739,6 @@ function FichesPage() {
                 </ul>
               ) : null}
             </div>
-
           </div>
 
           <button
@@ -755,7 +780,9 @@ function FichesPage() {
                   ) : (
                     <>
                       <Bookmark className="h-4 w-4" />
-                      {enregistrement.isPending ? "Enregistrement…" : "Enregistrer la fiche générée"}
+                      {enregistrement.isPending
+                        ? "Enregistrement…"
+                        : "Enregistrer la fiche générée"}
                     </>
                   )}
                 </button>
@@ -779,7 +806,6 @@ function FichesPage() {
                   )}
                 </button>
                 <CopyButton value={markdown} label="Copier la fiche" />
-
               </div>
             </div>
             <FicheMarkdown markdown={markdown} />

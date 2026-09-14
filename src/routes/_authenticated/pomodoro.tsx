@@ -16,7 +16,8 @@ export const Route = createFileRoute("/_authenticated/pomodoro")({
       { property: "og:title", content: "Pomodoro — Minuteur de concentration" },
       {
         property: "og:description",
-        content: "Un minuteur simple pour enchaîner concentration et pauses, avec le suivi du jour.",
+        content:
+          "Un minuteur simple pour enchaîner concentration et pauses, avec le suivi du jour.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -133,7 +134,8 @@ function PomodoroPage() {
         setFaits(total);
         if (auto) {
           setJournal((j) => {
-            const base = j.jour === jourCourant() ? j : { jour: jourCourant(), sessions: 0, minutes: 0 };
+            const base =
+              j.jour === jourCourant() ? j : { jour: jourCourant(), sessions: 0, minutes: 0 };
             return {
               jour: base.jour,
               sessions: base.sessions + 1,
@@ -172,7 +174,10 @@ function PomodoroPage() {
   const progression = total > 0 ? 1 - restant / total : 0;
   const couleur = PHASES[phase].couleur;
 
-  const titreOnglet = useMemo(() => `${formatTemps(restant)} · ${PHASES[phase].label}`, [restant, phase]);
+  const titreOnglet = useMemo(
+    () => `${formatTemps(restant)} · ${PHASES[phase].label}`,
+    [restant, phase],
+  );
   useEffect(() => {
     document.title = `${titreOnglet} — Pomodoro | Studio Cami IA`;
   }, [titreOnglet]);
@@ -272,13 +277,24 @@ function PomodoroPage() {
                 color: couleur,
               }}
             >
-              {phase === "focus" ? <Timer className="h-3.5 w-3.5" /> : <Coffee className="h-3.5 w-3.5" />}
+              {phase === "focus" ? (
+                <Timer className="h-3.5 w-3.5" />
+              ) : (
+                <Coffee className="h-3.5 w-3.5" />
+              )}
               {PHASES[phase].label}
             </span>
 
             <div className="relative">
               <svg width="208" height="208" viewBox="0 0 208 208" className="-rotate-90">
-                <circle cx="104" cy="104" r={rayon} fill="none" stroke="var(--border)" strokeWidth="12" />
+                <circle
+                  cx="104"
+                  cy="104"
+                  r={rayon}
+                  fill="none"
+                  stroke="var(--border)"
+                  strokeWidth="12"
+                />
                 <circle
                   cx="104"
                   cy="104"

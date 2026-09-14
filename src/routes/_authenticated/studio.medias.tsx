@@ -206,7 +206,11 @@ function StudioMediasPage() {
 
       const traiterBloc = (bloc: string) => {
         const lignes = bloc.split("\n");
-        const nomEvenement = lignes.find((l) => l.startsWith("event:"))?.slice(6).trim() ?? "";
+        const nomEvenement =
+          lignes
+            .find((l) => l.startsWith("event:"))
+            ?.slice(6)
+            .trim() ?? "";
         const donnees = lignes
           .filter((l) => l.startsWith("data:"))
           .map((l) => l.slice(5).trim())
@@ -229,7 +233,8 @@ function StudioMediasPage() {
         }
         if (!charge.b64_json) return;
         vuUnEvenement = true;
-        const final = nomEvenement.endsWith("completed") || charge.type?.endsWith("completed") === true;
+        const final =
+          nomEvenement.endsWith("completed") || charge.type?.endsWith("completed") === true;
         if (final) termine = true;
         setApercuIA({ url: `data:image/png;base64,${charge.b64_json}`, final });
       };
@@ -302,7 +307,7 @@ function StudioMediasPage() {
         const image = await chargerImage(retouche.media.url);
         if (annule) return;
 
-        const pivote = ((retouche.rotation % 360) + 360) % 360 % 180 !== 0;
+        const pivote = (((retouche.rotation % 360) + 360) % 360) % 180 !== 0;
         // Dimensions de l'image après rotation.
         const largeurSource = pivote ? image.naturalHeight : image.naturalWidth;
         const hauteurSource = pivote ? image.naturalWidth : image.naturalHeight;
@@ -349,7 +354,6 @@ function StudioMediasPage() {
         );
         ctx.restore();
         ctx.filter = "none";
-
       } catch (error) {
         toast.error((error as Error).message);
       }
@@ -416,10 +420,7 @@ function StudioMediasPage() {
           <img
             src={apercuIA.url}
             alt="Aperçu du visuel généré"
-            className={[
-              "w-full rounded-2xl transition",
-              apercuIA.final ? "" : "blur-md",
-            ].join(" ")}
+            className={["w-full rounded-2xl transition", apercuIA.final ? "" : "blur-md"].join(" ")}
           />
           <button
             type="button"
@@ -440,7 +441,7 @@ function StudioMediasPage() {
         <header className="flex flex-col gap-3">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <h1 className="font-display text-2xl font-bold text-primary lg:text-3xl">Médias</h1>
+              <h1 className="font-display text-2xl font-bold text-primary sm:text-3xl">Médias</h1>
               <p className="text-xs text-muted-foreground lg:text-sm">
                 Tes images, tes retouches et tes visuels générés.
               </p>
@@ -582,7 +583,6 @@ function StudioMediasPage() {
               {canvasRef.current?.height ?? "—"} px
             </p>
 
-
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               <label className="flex flex-col gap-1 text-xs font-semibold text-primary">
                 Format
@@ -686,7 +686,6 @@ function StudioMediasPage() {
                   className="accent-[var(--info)]"
                 />
               </label>
-
 
               {(
                 [
