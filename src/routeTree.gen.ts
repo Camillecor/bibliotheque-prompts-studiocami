@@ -30,6 +30,7 @@ import { Route as AuthenticatedStudioIndexRouteImport } from './routes/_authenti
 import { Route as AuthenticatedStudioCalendrierRouteImport } from './routes/_authenticated/studio.calendrier'
 import { Route as AuthenticatedStudioMediasRouteImport } from './routes/_authenticated/studio.medias'
 import { Route as AuthenticatedStudioStatistiquesRouteImport } from './routes/_authenticated/studio.statistiques'
+import { Route as AuthenticatedVeilleIndexRouteImport } from './routes/_authenticated/veille.index'
 import { Route as ApiPublicVeilleCronRouteImport } from './routes/api/public/veille-cron'
 
 const IndexRoute = IndexRouteImport.update({
@@ -144,6 +145,12 @@ const AuthenticatedStudioStatistiquesRoute =
     path: '/statistiques',
     getParentRoute: () => AuthenticatedStudioRoute,
   } as any)
+const AuthenticatedVeilleIndexRoute =
+  AuthenticatedVeilleIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedVeilleRoute,
+  } as any)
 const ApiPublicVeilleCronRoute = ApiPublicVeilleCronRouteImport.update({
   id: '/api/public/veille-cron',
   path: '/api/public/veille-cron',
@@ -161,7 +168,7 @@ export interface FileRoutesByFullPath {
   '/pomodoro': typeof AuthenticatedPomodoroRoute
   '/projets': typeof AuthenticatedProjetsRouteWithChildren
   '/studio': typeof AuthenticatedStudioRouteWithChildren
-  '/veille': typeof AuthenticatedVeilleRoute
+  '/veille': typeof AuthenticatedVeilleRouteWithChildren
   '/api/studio-visuel': typeof ApiStudioVisuelRoute
   '/outils/$slug': typeof AuthenticatedOutilsSlugRoute
   '/projets/tableau': typeof AuthenticatedProjetsTableauRoute
@@ -172,6 +179,7 @@ export interface FileRoutesByFullPath {
   '/outils/': typeof AuthenticatedOutilsIndexRoute
   '/projets/': typeof AuthenticatedProjetsIndexRoute
   '/studio/': typeof AuthenticatedStudioIndexRoute
+  '/veille/': typeof AuthenticatedVeilleIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -181,7 +189,6 @@ export interface FileRoutesByTo {
   '/glossaire': typeof AuthenticatedGlossaireRoute
   '/mes-fiches': typeof AuthenticatedMesFichesRoute
   '/pomodoro': typeof AuthenticatedPomodoroRoute
-  '/veille': typeof AuthenticatedVeilleRoute
   '/api/studio-visuel': typeof ApiStudioVisuelRoute
   '/outils/$slug': typeof AuthenticatedOutilsSlugRoute
   '/projets/tableau': typeof AuthenticatedProjetsTableauRoute
@@ -192,6 +199,7 @@ export interface FileRoutesByTo {
   '/outils': typeof AuthenticatedOutilsIndexRoute
   '/projets': typeof AuthenticatedProjetsIndexRoute
   '/studio': typeof AuthenticatedStudioIndexRoute
+  '/veille': typeof AuthenticatedVeilleIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -206,7 +214,7 @@ export interface FileRoutesById {
   '/_authenticated/pomodoro': typeof AuthenticatedPomodoroRoute
   '/_authenticated/projets': typeof AuthenticatedProjetsRouteWithChildren
   '/_authenticated/studio': typeof AuthenticatedStudioRouteWithChildren
-  '/_authenticated/veille': typeof AuthenticatedVeilleRoute
+  '/_authenticated/veille': typeof AuthenticatedVeilleRouteWithChildren
   '/api/studio-visuel': typeof ApiStudioVisuelRoute
   '/_authenticated/outils/$slug': typeof AuthenticatedOutilsSlugRoute
   '/_authenticated/projets/tableau': typeof AuthenticatedProjetsTableauRoute
@@ -217,6 +225,7 @@ export interface FileRoutesById {
   '/_authenticated/outils/': typeof AuthenticatedOutilsIndexRoute
   '/_authenticated/projets/': typeof AuthenticatedProjetsIndexRoute
   '/_authenticated/studio/': typeof AuthenticatedStudioIndexRoute
+  '/_authenticated/veille/': typeof AuthenticatedVeilleIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -242,6 +251,7 @@ export interface FileRouteTypes {
     | '/outils/'
     | '/projets/'
     | '/studio/'
+    | '/veille/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -251,7 +261,6 @@ export interface FileRouteTypes {
     | '/glossaire'
     | '/mes-fiches'
     | '/pomodoro'
-    | '/veille'
     | '/api/studio-visuel'
     | '/outils/$slug'
     | '/projets/tableau'
@@ -262,6 +271,7 @@ export interface FileRouteTypes {
     | '/outils'
     | '/projets'
     | '/studio'
+    | '/veille'
   id:
     | '__root__'
     | '/'
@@ -286,6 +296,7 @@ export interface FileRouteTypes {
     | '/_authenticated/outils/'
     | '/_authenticated/projets/'
     | '/_authenticated/studio/'
+    | '/_authenticated/veille/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -445,6 +456,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStudioStatistiquesRouteImport
       parentRoute: typeof AuthenticatedStudioRoute
     }
+    '/_authenticated/veille/': {
+      id: '/_authenticated/veille/'
+      path: '/'
+      fullPath: '/veille/'
+      preLoaderRoute: typeof AuthenticatedVeilleIndexRouteImport
+      parentRoute: typeof AuthenticatedVeilleRoute
+    }
     '/api/public/veille-cron': {
       id: '/api/public/veille-cron'
       path: '/api/public/veille-cron'
@@ -498,6 +516,17 @@ const AuthenticatedStudioRouteChildren: AuthenticatedStudioRouteChildren = {
 const AuthenticatedStudioRouteWithChildren =
   AuthenticatedStudioRoute._addFileChildren(AuthenticatedStudioRouteChildren)
 
+interface AuthenticatedVeilleRouteChildren {
+  AuthenticatedVeilleIndexRoute: typeof AuthenticatedVeilleIndexRoute
+}
+
+const AuthenticatedVeilleRouteChildren: AuthenticatedVeilleRouteChildren = {
+  AuthenticatedVeilleIndexRoute: AuthenticatedVeilleIndexRoute,
+}
+
+const AuthenticatedVeilleRouteWithChildren =
+  AuthenticatedVeilleRoute._addFileChildren(AuthenticatedVeilleRouteChildren)
+
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedBibliothequeRoute: typeof AuthenticatedBibliothequeRoute
   AuthenticatedFichesRoute: typeof AuthenticatedFichesRoute
@@ -507,7 +536,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedPomodoroRoute: typeof AuthenticatedPomodoroRoute
   AuthenticatedProjetsRoute: typeof AuthenticatedProjetsRouteWithChildren
   AuthenticatedStudioRoute: typeof AuthenticatedStudioRouteWithChildren
-  AuthenticatedVeilleRoute: typeof AuthenticatedVeilleRoute
+  AuthenticatedVeilleRoute: typeof AuthenticatedVeilleRouteWithChildren
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -519,7 +548,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPomodoroRoute: AuthenticatedPomodoroRoute,
   AuthenticatedProjetsRoute: AuthenticatedProjetsRouteWithChildren,
   AuthenticatedStudioRoute: AuthenticatedStudioRouteWithChildren,
-  AuthenticatedVeilleRoute: AuthenticatedVeilleRoute,
+  AuthenticatedVeilleRoute: AuthenticatedVeilleRouteWithChildren,
 }
 
 const AuthenticatedRouteRouteWithChildren =
