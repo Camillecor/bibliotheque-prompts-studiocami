@@ -2,7 +2,7 @@ import { useState, type ReactNode } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { BookOpen, Clapperboard, FileText, FolderOpen, Library, ListChecks, Menu, Plus, SlidersHorizontal, Timer, Wrench, X } from "lucide-react";
+import { BookOpen, Clapperboard, FileText, FolderOpen, Library, ListChecks, Menu, Plus, Rss, SlidersHorizontal, Timer, Wrench, X } from "lucide-react";
 import {
   Sheet,
   SheetContent,
