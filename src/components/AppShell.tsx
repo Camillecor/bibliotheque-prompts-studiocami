@@ -22,6 +22,7 @@ const NAV_ITEMS = [
   { to: "/outils", icon: Wrench, label: "Outils" },
   { to: "/studio", icon: Clapperboard, label: "Studio" },
   { to: "/projets", icon: ListChecks, label: "Projets" },
+  { to: "/veille", icon: Rss, label: "Veille IA" },
   { to: "/pomodoro", icon: Timer, label: "Pomodoro" },
 
 ];
