@@ -405,6 +405,147 @@ export type Database = {
           },
         ]
       }
+      veille_items: {
+        Row: {
+          created_at: string
+          favori: boolean
+          id: string
+          origine: string
+          publie_le: string | null
+          resume: string
+          source: string
+          tags: string[]
+          titre: string
+          updated_at: string
+          url: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          favori?: boolean
+          id?: string
+          origine?: string
+          publie_le?: string | null
+          resume?: string
+          source?: string
+          tags?: string[]
+          titre: string
+          updated_at?: string
+          url: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          favori?: boolean
+          id?: string
+          origine?: string
+          publie_le?: string | null
+          resume?: string
+          source?: string
+          tags?: string[]
+          titre?: string
+          updated_at?: string
+          url?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      veille_runs: {
+        Row: {
+          created_at: string
+          demarre_le: string
+          id: string
+          message: string
+          nb_items: number
+          statut: string
+          termine_le: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          demarre_le?: string
+          id?: string
+          message?: string
+          nb_items?: number
+          statut?: string
+          termine_le?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          demarre_le?: string
+          id?: string
+          message?: string
+          nb_items?: number
+          statut?: string
+          termine_le?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      veille_sources: {
+        Row: {
+          actif: boolean
+          created_at: string
+          derniere_lecture: string | null
+          id: string
+          nom: string
+          updated_at: string
+          url: string
+          user_id: string
+        }
+        Insert: {
+          actif?: boolean
+          created_at?: string
+          derniere_lecture?: string | null
+          id?: string
+          nom: string
+          updated_at?: string
+          url: string
+          user_id: string
+        }
+        Update: {
+          actif?: boolean
+          created_at?: string
+          derniere_lecture?: string | null
+          id?: string
+          nom?: string
+          updated_at?: string
+          url?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      veille_themes: {
+        Row: {
+          actif: boolean
+          created_at: string
+          id: string
+          libelle: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          actif?: boolean
+          created_at?: string
+          id?: string
+          libelle: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          actif?: boolean
+          created_at?: string
+          id?: string
+          libelle?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
