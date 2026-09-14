@@ -101,7 +101,7 @@ function ProjetsTableauPage() {
           <h1 className="font-display text-2xl font-bold text-primary sm:text-3xl">
             {projetActif ? (projetsParId.get(projetActif)?.nom ?? "Projet") : "Tableau"}
           </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
             Glisse une carte d'une colonne à l'autre pour changer son statut.
           </p>
         </header>

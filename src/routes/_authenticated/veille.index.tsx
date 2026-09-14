@@ -1,3 +1,4 @@
+import { EnTetePage } from "@/components/EnTetePage";
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
@@ -124,13 +125,11 @@ function VeillePage() {
   return (
     <AppShell panel={<PanneauSources />}>
       <div className="mx-auto flex w-full max-w-4xl flex-col gap-5 px-4 py-6 lg:px-8">
-        <header className="flex flex-col gap-3">
-          <div className="flex flex-wrap items-end justify-between gap-3">
-            <div>
-              <h1 className="font-display text-2xl font-bold text-primary sm:text-3xl">
-                Veille IA
-              </h1>
-              <p className="text-xs capitalize text-muted-foreground lg:text-sm">
+        <div className="flex flex-col gap-3">
+          <EnTetePage
+            titre="Veille IA"
+            description={
+              <span className="capitalize">
                 {new Date().toLocaleDateString("fr-FR", {
                   weekday: "long",
                   day: "numeric",
@@ -140,22 +139,24 @@ function VeillePage() {
                 <span className="lowercase">
                   {nouveautes} nouveauté{nouveautes > 1 ? "s" : ""} aujourd'hui
                 </span>
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={() => mutationRelance.mutate()}
-              disabled={mutationRelance.isPending}
-              className="cami-btn-secondary"
-            >
-              {mutationRelance.isPending ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <RefreshCw className="h-4 w-4" />
-              )}
-              Relancer la veille
-            </button>
-          </div>
+              </span>
+            }
+            actions={
+              <button
+                type="button"
+                onClick={() => mutationRelance.mutate()}
+                disabled={mutationRelance.isPending}
+                className="cami-btn-secondary"
+              >
+                {mutationRelance.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <RefreshCw className="h-4 w-4" />
+                )}
+                Relancer la veille
+              </button>
+            }
+          />
           <VeilleTabs />
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
             <div className="relative flex-1">
@@ -173,7 +174,7 @@ function VeillePage() {
               onChange={(valeur) => setFiltre(valeur as FiltreVeille)}
             />
           </div>
-        </header>
+        </div>
 
         {isLoading || mutationRelance.isPending ? (
           <div className="flex items-center gap-2 text-sm text-muted-foreground">

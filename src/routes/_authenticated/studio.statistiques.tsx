@@ -120,7 +120,7 @@ function StudioStatistiquesPage() {
             <h1 className="font-display text-2xl font-bold text-primary sm:text-3xl">
               Statistiques
             </h1>
-            <p className="text-xs text-muted-foreground lg:text-sm">
+            <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
               Ton activité de création dans l'app, pas les chiffres des réseaux.
             </p>
           </div>

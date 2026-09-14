@@ -1,3 +1,4 @@
+import { EnTetePage } from "@/components/EnTetePage";
 import { useMemo, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
@@ -148,25 +149,16 @@ function MesFichesPage() {
   return (
     <AppShell panel={panneau}>
       <div className="mx-auto w-full max-w-[900px] px-4 py-6 lg:px-8 lg:py-10">
-        <header className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-secondary text-[var(--primary)]">
-              <Library className="h-5 w-5" />
-            </span>
-            <div>
-              <h1 className="font-display text-2xl font-bold text-primary sm:text-3xl">
-                Bibliothèque de fiches
-              </h1>
-              <p className="text-xs text-muted-foreground">
-                Toutes tes fiches de reconstruction enregistrées.
-              </p>
-            </div>
-          </div>
-          <Link to="/fiches" className="cami-btn min-h-11">
-            <FileText className="h-4 w-4" />
-            Nouvelle fiche
-          </Link>
-        </header>
+        <EnTetePage
+          titre="Bibliothèque de fiches"
+          description="Toutes tes fiches de reconstruction enregistrées."
+          actions={
+            <Link to="/fiches" className="cami-btn min-h-11">
+              <FileText className="h-4 w-4" />
+              Nouvelle fiche
+            </Link>
+          }
+        />
 
         {isLoading ? (
           <p className="mt-10 flex items-center justify-center gap-2 text-sm text-muted-foreground">

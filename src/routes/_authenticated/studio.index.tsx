@@ -478,7 +478,7 @@ function StudioContenusPage() {
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <h1 className="font-display text-2xl font-bold text-primary sm:text-3xl">Studio</h1>
-              <p className="text-xs text-muted-foreground lg:text-sm">
+              <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
                 Rédige, illustre et planifie tes publications.
               </p>
             </div>
