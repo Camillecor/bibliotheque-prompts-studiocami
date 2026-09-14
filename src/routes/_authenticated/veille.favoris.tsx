@@ -1,3 +1,4 @@
+import { EnTetePage } from "@/components/EnTetePage";
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
@@ -188,7 +189,7 @@ function VeilleBibliothequePage() {
               ) : null}
             </div>
           ) : null}
-        </header>
+        </div>
 
         {isLoading ? (
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
