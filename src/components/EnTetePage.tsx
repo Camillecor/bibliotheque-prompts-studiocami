@@ -11,10 +11,7 @@ type EnTetePageProps = {
 export function EnTetePage({ titre, description, actions, className }: EnTetePageProps) {
   return (
     <header
-      className={[
-        "flex flex-wrap items-end justify-between gap-3",
-        className ?? "",
-      ].join(" ")}
+      className={["flex flex-wrap items-end justify-between gap-3", className ?? ""].join(" ")}
     >
       <div className="min-w-0">
         <h1 className="font-display text-2xl font-bold text-primary sm:text-3xl">{titre}</h1>
