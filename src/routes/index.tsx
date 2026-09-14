@@ -601,15 +601,17 @@ function GeneratorPage() {
         </div>
       }
     >
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-3 md:px-6">
-        <h1 className="font-display text-2xl font-bold text-primary sm:text-3xl">
-          Générateur de prompt
-        </h1>
-        <button type="button" onClick={nouveauPrompt} className="cami-btn min-h-11">
-          <Plus className="h-4 w-4" />
-          Nouveau prompt
-        </button>
-      </div>
+      <EnTetePage
+        className="px-4 py-6 md:px-6 md:py-8"
+        titre="Générateur de prompt"
+        description="Décris ton besoin, Mario te construit le prompt."
+        actions={
+          <button type="button" onClick={nouveauPrompt} className="cami-btn min-h-11">
+            <Plus className="h-4 w-4" />
+            Nouveau prompt
+          </button>
+        }
+      />
 
       <div className="grid grid-cols-2 gap-3 px-4 pt-4 sm:gap-4 sm:grid-cols-4 md:px-10">
         {[
