@@ -679,6 +679,32 @@ export const Route = createFileRoute("/_authenticated/outils/")({
 function OutilsPage() {
   const [recherche, setRecherche] = useState("");
   const [categorieActive, setCategorieActive] = useState<string | null>(null);
+  const [ongletFavoris, setOngletFavoris] = useState(false);
+  // Favoris gardés dans le navigateur : aucune donnée personnelle côté serveur.
+  const [favoris, setFavoris] = useState<string[]>([]);
+
+  useEffect(() => {
+    try {
+      const brut = window.localStorage.getItem(CLE_FAVORIS);
+      if (brut) setFavoris(JSON.parse(brut) as string[]);
+    } catch {
+      setFavoris([]);
+    }
+  }, []);
+
+  function basculerFavori(slug: string) {
+    setFavoris((actuels) => {
+      const suivants = actuels.includes(slug)
+        ? actuels.filter((s) => s !== slug)
+        : [...actuels, slug];
+      try {
+        window.localStorage.setItem(CLE_FAVORIS, JSON.stringify(suivants));
+      } catch {
+        /* stockage indisponible : les favoris restent le temps de la session */
+      }
+      return suivants;
+    });
+  }
 
   const fetchOutilsPersos = useServerFn(listOutilsPersos);
   const addOutilPerso = useServerFn(saveOutilPerso);
