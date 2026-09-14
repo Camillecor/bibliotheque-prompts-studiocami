@@ -771,12 +771,22 @@ function OutilsPage() {
     [sectionsCombinees],
   );
 
+  const nbFavoris = useMemo(
+    () =>
+      sectionsCombinees.reduce(
+        (somme, section) => somme + section.outils.filter((o) => favoris.includes(o.slug)).length,
+        0,
+      ),
+    [sectionsCombinees, favoris],
+  );
+
   const sectionsFiltrees = useMemo(() => {
     const terme = recherche.trim().toLowerCase();
     return sectionsCombinees
       .map((section) => ({
         ...section,
         outils: section.outils
+          .filter((o) => !ongletFavoris || favoris.includes(o.slug))
           .filter(
             (o) =>
               !terme ||
