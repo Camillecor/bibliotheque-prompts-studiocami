@@ -989,7 +989,7 @@ function GlossairePage() {
           <h1 className="font-display text-2xl font-bold text-primary sm:text-3xl">
             Glossaire du prompt engineering
           </h1>
-          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
             {totalTermes} définitions claires sur le prompt engineering, les LLMs et l'IA
             générative, classées de A à Z.
             {recherche.trim() ? (

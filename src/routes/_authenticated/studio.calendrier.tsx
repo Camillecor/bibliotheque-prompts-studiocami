@@ -159,7 +159,7 @@ function StudioCalendrierPage() {
               <h1 className="font-display text-2xl font-bold text-primary sm:text-3xl">
                 Calendrier
               </h1>
-              <p className="text-xs text-muted-foreground lg:text-sm">
+              <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
                 Ton mois de publication, relié à tes contenus.
               </p>
             </div>

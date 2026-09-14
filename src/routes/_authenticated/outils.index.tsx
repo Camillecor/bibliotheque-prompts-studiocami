@@ -647,7 +647,7 @@ function OutilsPage() {
           <h1 className="font-display text-2xl font-bold text-primary sm:text-3xl">
             Mes outils IA
           </h1>
-          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
             {totalOutils} outils que j'utilise vraiment, classés par usage — pour retrouver le bon
             réflexe en un clic.
             {recherche.trim() ? (

@@ -329,7 +329,7 @@ function ProjetsListePage() {
 
         <header className="mt-5">
           <h1 className="font-display text-2xl font-bold text-primary sm:text-3xl">{titre}</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
             {visibles.filter((t) => t.statut !== "termine").length} tâche(s) en cours
           </p>
         </header>
@@ -365,7 +365,7 @@ function ProjetsListePage() {
           <div className="mt-8 rounded-[20px] border border-dashed border-border bg-card px-5 py-10 text-center">
             <Sparkles className="mx-auto h-6 w-6 text-[var(--coral)]" />
             <p className="mt-3 text-sm font-semibold text-primary">Aucune tâche ici</p>
-            <p className="mt-1 text-sm text-muted-foreground">
+            <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
               Ajoute une tâche ci-dessus, ou demande à Mario de découper un objectif dans le panneau
               de droite.
             </p>

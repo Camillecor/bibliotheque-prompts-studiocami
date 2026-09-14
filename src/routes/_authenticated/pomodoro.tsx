@@ -263,7 +263,7 @@ function PomodoroPage() {
           <h1 className="mt-3 font-display text-2xl font-bold text-primary sm:text-3xl">
             Minuteur de concentration
           </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
             Enchaîne des blocs de travail et des pauses, sans quitter ton studio.
           </p>
         </header>
