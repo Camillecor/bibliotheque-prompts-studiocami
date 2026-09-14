@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { VeilleTabs } from "@/components/VeilleTabs";
 import { CarteVeille } from "@/components/veille/CarteVeille";
+import { ChipsFiltre } from "@/components/veille/ChipsFiltre";
 import { PanneauSources } from "@/components/veille/PanneauSources";
 import { FILTRES_VEILLE, type FiltreVeille, type VeilleItemRow } from "@/lib/veille";
 import {
