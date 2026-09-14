@@ -1,3 +1,4 @@
+import { EnTetePage } from "@/components/EnTetePage";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowUp, Plus, Search } from "lucide-react";
