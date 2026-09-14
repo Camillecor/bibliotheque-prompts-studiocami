@@ -20,6 +20,7 @@ import { Route as AuthenticatedOutilsRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedPomodoroRouteImport } from './routes/_authenticated/pomodoro'
 import { Route as AuthenticatedProjetsRouteImport } from './routes/_authenticated/projets'
 import { Route as AuthenticatedStudioRouteImport } from './routes/_authenticated/studio'
+import { Route as AuthenticatedVeilleRouteImport } from './routes/_authenticated/veille'
 import { Route as ApiStudioVisuelRouteImport } from './routes/api/studio-visuel'
 import { Route as AuthenticatedOutilsIndexRouteImport } from './routes/_authenticated/outils.index'
 import { Route as AuthenticatedOutilsSlugRouteImport } from './routes/_authenticated/outils.$slug'
@@ -84,6 +85,11 @@ const AuthenticatedProjetsRoute = AuthenticatedProjetsRouteImport.update({
 const AuthenticatedStudioRoute = AuthenticatedStudioRouteImport.update({
   id: '/studio',
   path: '/studio',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedVeilleRoute = AuthenticatedVeilleRouteImport.update({
+  id: '/veille',
+  path: '/veille',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const ApiStudioVisuelRoute = ApiStudioVisuelRouteImport.update({
@@ -155,6 +161,7 @@ export interface FileRoutesByFullPath {
   '/pomodoro': typeof AuthenticatedPomodoroRoute
   '/projets': typeof AuthenticatedProjetsRouteWithChildren
   '/studio': typeof AuthenticatedStudioRouteWithChildren
+  '/veille': typeof AuthenticatedVeilleRoute
   '/api/studio-visuel': typeof ApiStudioVisuelRoute
   '/outils/$slug': typeof AuthenticatedOutilsSlugRoute
   '/projets/tableau': typeof AuthenticatedProjetsTableauRoute
@@ -174,6 +181,7 @@ export interface FileRoutesByTo {
   '/glossaire': typeof AuthenticatedGlossaireRoute
   '/mes-fiches': typeof AuthenticatedMesFichesRoute
   '/pomodoro': typeof AuthenticatedPomodoroRoute
+  '/veille': typeof AuthenticatedVeilleRoute
   '/api/studio-visuel': typeof ApiStudioVisuelRoute
   '/outils/$slug': typeof AuthenticatedOutilsSlugRoute
   '/projets/tableau': typeof AuthenticatedProjetsTableauRoute
@@ -198,6 +206,7 @@ export interface FileRoutesById {
   '/_authenticated/pomodoro': typeof AuthenticatedPomodoroRoute
   '/_authenticated/projets': typeof AuthenticatedProjetsRouteWithChildren
   '/_authenticated/studio': typeof AuthenticatedStudioRouteWithChildren
+  '/_authenticated/veille': typeof AuthenticatedVeilleRoute
   '/api/studio-visuel': typeof ApiStudioVisuelRoute
   '/_authenticated/outils/$slug': typeof AuthenticatedOutilsSlugRoute
   '/_authenticated/projets/tableau': typeof AuthenticatedProjetsTableauRoute
@@ -222,6 +231,7 @@ export interface FileRouteTypes {
     | '/pomodoro'
     | '/projets'
     | '/studio'
+    | '/veille'
     | '/api/studio-visuel'
     | '/outils/$slug'
     | '/projets/tableau'
@@ -241,6 +251,7 @@ export interface FileRouteTypes {
     | '/glossaire'
     | '/mes-fiches'
     | '/pomodoro'
+    | '/veille'
     | '/api/studio-visuel'
     | '/outils/$slug'
     | '/projets/tableau'
@@ -264,6 +275,7 @@ export interface FileRouteTypes {
     | '/_authenticated/pomodoro'
     | '/_authenticated/projets'
     | '/_authenticated/studio'
+    | '/_authenticated/veille'
     | '/api/studio-visuel'
     | '/_authenticated/outils/$slug'
     | '/_authenticated/projets/tableau'
@@ -361,6 +373,13 @@ declare module '@tanstack/react-router' {
       path: '/studio'
       fullPath: '/studio'
       preLoaderRoute: typeof AuthenticatedStudioRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/veille': {
+      id: '/_authenticated/veille'
+      path: '/veille'
+      fullPath: '/veille'
+      preLoaderRoute: typeof AuthenticatedVeilleRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/api/studio-visuel': {
@@ -488,6 +507,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedPomodoroRoute: typeof AuthenticatedPomodoroRoute
   AuthenticatedProjetsRoute: typeof AuthenticatedProjetsRouteWithChildren
   AuthenticatedStudioRoute: typeof AuthenticatedStudioRouteWithChildren
+  AuthenticatedVeilleRoute: typeof AuthenticatedVeilleRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -499,6 +519,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPomodoroRoute: AuthenticatedPomodoroRoute,
   AuthenticatedProjetsRoute: AuthenticatedProjetsRouteWithChildren,
   AuthenticatedStudioRoute: AuthenticatedStudioRouteWithChildren,
+  AuthenticatedVeilleRoute: AuthenticatedVeilleRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
