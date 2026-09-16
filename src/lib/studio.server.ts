@@ -124,12 +124,17 @@ export async function reecrirePost(input: {
   const reseau = RESEAUX.find((r) => r.value === input.reseau) ?? RESEAUX[0];
   const variante = VARIANTES.find((v) => v.value === input.variante) ?? VARIANTES[0];
 
-  const consigne =
-    variante.value === "raccourcir"
-      ? "Réduis nettement la longueur (environ 40 % de moins) sans perdre le message principal."
-      : variante.value === "percutant"
-        ? "Renforce l'accroche, coupe les phrases longues, va droit au but."
-        : "Transforme le post en une courte histoire concrète, avec une situation vécue puis l'enseignement.";
+  const consignes: Record<string, string> = {
+    raccourcir:
+      "Réduis nettement la longueur (environ 40 % de moins) sans perdre le message principal.",
+    percutant: "Renforce l'accroche, coupe les phrases longues, va droit au but.",
+    storytelling:
+      "Transforme le post en une courte histoire concrète, avec une situation vécue puis l'enseignement.",
+    accroche:
+      "Ajoute en première ligne une accroche forte qui donne envie de lire la suite, et garde le reste du post quasiment tel quel.",
+    cta: "Ajoute à la fin un appel à l'action clair et naturel (question, invitation à commenter ou à écrire), et garde le reste du post quasiment tel quel.",
+  };
+  const consigne = consignes[variante.value] ?? consignes["percutant"]!;
 
   const message = [
     `Réseau : ${reseau.label} (maximum ${reseau.limite} caractères).`,
@@ -140,6 +145,81 @@ export async function reecrirePost(input: {
 
   return appelClaude(SYSTEM_VARIANTE, message);
 }
+
+/** Adapte un post existant à un autre réseau (longueur, ton, hashtags). */
+export async function declinerPost(input: { texte: string; reseauSource: string; cible: string }) {
+  const source = RESEAUX.find((r) => r.value === input.reseauSource) ?? RESEAUX[0];
+  const cible = RESEAUX.find((r) => r.value === input.cible) ?? RESEAUX[0];
+
+  const message = [
+    `Publication écrite pour ${source.label}. Adapte-la à ${cible.label} (maximum ${cible.limite} caractères).`,
+    `Consigne : respecte les codes de ${cible.label} — longueur, ton, mise en forme, usage des emojis et des hashtags. Garde le fond et la langue.`,
+    "Publication actuelle :",
+    input.texte,
+  ].join("\n");
+
+  return appelClaude(SYSTEM_VARIANTE, message);
+}
+
+const SYSTEM_SERIE = `Tu es Mario le renard, l'agent IA de communication de Studio Cami.
+À partir d'une idée, tu proposes une série de 3 publications complémentaires (angles différents : constat, méthode, retour d'expérience par exemple) pour un même réseau, en français.
+Chaque post est complet, autonome, avec une accroche forte, des phrases courtes, aucun jargon creux, aucune statistique inventée.
+
+Réponds UNIQUEMENT avec ce JSON, sans texte autour et sans bloc de code :
+{ "posts": [ { "titre": "Titre interne court", "texte": "Le post complet", "tags": ["mot1", "mot2"] } ] }`;
+
+export async function serieDePosts(input: { idee: string; reseau: string; ton: string }) {
+  const reseau = RESEAUX.find((r) => r.value === input.reseau) ?? RESEAUX[0];
+  const ton = TONS_POST.find((t) => t.value === input.ton);
+
+  const message = [
+    `Réseau visé : ${reseau.label} (maximum ${reseau.limite} caractères par post).`,
+    ton ? `Ton souhaité : ${ton.label}.` : "",
+    `Idée de départ : ${input.idee}`,
+    "Donne exactement 3 posts.",
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+  const brut = (await appelClaudeJson(SYSTEM_SERIE, message)) as { posts?: unknown };
+  const liste = Array.isArray(brut.posts) ? brut.posts : [];
+  return liste.slice(0, 3).map(normaliserPost);
+}
+
+const SYSTEM_HASHTAGS = `Tu es Mario le renard, l'agent IA de communication de Studio Cami.
+Tu proposes des hashtags pertinents pour une publication, adaptés au réseau visé : mélange de hashtags larges et de hashtags de niche, en minuscules, sans le signe #, sans doublon, sans accent ni espace.
+
+Réponds UNIQUEMENT avec ce JSON, sans texte autour et sans bloc de code :
+{ "hashtags": ["mot1", "mot2"] }`;
+
+export async function suggererHashtagsPost(input: { texte: string; reseau: string }) {
+  const reseau = RESEAUX.find((r) => r.value === input.reseau) ?? RESEAUX[0];
+
+  const message = [
+    `Réseau : ${reseau.label}.`,
+    "Donne entre 8 et 12 hashtags.",
+    "Publication :",
+    input.texte,
+  ].join("\n");
+
+  const brut = (await appelClaudeJson(SYSTEM_HASHTAGS, message)) as { hashtags?: unknown };
+  const liste = Array.isArray(brut.hashtags) ? brut.hashtags : [];
+  return [
+    ...new Set(
+      liste
+        .map((tag) =>
+          String(tag)
+            .trim()
+            .toLowerCase()
+            .replace(/^#/, "")
+            .replace(/\s+/g, "")
+            .slice(0, 40),
+        )
+        .filter(Boolean),
+    ),
+  ].slice(0, 12);
+}
+
 
 /**
  * Ouvre le flux de génération d'image de la passerelle IA de Lovable.
