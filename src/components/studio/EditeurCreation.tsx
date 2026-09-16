@@ -1133,7 +1133,7 @@ function ReglagesCalque({
   onSupprimer: () => void;
   onDupliquer: () => void;
   onOrdre: (sens: -1 | 1) => void;
-  onFond?: () => void;
+  onFond?: (() => void) | undefined;
 }) {
   return (
     <div className="space-y-3">
