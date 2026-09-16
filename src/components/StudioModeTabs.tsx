@@ -16,7 +16,7 @@ export function StudioModeTabs() {
 
   return (
     <div className="flex gap-2">
-      <Link to="/studio" className={classes(!creation)}>
+      <Link to="/studio" search={{ contenu: undefined }} className={classes(!creation)}>
         <PenLine className="h-4 w-4" />
         Rédaction
       </Link>
