@@ -678,21 +678,84 @@ function StudioContenusPage() {
                 ))}
               </select>
             </label>
-            <button
-              type="button"
-              disabled={idee.trim().length < 5 || mutationRediger.isPending}
-              onClick={() => mutationRediger.mutate()}
-              className="cami-btn-accent w-full disabled:pointer-events-none disabled:opacity-50 sm:w-auto"
-            >
-              {mutationRediger.isPending ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Wand2 className="h-4 w-4" />
-              )}
-              Générer le post
-            </button>
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                disabled={idee.trim().length < 5 || mutationSerie.isPending}
+                onClick={() => mutationSerie.mutate()}
+                className="cami-btn-secondary flex-nowrap whitespace-nowrap disabled:pointer-events-none disabled:opacity-50"
+              >
+                {mutationSerie.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Layers className="h-4 w-4" />
+                )}
+                Série de 3 posts
+              </button>
+              <button
+                type="button"
+                disabled={idee.trim().length < 5 || mutationRediger.isPending}
+                onClick={() => mutationRediger.mutate()}
+                className="cami-btn-accent flex-1 disabled:pointer-events-none disabled:opacity-50 sm:flex-none"
+              >
+                {mutationRediger.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Wand2 className="h-4 w-4" />
+                )}
+                Générer le post
+              </button>
+            </div>
           </div>
+
+          {serie.length > 0 ? (
+            <div className="mt-4 flex flex-col gap-2">
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+                  Série proposée
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setSerie([])}
+                  className="text-[11px] font-semibold text-muted-foreground hover:text-[var(--coral)]"
+                >
+                  Fermer
+                </button>
+              </div>
+              {serie.map((post, index) => (
+                <article
+                  key={`${post.titre}-${index}`}
+                  className="rounded-2xl border border-border bg-muted p-3"
+                >
+                  <p className="text-xs font-bold text-primary">
+                    {index + 1}. {post.titre}
+                  </p>
+                  <p className="mt-1 line-clamp-4 whitespace-pre-wrap text-[11px] leading-relaxed text-muted-foreground">
+                    {post.texte}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTexteAvant(brouillon.texte);
+                      setBrouillon((etat) => ({
+                        ...etat,
+                        id: undefined,
+                        titre: post.titre,
+                        texte: post.texte,
+                        tags: post.tags,
+                      }));
+                      toast.success("Post chargé dans l'éditeur");
+                    }}
+                    className="mt-2 inline-flex min-h-9 items-center gap-1 rounded-full border border-border bg-card px-3 text-[11px] font-semibold text-primary transition hover:border-[var(--coral)] hover:text-[var(--coral)]"
+                  >
+                    <Pencil className="h-3.5 w-3.5" /> Reprendre ce post
+                  </button>
+                </article>
+              ))}
+            </div>
+          ) : null}
         </section>
+
 
         {/* Éditeur */}
         <section className="cami-card flex flex-col gap-4 p-4">
