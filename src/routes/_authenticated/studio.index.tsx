@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -6,13 +6,17 @@ import {
   CalendarClock,
   CheckCircle2,
   Copy,
+  Hash,
   ImagePlus,
+  Layers,
   Loader2,
   Pencil,
   Plus,
   Search,
+  Share2,
   Sparkles,
   Trash2,
+  Undo2,
   Wand2,
   X,
 } from "lucide-react";
@@ -21,6 +25,8 @@ import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { StudioTabs } from "@/components/StudioTabs";
 import { CopyButton } from "@/components/CopyButton";
+import { ApercuPost } from "@/components/studio/ApercuPost";
+import { JaugeLongueur } from "@/components/studio/JaugeLongueur";
 import {
   RESEAUX,
   STATUTS,
@@ -35,13 +41,17 @@ import {
   type StatutValue,
 } from "@/lib/studio";
 import {
+  declinerContenu,
   deleteContenu,
   listContenus,
   listMedias,
   redigerContenu,
   reecrireContenu,
   saveContenu,
+  serieContenus,
+  suggererHashtags,
 } from "@/lib/studio.functions";
+
 
 export const Route = createFileRoute("/_authenticated/studio/")({
   validateSearch: (search: Record<string, unknown>) => ({
