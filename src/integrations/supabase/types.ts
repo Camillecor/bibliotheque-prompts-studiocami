@@ -109,6 +109,45 @@ export type Database = {
           },
         ]
       }
+      creations: {
+        Row: {
+          apercu: string
+          created_at: string
+          document: Json
+          format: string
+          hauteur: number
+          id: string
+          largeur: number
+          nom: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          apercu?: string
+          created_at?: string
+          document?: Json
+          format?: string
+          hauteur?: number
+          id?: string
+          largeur?: number
+          nom?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          apercu?: string
+          created_at?: string
+          document?: Json
+          format?: string
+          hauteur?: number
+          id?: string
+          largeur?: number
+          nom?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       fiches: {
         Row: {
           created_at: string
