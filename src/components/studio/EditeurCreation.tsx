@@ -1335,6 +1335,16 @@ function ReglagesCalque({
 
       {calque.type === "image" ? (
         <div className="space-y-3">
+          {onFond ? (
+            <button
+              type="button"
+              onClick={onFond}
+              className="min-h-10 w-full rounded-xl border border-border text-sm font-semibold text-primary"
+            >
+              Utiliser comme fond
+            </button>
+          ) : null}
+
           <Champ label={`Angles arrondis : ${calque.arrondi}px`}>
             <input
               type="range"
