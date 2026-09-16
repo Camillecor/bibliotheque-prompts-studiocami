@@ -111,6 +111,25 @@ function inputVersIso(valeur: string) {
   return Number.isNaN(date.getTime()) ? null : date.toISOString();
 }
 
+const CLE_BROUILLON = "cami:studio-brouillon";
+
+function lireBrouillonLocal(): Brouillon | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const brut = window.localStorage.getItem(CLE_BROUILLON);
+    if (!brut) return null;
+    const parsed = JSON.parse(brut) as Partial<Brouillon>;
+    if (!parsed || typeof parsed.texte !== "string") return null;
+    return { ...BROUILLON_VIDE, ...parsed } as Brouillon;
+  } catch {
+    return null;
+  }
+}
+
+function heureCourte(date: Date) {
+  return date.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+}
+
 function StudioContenusPage() {
   const queryClient = useQueryClient();
   const [brouillon, setBrouillon] = useState<Brouillon>(BROUILLON_VIDE);
@@ -120,6 +139,11 @@ function StudioContenusPage() {
   const [selecteurMedias, setSelecteurMedias] = useState(false);
   const [recherche, setRecherche] = useState("");
   const [filtreStatut, setFiltreStatut] = useState<string>("tous");
+  const [enregistreA, setEnregistreA] = useState<string | null>(null);
+  const [texteAvant, setTexteAvant] = useState<string | null>(null);
+  const [hashtagsProposes, setHashtagsProposes] = useState<string[]>([]);
+  const [serie, setSerie] = useState<{ titre: string; texte: string; tags: string[] }[]>([]);
+  const [brouillonRecupere, setBrouillonRecupere] = useState(false);
 
   const fetchContenus = useServerFn(listContenus);
   const fetchMedias = useServerFn(listMedias);
@@ -127,6 +151,10 @@ function StudioContenusPage() {
   const supprimer = useServerFn(deleteContenu);
   const rediger = useServerFn(redigerContenu);
   const reecrire = useServerFn(reecrireContenu);
+  const decliner = useServerFn(declinerContenu);
+  const genererSerie = useServerFn(serieContenus);
+  const genererHashtags = useServerFn(suggererHashtags);
+
 
   const { data: contenus = [], isLoading } = useQuery({
     queryKey: ["studio-contenus"],
