@@ -313,6 +313,62 @@ function StudioCalendrierPage() {
           </div>
         </header>
 
+        {semaineCourante.length > 0 ? (
+          <section className="cami-card p-4">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h2 className="font-display text-sm font-bold text-primary">Cette semaine</h2>
+              {enRetard.length > 0 ? (
+                <span className="rounded-full bg-[color-mix(in_srgb,var(--coral)_14%,white)] px-3 py-1 text-[11px] font-semibold text-[var(--coral)]">
+                  {enRetard.length} contenu{enRetard.length > 1 ? "s" : ""} à marquer comme publié
+                </span>
+              ) : null}
+            </div>
+            <ul className="mt-3 flex flex-col gap-2">
+              {semaineCourante.map((contenu) => {
+                const info = reseauInfo(contenu.reseau);
+                const passe =
+                  contenu.statut !== "publie" && new Date(contenu.date_planifiee ?? "") < new Date();
+                return (
+                  <li
+                    key={contenu.id}
+                    className="flex flex-wrap items-center gap-2 rounded-2xl border-l-[3px] border border-border bg-card px-3 py-2"
+                    style={{ borderLeftColor: info.couleur }}
+                  >
+                    <span className="text-[11px] font-bold" style={{ color: info.couleur }}>
+                      {formatDateHeure(contenu.date_planifiee ?? "")}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setApercu(contenu)}
+                      className="min-w-0 flex-1 truncate text-left text-xs font-semibold text-primary hover:text-[var(--coral)]"
+                    >
+                      {contenu.titre || "Sans titre"}
+                    </button>
+                    {contenu.statut === "publie" ? (
+                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-muted-foreground">
+                        <CheckCircle2 className="h-3.5 w-3.5" /> Publié
+                      </span>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => mutationPublier.mutate(contenu.id)}
+                        className={[
+                          "inline-flex min-h-9 items-center gap-1 rounded-full border px-3 text-[11px] font-semibold transition",
+                          passe
+                            ? "border-[var(--coral)] text-[var(--coral)]"
+                            : "border-border text-primary hover:border-[var(--coral)] hover:text-[var(--coral)]",
+                        ].join(" ")}
+                      >
+                        <CheckCircle2 className="h-3.5 w-3.5" /> Marquer comme publié
+                      </button>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        ) : null}
+
         {isLoading ? (
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Loader2 className="h-4 w-4 animate-spin" /> Chargement du calendrier…
@@ -332,19 +388,27 @@ function StudioCalendrierPage() {
             <div className="grid grid-cols-7 gap-1.5">
               {jours.map((jour) => {
                 const cle = cleJour(jour);
-                const duMois = jour.getMonth() === mois.getMonth();
+                const duMois = vue === "semaine" || jour.getMonth() === mois.getMonth();
                 const items = parJour.get(cle) ?? [];
                 return (
                   <div
                     key={cle}
-                    onDragOver={(event) => event.preventDefault()}
+                    onDragOver={(event) => {
+                      event.preventDefault();
+                      if (glisse && survol !== cle) setSurvol(cle);
+                    }}
+                    onDragLeave={() => setSurvol((actuel) => (actuel === cle ? null : actuel))}
                     onDrop={() => deposer(jour)}
                     className={[
-                      "min-h-28 rounded-xl border p-2 transition",
+                      vue === "semaine" ? "min-h-56" : "min-h-28",
+                      "rounded-xl border p-2 transition",
                       duMois ? "border-border bg-card" : "border-transparent bg-muted/40",
-                      glisse ? "hover:border-[var(--coral)]" : "",
+                      glisse && survol === cle
+                        ? "border-[var(--coral)] bg-[color-mix(in_srgb,var(--coral)_8%,white)]"
+                        : "",
                     ].join(" ")}
                   >
+
                     <span
                       className={[
                         "inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-[10px] font-bold",
