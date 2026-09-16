@@ -916,12 +916,22 @@ export function EditeurCreation({ creation }: Props) {
               onSupprimer={() => supprimerCalque(calqueActif.id)}
               onDupliquer={() => dupliquerCalque(calqueActif.id)}
               onOrdre={(sens) => deplacerCalque(calqueActif.id, sens)}
+              onFond={
+                calqueActif.type === "image" ? () => calqueVersFond(calqueActif) : undefined
+              }
             />
           ) : (
             <ReglagesFond
               fond={doc.fond}
               onChange={(fond) => appliquer((d) => ({ ...d, fond }))}
-              onImage={async () => fichierRef.current?.click()}
+              onImage={() => {
+                cibleImport.current = "fond";
+                fichierRef.current?.click();
+              }}
+              onMedias={() => {
+                cibleImport.current = "fond";
+                setOuvrirMedias(true);
+              }}
             />
           )}
         </aside>
