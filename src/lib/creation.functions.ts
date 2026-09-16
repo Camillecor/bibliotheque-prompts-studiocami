@@ -4,6 +4,7 @@ import { z } from "zod";
 import { COMPTE_ID } from "@/lib/compte";
 import { erreurBase } from "@/lib/erreurs";
 import type { CreationComplete, CreationRow, DocumentCreation } from "@/lib/creation";
+import type { Json } from "@/integrations/supabase/types";
 
 // Application mono-compte : le filtrage sur COMPTE_ID est fait côté serveur
 // uniquement, jamais d'après une valeur venue du navigateur.
@@ -120,7 +121,7 @@ export const createCreation = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: row, error } = await supabaseAdmin
       .from("creations")
-      .insert({ ...data, document: data.document as unknown as object, user_id: COMPTE_ID })
+      .insert({ ...data, document: data.document as unknown as Json, user_id: COMPTE_ID })
       .select("id")
       .single();
     if (error) throw erreurBase("creation", error);
@@ -141,10 +142,14 @@ export const saveCreation = createServerFn({ method: "POST" })
     limiterDebit("creation:sauver", 120, 60_000);
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { id, ...champs } = data;
+    const { id, nom, document, apercu } = data;
+    const champs: { nom?: string; document?: Json; apercu?: string } = {};
+    if (nom !== undefined) champs.nom = nom;
+    if (document !== undefined) champs.document = document as unknown as Json;
+    if (apercu !== undefined) champs.apercu = apercu;
     const { error } = await supabaseAdmin
       .from("creations")
-      .update(champs as unknown as Record<string, unknown>)
+      .update(champs)
       .eq("id", id)
       .eq("user_id", COMPTE_ID);
     if (error) throw erreurBase("creation", error);
