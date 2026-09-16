@@ -260,15 +260,14 @@ function StudioCalendrierPage() {
                 type="button"
                 aria-label={vue === "mois" ? "Mois précédent" : "Semaine précédente"}
                 onClick={() =>
-                  setVue === undefined
-                    ? undefined
-                    : setMois((actuel) => {
-                        const suivant = new Date(actuel);
-                        if (vue === "mois") suivant.setMonth(actuel.getMonth() - 1, 1);
-                        else suivant.setDate(actuel.getDate() - 7);
-                        return suivant;
-                      })
+                  setMois((actuel) => {
+                    const suivant = new Date(actuel);
+                    if (vue === "mois") suivant.setMonth(actuel.getMonth() - 1, 1);
+                    else suivant.setDate(actuel.getDate() - 7);
+                    return suivant;
+                  })
                 }
+
                 className="cami-icon-btn"
               >
                 <ChevronLeft className="h-4 w-4" />
