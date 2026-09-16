@@ -43,24 +43,45 @@ import { listMedias, uploadMedia } from "@/lib/studio.functions";
 
 const MAX_IMPORT = 1600;
 
-/** Réduit une image et la convertit en donnée embarquée (PNG) pour rester autonome. */
-async function imageVersDonnee(source: string): Promise<string> {
-  const image = new Image();
-  image.crossOrigin = "anonymous";
-  await new Promise<void>((resolve, reject) => {
-    image.onload = () => resolve();
+function estSvg(source: string) {
+  return source.startsWith("data:image/svg+xml") || /\.svg($|\?)/i.test(source);
+}
+
+function chargerImage(source: string) {
+  return new Promise<HTMLImageElement>((resolve, reject) => {
+    const image = new Image();
+    image.crossOrigin = "anonymous";
+    image.onload = () => resolve(image);
     image.onerror = () => reject(new Error("Image illisible."));
     image.src = source;
   });
-  const ratio = Math.min(1, MAX_IMPORT / Math.max(image.naturalWidth, image.naturalHeight));
+}
+
+/**
+ * Prépare une image (PNG, JPG, WebP ou SVG) pour l'éditeur : les SVG sont
+ * gardés tels quels pour rester nets, les autres sont réduits et embarqués.
+ */
+async function preparerImage(
+  source: string,
+): Promise<{ url: string; largeur: number; hauteur: number }> {
+  const image = await chargerImage(source);
+  const largeurSource = image.naturalWidth || 800;
+  const hauteurSource = image.naturalHeight || 800;
+
+  if (estSvg(source)) {
+    return { url: source, largeur: largeurSource, hauteur: hauteurSource };
+  }
+
+  const ratio = Math.min(1, MAX_IMPORT / Math.max(largeurSource, hauteurSource));
   const canvas = document.createElement("canvas");
-  canvas.width = Math.max(1, Math.round(image.naturalWidth * ratio));
-  canvas.height = Math.max(1, Math.round(image.naturalHeight * ratio));
+  canvas.width = Math.max(1, Math.round(largeurSource * ratio));
+  canvas.height = Math.max(1, Math.round(hauteurSource * ratio));
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("Impossible de préparer l'image.");
   ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-  return canvas.toDataURL("image/png");
+  return { url: canvas.toDataURL("image/png"), largeur: canvas.width, hauteur: canvas.height };
 }
+
 
 function fichierVersUrl(fichier: File) {
   return new Promise<string>((resolve, reject) => {
