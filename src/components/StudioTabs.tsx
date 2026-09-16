@@ -36,6 +36,7 @@ export function StudioTabs() {
           </Link>
         );
       })}
-    </nav>
+      </nav>
+    </div>
   );
 }
