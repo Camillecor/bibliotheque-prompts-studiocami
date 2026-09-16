@@ -29,7 +29,6 @@ export function reseauConnu(value: string) {
   return RESEAUX.some((r) => r.value === value);
 }
 
-
 export const STATUTS = [
   { value: "brouillon", label: "Brouillon" },
   { value: "planifie", label: "Planifié" },
@@ -64,11 +63,7 @@ export const VARIANTES = [
 
 export type VarianteValue = (typeof VARIANTES)[number]["value"];
 
-export const VARIANTE_VALUES = VARIANTES.map((v) => v.value) as [
-  VarianteValue,
-  ...VarianteValue[],
-];
-
+export const VARIANTE_VALUES = VARIANTES.map((v) => v.value) as [VarianteValue, ...VarianteValue[]];
 
 export const FORMATS_MEDIA = [
   { value: "1:1", label: "Carré 1:1", ratio: 1 },

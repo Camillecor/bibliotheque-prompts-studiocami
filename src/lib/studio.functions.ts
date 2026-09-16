@@ -441,7 +441,6 @@ export const suggererHashtags = createServerFn({ method: "POST" })
     return suggererHashtagsPost(data);
   });
 
-
 /* --------------------------------------------------------------- statistiques */
 
 export const statsStudio = createServerFn({ method: "GET" }).handler(

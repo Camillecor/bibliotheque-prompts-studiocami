@@ -75,7 +75,9 @@ function lireCreneau() {
     const parse = JSON.parse(brut) as { heure?: number; minute?: number };
     return {
       heure: Number.isInteger(parse.heure) ? Math.min(23, Math.max(0, parse.heure as number)) : 9,
-      minute: Number.isInteger(parse.minute) ? Math.min(59, Math.max(0, parse.minute as number)) : 0,
+      minute: Number.isInteger(parse.minute)
+        ? Math.min(59, Math.max(0, parse.minute as number))
+        : 0,
     };
   } catch {
     return { heure: 9, minute: 0 };
@@ -183,7 +185,6 @@ function StudioCalendrierPage() {
     setSurvol(null);
   };
 
-
   const panneau = (
     <div className="flex flex-col gap-3 p-5">
       <h2 className="font-display text-sm font-bold text-primary">À planifier</h2>
@@ -221,7 +222,6 @@ function StudioCalendrierPage() {
         Astuce : fais glisser une carte sur une date. Un contenu déjà planifié garde son heure, un
         nouveau prend ton créneau habituel.
       </p>
-
     </div>
   );
 
@@ -327,7 +327,8 @@ function StudioCalendrierPage() {
               {semaineCourante.map((contenu) => {
                 const info = reseauInfo(contenu.reseau);
                 const passe =
-                  contenu.statut !== "publie" && new Date(contenu.date_planifiee ?? "") < new Date();
+                  contenu.statut !== "publie" &&
+                  new Date(contenu.date_planifiee ?? "") < new Date();
                 return (
                   <li
                     key={contenu.id}
@@ -408,7 +409,6 @@ function StudioCalendrierPage() {
                         : "",
                     ].join(" ")}
                   >
-
                     <span
                       className={[
                         "inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-[10px] font-bold",

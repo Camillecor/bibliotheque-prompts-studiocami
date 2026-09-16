@@ -52,7 +52,6 @@ import {
   suggererHashtags,
 } from "@/lib/studio.functions";
 
-
 export const Route = createFileRoute("/_authenticated/studio/")({
   validateSearch: (search: Record<string, unknown>) => ({
     contenu: typeof search["contenu"] === "string" ? (search["contenu"] as string) : undefined,
@@ -155,7 +154,6 @@ function StudioContenusPage() {
   const genererSerie = useServerFn(serieContenus);
   const genererHashtags = useServerFn(suggererHashtags);
 
-
   const { data: contenus = [], isLoading } = useQuery({
     queryKey: ["studio-contenus"],
     queryFn: () => fetchContenus(),
@@ -207,7 +205,6 @@ function StudioContenusPage() {
     },
     onError: (error: Error) => toast.error(error.message),
   });
-
 
   const mutationSupprimer = useMutation({
     mutationFn: async (id: string) => supprimer({ data: { id } }),
@@ -306,7 +303,6 @@ function StudioContenusPage() {
     onError: (error: Error) => toast.error(error.message),
   });
 
-
   const chargerContenu = (contenu: ContenuRow) => {
     setBrouillon({
       id: contenu.id,
@@ -325,7 +321,6 @@ function StudioContenusPage() {
     setTexteAvant(null);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
-
 
   const ajouterTag = () => {
     const propre = nouveauTag.trim().toLowerCase().replace(/^#/, "");
@@ -405,7 +400,6 @@ function StudioContenusPage() {
     window.addEventListener("keydown", surTouche);
     return () => window.removeEventListener("keydown", surTouche);
   }, [enregistrerMaintenant, idee, mutationRediger]);
-
 
   useEffect(() => {
     if (!selecteurMedias) return;
@@ -756,7 +750,6 @@ function StudioContenusPage() {
           ) : null}
         </section>
 
-
         {/* Éditeur */}
         <section className="cami-card flex flex-col gap-4 p-4">
           {brouillonRecupere ? (
@@ -787,7 +780,6 @@ function StudioContenusPage() {
               </span>
             ) : null}
           </div>
-
 
           <div className="flex flex-wrap gap-2">
             {RESEAUX.map((option) => (
@@ -874,7 +866,9 @@ function StudioContenusPage() {
 
           {/* Aperçu tel qu'il apparaîtra */}
           <div>
-            <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Aperçu</p>
+            <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+              Aperçu
+            </p>
             <div className="mt-2 max-w-sm">
               <ApercuPost
                 texte={brouillon.texte}
@@ -884,7 +878,6 @@ function StudioContenusPage() {
               />
             </div>
           </div>
-
 
           {/* Hashtags */}
           <div>
@@ -967,7 +960,6 @@ function StudioContenusPage() {
               </div>
             ) : null}
           </div>
-
 
           {/* Médias liés */}
           <div>

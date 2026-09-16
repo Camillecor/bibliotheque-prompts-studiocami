@@ -94,7 +94,6 @@ async function appelClaude(system: string, message: string) {
   return normaliserPost(await appelClaudeJson(system, message));
 }
 
-
 export async function redigerPost(input: {
   idee: string;
   reseau: string;
@@ -116,11 +115,7 @@ export async function redigerPost(input: {
   return appelClaude(SYSTEM_POST, message);
 }
 
-export async function reecrirePost(input: {
-  texte: string;
-  reseau: string;
-  variante: string;
-}) {
+export async function reecrirePost(input: { texte: string; reseau: string; variante: string }) {
   const reseau = RESEAUX.find((r) => r.value === input.reseau) ?? RESEAUX[0];
   const variante = VARIANTES.find((v) => v.value === input.variante) ?? VARIANTES[0];
 
@@ -208,18 +203,12 @@ export async function suggererHashtagsPost(input: { texte: string; reseau: strin
     ...new Set(
       liste
         .map((tag) =>
-          String(tag)
-            .trim()
-            .toLowerCase()
-            .replace(/^#/, "")
-            .replace(/\s+/g, "")
-            .slice(0, 40),
+          String(tag).trim().toLowerCase().replace(/^#/, "").replace(/\s+/g, "").slice(0, 40),
         )
         .filter(Boolean),
     ),
   ].slice(0, 12);
 }
-
 
 /**
  * Ouvre le flux de génération d'image de la passerelle IA de Lovable.
