@@ -888,9 +888,25 @@ function StudioContenusPage() {
 
           {/* Hashtags */}
           <div>
-            <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
-              Hashtags
-            </p>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+                Hashtags
+              </p>
+              <button
+                type="button"
+                disabled={brouillon.texte.trim().length < 10 || mutationHashtags.isPending}
+                onClick={() => mutationHashtags.mutate()}
+                className="inline-flex items-center gap-1 text-xs font-semibold text-[var(--info)] disabled:pointer-events-none disabled:opacity-50"
+              >
+                {mutationHashtags.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Hash className="h-4 w-4" />
+                )}
+                Proposer des hashtags
+              </button>
+            </div>
+
             <div className="mt-2 flex flex-wrap items-center gap-2">
               {brouillon.tags.map((tag) => (
                 <span
