@@ -34,6 +34,7 @@ import { Route as AuthenticatedVeilleIndexRouteImport } from './routes/_authenti
 import { Route as AuthenticatedVeilleFavorisRouteImport } from './routes/_authenticated/veille.favoris'
 import { Route as ApiPublicVeilleCronRouteImport } from './routes/api/public/veille-cron'
 import { Route as AuthenticatedStudioCreationIndexRouteImport } from './routes/_authenticated/studio.creation.index'
+import { Route as AuthenticatedStudioCreationIdRouteImport } from './routes/_authenticated/studio.creation.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -170,6 +171,12 @@ const AuthenticatedStudioCreationIndexRoute =
     path: '/creation/',
     getParentRoute: () => AuthenticatedStudioRoute,
   } as any)
+const AuthenticatedStudioCreationIdRoute =
+  AuthenticatedStudioCreationIdRouteImport.update({
+    id: '/creation/$id',
+    path: '/creation/$id',
+    getParentRoute: () => AuthenticatedStudioRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -195,6 +202,7 @@ export interface FileRoutesByFullPath {
   '/projets/': typeof AuthenticatedProjetsIndexRoute
   '/studio/': typeof AuthenticatedStudioIndexRoute
   '/veille/': typeof AuthenticatedVeilleIndexRoute
+  '/studio/creation/$id': typeof AuthenticatedStudioCreationIdRoute
   '/studio/creation/': typeof AuthenticatedStudioCreationIndexRoute
 }
 export interface FileRoutesByTo {
@@ -217,6 +225,7 @@ export interface FileRoutesByTo {
   '/projets': typeof AuthenticatedProjetsIndexRoute
   '/studio': typeof AuthenticatedStudioIndexRoute
   '/veille': typeof AuthenticatedVeilleIndexRoute
+  '/studio/creation/$id': typeof AuthenticatedStudioCreationIdRoute
   '/studio/creation': typeof AuthenticatedStudioCreationIndexRoute
 }
 export interface FileRoutesById {
@@ -245,6 +254,7 @@ export interface FileRoutesById {
   '/_authenticated/projets/': typeof AuthenticatedProjetsIndexRoute
   '/_authenticated/studio/': typeof AuthenticatedStudioIndexRoute
   '/_authenticated/veille/': typeof AuthenticatedVeilleIndexRoute
+  '/_authenticated/studio/creation/$id': typeof AuthenticatedStudioCreationIdRoute
   '/_authenticated/studio/creation/': typeof AuthenticatedStudioCreationIndexRoute
 }
 export interface FileRouteTypes {
@@ -273,6 +283,7 @@ export interface FileRouteTypes {
     | '/projets/'
     | '/studio/'
     | '/veille/'
+    | '/studio/creation/$id'
     | '/studio/creation/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -295,6 +306,7 @@ export interface FileRouteTypes {
     | '/projets'
     | '/studio'
     | '/veille'
+    | '/studio/creation/$id'
     | '/studio/creation'
   id:
     | '__root__'
@@ -322,6 +334,7 @@ export interface FileRouteTypes {
     | '/_authenticated/projets/'
     | '/_authenticated/studio/'
     | '/_authenticated/veille/'
+    | '/_authenticated/studio/creation/$id'
     | '/_authenticated/studio/creation/'
   fileRoutesById: FileRoutesById
 }
@@ -510,6 +523,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStudioCreationIndexRouteImport
       parentRoute: typeof AuthenticatedStudioRoute
     }
+    '/_authenticated/studio/creation/$id': {
+      id: '/_authenticated/studio/creation/$id'
+      path: '/creation/$id'
+      fullPath: '/studio/creation/$id'
+      preLoaderRoute: typeof AuthenticatedStudioCreationIdRouteImport
+      parentRoute: typeof AuthenticatedStudioRoute
+    }
   }
 }
 
@@ -544,6 +564,7 @@ interface AuthenticatedStudioRouteChildren {
   AuthenticatedStudioMediasRoute: typeof AuthenticatedStudioMediasRoute
   AuthenticatedStudioStatistiquesRoute: typeof AuthenticatedStudioStatistiquesRoute
   AuthenticatedStudioIndexRoute: typeof AuthenticatedStudioIndexRoute
+  AuthenticatedStudioCreationIdRoute: typeof AuthenticatedStudioCreationIdRoute
   AuthenticatedStudioCreationIndexRoute: typeof AuthenticatedStudioCreationIndexRoute
 }
 
@@ -552,6 +573,7 @@ const AuthenticatedStudioRouteChildren: AuthenticatedStudioRouteChildren = {
   AuthenticatedStudioMediasRoute: AuthenticatedStudioMediasRoute,
   AuthenticatedStudioStatistiquesRoute: AuthenticatedStudioStatistiquesRoute,
   AuthenticatedStudioIndexRoute: AuthenticatedStudioIndexRoute,
+  AuthenticatedStudioCreationIdRoute: AuthenticatedStudioCreationIdRoute,
   AuthenticatedStudioCreationIndexRoute: AuthenticatedStudioCreationIndexRoute,
 }
 
