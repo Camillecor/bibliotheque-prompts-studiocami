@@ -13,7 +13,9 @@ export function StudioTabs() {
   const pathname = useRouterState({ select: (r) => r.location.pathname });
 
   return (
-    <nav className="-mx-1 flex gap-1 overflow-x-auto pb-1">
+    <div className="space-y-2">
+      <StudioModeTabs />
+      <nav className="-mx-1 flex gap-1 overflow-x-auto pb-1">
       {ONGLETS.map((onglet) => {
         const actif = onglet.exact
           ? pathname === onglet.to || pathname === "/studio/"
