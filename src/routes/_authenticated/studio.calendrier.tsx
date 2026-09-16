@@ -38,11 +38,18 @@ export const Route = createFileRoute("/_authenticated/studio/calendrier")({
 });
 
 const JOURS = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
+const CLE_CRENEAU = "cami:studio-creneau";
+
+function debutSemaine(reference: Date) {
+  const debut = new Date(reference);
+  debut.setDate(reference.getDate() - ((reference.getDay() + 6) % 7));
+  debut.setHours(0, 0, 0, 0);
+  return debut;
+}
 
 function grilleDuMois(reference: Date) {
   const premier = new Date(reference.getFullYear(), reference.getMonth(), 1);
-  const debut = new Date(premier);
-  debut.setDate(premier.getDate() - ((premier.getDay() + 6) % 7));
+  const debut = debutSemaine(premier);
   return Array.from({ length: 42 }, (_, index) => {
     const jour = new Date(debut);
     jour.setDate(debut.getDate() + index);
@@ -50,10 +57,37 @@ function grilleDuMois(reference: Date) {
   });
 }
 
+function grilleSemaine(reference: Date) {
+  const debut = debutSemaine(reference);
+  return Array.from({ length: 7 }, (_, index) => {
+    const jour = new Date(debut);
+    jour.setDate(debut.getDate() + index);
+    return jour;
+  });
+}
+
+/** Créneau habituel retenu localement (heure du dernier dépôt). */
+function lireCreneau() {
+  if (typeof window === "undefined") return { heure: 9, minute: 0 };
+  try {
+    const brut = window.localStorage.getItem(CLE_CRENEAU);
+    if (!brut) return { heure: 9, minute: 0 };
+    const parse = JSON.parse(brut) as { heure?: number; minute?: number };
+    return {
+      heure: Number.isInteger(parse.heure) ? Math.min(23, Math.max(0, parse.heure as number)) : 9,
+      minute: Number.isInteger(parse.minute) ? Math.min(59, Math.max(0, parse.minute as number)) : 0,
+    };
+  } catch {
+    return { heure: 9, minute: 0 };
+  }
+}
+
 function StudioCalendrierPage() {
   const queryClient = useQueryClient();
+  const [vue, setVue] = useState<"mois" | "semaine">("mois");
   const [mois, setMois] = useState(() => new Date());
   const [glisse, setGlisse] = useState<string | null>(null);
+  const [survol, setSurvol] = useState<string | null>(null);
   const [apercu, setApercu] = useState<ContenuRow | null>(null);
 
   const fetchContenus = useServerFn(listContenus);
@@ -100,16 +134,55 @@ function StudioCalendrierPage() {
   }, [contenus]);
 
   const aPlanifier = contenus.filter((c) => !c.date_planifiee && c.statut !== "publie");
-  const jours = grilleDuMois(mois);
+  const jours = vue === "mois" ? grilleDuMois(mois) : grilleSemaine(mois);
   const aujourdhui = cleJour(new Date());
+
+  // Contenus de la semaine en cours, pour le bandeau du haut.
+  const semaineCourante = useMemo(() => {
+    const debut = debutSemaine(new Date());
+    const fin = new Date(debut);
+    fin.setDate(debut.getDate() + 7);
+    return contenus
+      .filter((c) => {
+        if (!c.date_planifiee) return false;
+        const date = new Date(c.date_planifiee);
+        return date >= debut && date < fin;
+      })
+      .sort(
+        (a, b) =>
+          new Date(a.date_planifiee ?? "").getTime() - new Date(b.date_planifiee ?? "").getTime(),
+      );
+  }, [contenus]);
+
+  const enRetard = semaineCourante.filter(
+    (c) => c.statut !== "publie" && new Date(c.date_planifiee ?? "") < new Date(),
+  );
 
   const deposer = (jour: Date) => {
     if (!glisse) return;
+    const contenu = contenus.find((c) => c.id === glisse);
     const date = new Date(jour);
-    date.setHours(9, 0, 0, 0);
+    if (contenu?.date_planifiee) {
+      // On replanifie : on garde l'heure d'origine.
+      const origine = new Date(contenu.date_planifiee);
+      date.setHours(origine.getHours(), origine.getMinutes(), 0, 0);
+    } else {
+      const creneau = lireCreneau();
+      date.setHours(creneau.heure, creneau.minute, 0, 0);
+    }
+    try {
+      window.localStorage.setItem(
+        CLE_CRENEAU,
+        JSON.stringify({ heure: date.getHours(), minute: date.getMinutes() }),
+      );
+    } catch {
+      /* stockage indisponible : sans conséquence */
+    }
     mutationPlanifier.mutate({ id: glisse, date_planifiee: date.toISOString() });
     setGlisse(null);
+    setSurvol(null);
   };
+
 
   const panneau = (
     <div className="flex flex-col gap-3 p-5">
