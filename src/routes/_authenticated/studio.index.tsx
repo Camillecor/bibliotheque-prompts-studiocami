@@ -737,13 +737,13 @@ function StudioContenusPage() {
                     type="button"
                     onClick={() => {
                       setTexteAvant(brouillon.texte);
-                      setBrouillon((etat) => ({
+                      setBrouillon(({ id: _id, ...etat }) => ({
                         ...etat,
-                        id: undefined,
                         titre: post.titre,
                         texte: post.texte,
                         tags: post.tags,
                       }));
+
                       toast.success("Post chargé dans l'éditeur");
                     }}
                     className="mt-2 inline-flex min-h-9 items-center gap-1 rounded-full border border-border bg-card px-3 text-[11px] font-semibold text-primary transition hover:border-[var(--coral)] hover:text-[var(--coral)]"
