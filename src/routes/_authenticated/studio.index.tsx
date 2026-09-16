@@ -822,15 +822,13 @@ function StudioContenusPage() {
               placeholder="Écris ton post ici, ou laisse Mario proposer une première version."
               className="w-full resize-y rounded-2xl border border-border bg-muted p-3 text-sm leading-relaxed text-primary outline-none focus:border-[var(--info)]"
             />
-            <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
-              <span
-                className={[
-                  "text-[11px] font-semibold",
-                  depassement ? "text-destructive" : "text-muted-foreground",
-                ].join(" ")}
-              >
-                {longueur} / {reseau.limite} caractères
-              </span>
+            <div className="mt-2 flex flex-col gap-2">
+              <JaugeLongueur texte={brouillon.texte} limite={reseau.limite} />
+              {depassement ? (
+                <p className="text-[11px] font-semibold text-destructive">
+                  Le post dépasse la limite de {reseau.label}.
+                </p>
+              ) : null}
               <div className="flex flex-wrap items-center gap-2">
                 <CopyButton value={brouillon.texte} />
                 {VARIANTES.map((variante) => (
@@ -844,9 +842,49 @@ function StudioContenusPage() {
                     {variante.label}
                   </button>
                 ))}
+                {texteAvant !== null && texteAvant !== brouillon.texte ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const precedent = texteAvant;
+                      setTexteAvant(brouillon.texte);
+                      setBrouillon((etat) => ({ ...etat, texte: precedent }));
+                    }}
+                    className="inline-flex min-h-11 items-center gap-1 rounded-full border border-border bg-card px-3 text-xs font-semibold text-muted-foreground transition hover:border-[var(--info)] hover:text-[var(--info)] sm:min-h-9"
+                  >
+                    <Undo2 className="h-3.5 w-3.5" /> Version précédente
+                  </button>
+                ) : null}
+                <button
+                  type="button"
+                  disabled={brouillon.texte.trim().length < 10 || mutationDecliner.isPending}
+                  onClick={() => mutationDecliner.mutate()}
+                  className="inline-flex min-h-11 items-center gap-1 rounded-full border border-border bg-card px-3 text-xs font-semibold text-primary transition hover:border-[var(--coral)] hover:text-[var(--coral)] disabled:pointer-events-none disabled:opacity-50 sm:min-h-9"
+                >
+                  {mutationDecliner.isPending ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <Share2 className="h-3.5 w-3.5" />
+                  )}
+                  Décliner sur les autres réseaux
+                </button>
               </div>
             </div>
           </div>
+
+          {/* Aperçu tel qu'il apparaîtra */}
+          <div>
+            <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Aperçu</p>
+            <div className="mt-2 max-w-sm">
+              <ApercuPost
+                texte={brouillon.texte}
+                reseau={brouillon.reseau}
+                tags={brouillon.tags}
+                medias={mediasChoisis}
+              />
+            </div>
+          </div>
+
 
           {/* Hashtags */}
           <div>
