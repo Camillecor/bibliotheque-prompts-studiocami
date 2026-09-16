@@ -107,7 +107,9 @@ function ChoixCouleur({
             onClick={() => onChange(couleur.valeur)}
             className={[
               "h-7 w-7 rounded-full border",
-              valeur === couleur.valeur ? "border-[var(--coral)] ring-2 ring-[var(--coral)]" : "border-border",
+              valeur === couleur.valeur
+                ? "border-[var(--coral)] ring-2 ring-[var(--coral)]"
+                : "border-border",
             ].join(" ")}
             style={{ background: couleur.valeur }}
           />
@@ -154,7 +156,11 @@ function RenduCalque({ calque }: { calque: Calque }) {
           display: "flex",
           alignItems: "flex-start",
           justifyContent:
-            calque.align === "center" ? "center" : calque.align === "right" ? "flex-end" : "flex-start",
+            calque.align === "center"
+              ? "center"
+              : calque.align === "right"
+                ? "flex-end"
+                : "flex-start",
         }}
       >
         <span
@@ -256,9 +262,7 @@ export function EditeurCreation({ creation }: Props) {
     const calculer = () => {
       const dispo = zone.clientWidth - 8;
       const hauteurDispo = Math.max(320, window.innerHeight - 260);
-      setZoomAuto(
-        Math.min(dispo / creation.largeur, hauteurDispo / creation.hauteur, 1),
-      );
+      setZoomAuto(Math.min(dispo / creation.largeur, hauteurDispo / creation.hauteur, 1));
     };
     calculer();
     const observer = new ResizeObserver(calculer);
@@ -548,7 +552,9 @@ export function EditeurCreation({ creation }: Props) {
       await fnSave({ data: { id: creation.id, document: doc, ...(apercu ? { apercu } : {}) } });
     },
     onSuccess: () => {
-      setEnregistreA(new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }));
+      setEnregistreA(
+        new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }),
+      );
       toast.success("Création enregistrée.");
     },
     onError: (error: Error) => toast.error(error.message),
@@ -684,11 +690,7 @@ export function EditeurCreation({ creation }: Props) {
           <button type="button" onClick={() => setOuvrirMedias(true)} className={boutonOutil}>
             <Shapes className="h-4 w-4" /> Depuis Médias
           </button>
-          <button
-            type="button"
-            onClick={() => fichierRef.current?.click()}
-            className={boutonOutil}
-          >
+          <button type="button" onClick={() => fichierRef.current?.click()} className={boutonOutil}>
             <Upload className="h-4 w-4" /> Importer
           </button>
           <input
@@ -907,7 +909,10 @@ function ReglagesFond({
       </div>
 
       {fond.type === "couleur" ? (
-        <ChoixCouleur valeur={fond.couleur} onChange={(couleur) => onChange({ ...fond, couleur })} />
+        <ChoixCouleur
+          valeur={fond.couleur}
+          onChange={(couleur) => onChange({ ...fond, couleur })}
+        />
       ) : null}
 
       {fond.type === "degrade" ? (
@@ -1150,9 +1155,7 @@ function ReglagesCalque({
                 <input
                   type="color"
                   value={calque.fondTexte}
-                  onChange={(e) =>
-                    onChange({ fondTexte: e.target.value } as Partial<CalqueTexte>)
-                  }
+                  onChange={(e) => onChange({ fondTexte: e.target.value } as Partial<CalqueTexte>)}
                   className="h-9 w-12 rounded border border-border"
                 />
               ) : null}
@@ -1195,7 +1198,9 @@ function ReglagesCalque({
               min={0}
               max={400}
               value={calque.arrondi}
-              onChange={(e) => onChange({ arrondi: Number(e.target.value) } as Partial<CalqueImage>)}
+              onChange={(e) =>
+                onChange({ arrondi: Number(e.target.value) } as Partial<CalqueImage>)
+              }
               className="w-full"
             />
           </Champ>
@@ -1236,7 +1241,9 @@ function ReglagesCalque({
               min={0}
               max={400}
               value={calque.arrondi}
-              onChange={(e) => onChange({ arrondi: Number(e.target.value) } as Partial<CalqueForme>)}
+              onChange={(e) =>
+                onChange({ arrondi: Number(e.target.value) } as Partial<CalqueForme>)
+              }
               className="w-full"
             />
           </Champ>
