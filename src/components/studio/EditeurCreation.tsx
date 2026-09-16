@@ -778,25 +778,42 @@ export function EditeurCreation({ creation }: Props) {
           <button type="button" onClick={() => ajouterForme("trait")} className={boutonOutil}>
             <Minus className="h-4 w-4" /> Trait
           </button>
-          <button type="button" onClick={() => setOuvrirMedias(true)} className={boutonOutil}>
+          <button
+            type="button"
+            onClick={() => {
+              cibleImport.current = "calque";
+              setOuvrirMedias(true);
+            }}
+            className={boutonOutil}
+          >
             <Shapes className="h-4 w-4" /> Depuis Médias
           </button>
-          <button type="button" onClick={() => fichierRef.current?.click()} className={boutonOutil}>
-            <Upload className="h-4 w-4" /> Importer
+          <button
+            type="button"
+            onClick={() => {
+              cibleImport.current = "calque";
+              fichierRef.current?.click();
+            }}
+            className={boutonOutil}
+          >
+            <Upload className="h-4 w-4" /> Importer PNG/SVG
           </button>
           <input
             ref={fichierRef}
             type="file"
-            accept="image/*"
+            accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml,.svg"
             className="hidden"
             onChange={async (event) => {
               const fichier = event.target.files?.[0];
               event.target.value = "";
               if (!fichier) return;
-              await ajouterImage(await fichierVersUrl(fichier));
+              const source = await fichierVersUrl(fichier);
+              if (cibleImport.current === "fond") await definirFondImage(source);
+              else await ajouterImage(source);
             }}
           />
         </aside>
+
 
         {/* zone de travail */}
         <div
