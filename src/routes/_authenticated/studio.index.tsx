@@ -183,7 +183,7 @@ function StudioContenusPage() {
   };
 
   const mutationEnregistrer = useMutation({
-    mutationFn: async (valeurs: Brouillon) =>
+    mutationFn: async (valeurs: Brouillon & { silencieux?: boolean }) =>
       enregistrer({
         data: {
           ...(valeurs.id ? { id: valeurs.id } : {}),
@@ -199,13 +199,15 @@ function StudioContenusPage() {
           media_ids: valeurs.mediaIds,
         },
       }),
-    onSuccess: (resultat) => {
+    onSuccess: (resultat, valeurs) => {
       setBrouillon((etat) => ({ ...etat, id: resultat.id }));
+      setEnregistreA(heureCourte(new Date()));
       invalider();
-      toast.success("Contenu enregistré");
+      if (!valeurs.silencieux) toast.success("Contenu enregistré");
     },
     onError: (error: Error) => toast.error(error.message),
   });
+
 
   const mutationSupprimer = useMutation({
     mutationFn: async (id: string) => supprimer({ data: { id } }),
