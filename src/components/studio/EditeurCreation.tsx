@@ -536,6 +536,7 @@ export function EditeurCreation({ creation }: Props) {
         height: creation.hauteur,
         style: { transform: "none", transformOrigin: "top left" },
         cacheBust: true,
+        fontEmbedCSS: await cssPolices(),
       });
     },
     [creation.largeur, creation.hauteur],
