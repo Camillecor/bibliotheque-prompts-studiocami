@@ -29,7 +29,6 @@ export function reseauConnu(value: string) {
   return RESEAUX.some((r) => r.value === value);
 }
 
-
 export const STATUTS = [
   { value: "brouillon", label: "Brouillon" },
   { value: "planifie", label: "Planifié" },
@@ -58,9 +57,13 @@ export const VARIANTES = [
   { value: "raccourcir", label: "Raccourcir" },
   { value: "percutant", label: "Plus percutant" },
   { value: "storytelling", label: "Plus narratif" },
+  { value: "accroche", label: "Ajouter une accroche" },
+  { value: "cta", label: "Ajouter un appel à l'action" },
 ] as const;
 
 export type VarianteValue = (typeof VARIANTES)[number]["value"];
+
+export const VARIANTE_VALUES = VARIANTES.map((v) => v.value) as [VarianteValue, ...VarianteValue[]];
 
 export const FORMATS_MEDIA = [
   { value: "1:1", label: "Carré 1:1", ratio: 1 },

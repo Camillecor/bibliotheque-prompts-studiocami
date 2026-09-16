@@ -3,11 +3,13 @@ import { z } from "zod";
 import {
   RESEAU_VALUES,
   STATUT_VALUES,
+  VARIANTE_VALUES,
   type ContenuRow,
   type MediaRow,
   type StatsStudio,
   RESEAUX,
 } from "@/lib/studio";
+
 import { COMPTE_ID } from "@/lib/compte";
 import { erreurBase } from "@/lib/erreurs";
 
@@ -350,7 +352,7 @@ export const redigerContenu = createServerFn({ method: "POST" })
 const VarianteInput = z.object({
   texte: z.string().trim().min(10).max(20_000),
   reseau: z.enum(RESEAU_VALUES).default("instagram"),
-  variante: z.enum(["raccourcir", "percutant", "storytelling"]),
+  variante: z.enum(VARIANTE_VALUES),
 });
 
 export const reecrireContenu = createServerFn({ method: "POST" })
@@ -361,6 +363,82 @@ export const reecrireContenu = createServerFn({ method: "POST" })
 
     const { reecrirePost } = await import("@/lib/studio.server");
     return reecrirePost(data);
+  });
+
+const DeclinerInput = z.object({
+  texte: z.string().trim().min(10).max(20_000),
+  reseau: z.enum(RESEAU_VALUES).default("instagram"),
+});
+
+/** Crée, pour chaque autre réseau, un brouillon adapté à partir du post courant. */
+export const declinerContenu = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => DeclinerInput.parse(input))
+  .handler(async ({ data }): Promise<{ reseau: string; titre: string; id: string }[]> => {
+    const { limiterDebit } = await import("@/lib/securite.server");
+    limiterDebit("studio:decliner", 6, 60_000);
+
+    const { declinerPost } = await import("@/lib/studio.server");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const cibles = RESEAUX.filter((r) => r.value !== data.reseau);
+    const crees: { reseau: string; titre: string; id: string }[] = [];
+
+    for (const cible of cibles) {
+      const post = await declinerPost({
+        texte: data.texte,
+        reseauSource: data.reseau,
+        cible: cible.value,
+      });
+      if (!post.texte) continue;
+
+      const { data: row, error } = await supabaseAdmin
+        .from("contenus")
+        .insert({
+          user_id: COMPTE_ID,
+          titre: `${post.titre} — ${cible.label}`.slice(0, 160),
+          texte: post.texte,
+          reseau: cible.value,
+          statut: "brouillon",
+          tags: post.tags,
+        })
+        .select("id")
+        .single();
+      if (error) throw erreurBase("studio", error);
+      crees.push({ reseau: cible.value, titre: post.titre, id: row.id as string });
+    }
+
+    return crees;
+  });
+
+const SerieInput = z.object({
+  idee: z.string().trim().min(5).max(4000),
+  reseau: z.enum(RESEAU_VALUES).default("instagram"),
+  ton: z.string().trim().max(40).default(""),
+});
+
+export const serieContenus = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => SerieInput.parse(input))
+  .handler(async ({ data }) => {
+    const { limiterDebit } = await import("@/lib/securite.server");
+    limiterDebit("studio:serie", 6, 60_000);
+
+    const { serieDePosts } = await import("@/lib/studio.server");
+    return serieDePosts(data);
+  });
+
+const HashtagsInput = z.object({
+  texte: z.string().trim().min(10).max(20_000),
+  reseau: z.enum(RESEAU_VALUES).default("instagram"),
+});
+
+export const suggererHashtags = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => HashtagsInput.parse(input))
+  .handler(async ({ data }): Promise<string[]> => {
+    const { limiterDebit } = await import("@/lib/securite.server");
+    limiterDebit("studio:hashtags", 10, 60_000);
+
+    const { suggererHashtagsPost } = await import("@/lib/studio.server");
+    return suggererHashtagsPost(data);
   });
 
 /* --------------------------------------------------------------- statistiques */

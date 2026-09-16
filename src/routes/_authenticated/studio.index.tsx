@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -6,13 +6,17 @@ import {
   CalendarClock,
   CheckCircle2,
   Copy,
+  Hash,
   ImagePlus,
+  Layers,
   Loader2,
   Pencil,
   Plus,
   Search,
+  Share2,
   Sparkles,
   Trash2,
+  Undo2,
   Wand2,
   X,
 } from "lucide-react";
@@ -21,6 +25,8 @@ import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { StudioTabs } from "@/components/StudioTabs";
 import { CopyButton } from "@/components/CopyButton";
+import { ApercuPost } from "@/components/studio/ApercuPost";
+import { JaugeLongueur } from "@/components/studio/JaugeLongueur";
 import {
   RESEAUX,
   STATUTS,
@@ -35,12 +41,15 @@ import {
   type StatutValue,
 } from "@/lib/studio";
 import {
+  declinerContenu,
   deleteContenu,
   listContenus,
   listMedias,
   redigerContenu,
   reecrireContenu,
   saveContenu,
+  serieContenus,
+  suggererHashtags,
 } from "@/lib/studio.functions";
 
 export const Route = createFileRoute("/_authenticated/studio/")({
@@ -101,6 +110,25 @@ function inputVersIso(valeur: string) {
   return Number.isNaN(date.getTime()) ? null : date.toISOString();
 }
 
+const CLE_BROUILLON = "cami:studio-brouillon";
+
+function lireBrouillonLocal(): Brouillon | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const brut = window.localStorage.getItem(CLE_BROUILLON);
+    if (!brut) return null;
+    const parsed = JSON.parse(brut) as Partial<Brouillon>;
+    if (!parsed || typeof parsed.texte !== "string") return null;
+    return { ...BROUILLON_VIDE, ...parsed } as Brouillon;
+  } catch {
+    return null;
+  }
+}
+
+function heureCourte(date: Date) {
+  return date.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+}
+
 function StudioContenusPage() {
   const queryClient = useQueryClient();
   const [brouillon, setBrouillon] = useState<Brouillon>(BROUILLON_VIDE);
@@ -110,6 +138,11 @@ function StudioContenusPage() {
   const [selecteurMedias, setSelecteurMedias] = useState(false);
   const [recherche, setRecherche] = useState("");
   const [filtreStatut, setFiltreStatut] = useState<string>("tous");
+  const [enregistreA, setEnregistreA] = useState<string | null>(null);
+  const [texteAvant, setTexteAvant] = useState<string | null>(null);
+  const [hashtagsProposes, setHashtagsProposes] = useState<string[]>([]);
+  const [serie, setSerie] = useState<{ titre: string; texte: string; tags: string[] }[]>([]);
+  const [brouillonRecupere, setBrouillonRecupere] = useState(false);
 
   const fetchContenus = useServerFn(listContenus);
   const fetchMedias = useServerFn(listMedias);
@@ -117,6 +150,9 @@ function StudioContenusPage() {
   const supprimer = useServerFn(deleteContenu);
   const rediger = useServerFn(redigerContenu);
   const reecrire = useServerFn(reecrireContenu);
+  const decliner = useServerFn(declinerContenu);
+  const genererSerie = useServerFn(serieContenus);
+  const genererHashtags = useServerFn(suggererHashtags);
 
   const { data: contenus = [], isLoading } = useQuery({
     queryKey: ["studio-contenus"],
@@ -145,7 +181,7 @@ function StudioContenusPage() {
   };
 
   const mutationEnregistrer = useMutation({
-    mutationFn: async (valeurs: Brouillon) =>
+    mutationFn: async (valeurs: Brouillon & { silencieux?: boolean }) =>
       enregistrer({
         data: {
           ...(valeurs.id ? { id: valeurs.id } : {}),
@@ -161,10 +197,11 @@ function StudioContenusPage() {
           media_ids: valeurs.mediaIds,
         },
       }),
-    onSuccess: (resultat) => {
+    onSuccess: (resultat, valeurs) => {
       setBrouillon((etat) => ({ ...etat, id: resultat.id }));
+      setEnregistreA(heureCourte(new Date()));
       invalider();
-      toast.success("Contenu enregistré");
+      if (!valeurs.silencieux) toast.success("Contenu enregistré");
     },
     onError: (error: Error) => toast.error(error.message),
   });
@@ -204,6 +241,7 @@ function StudioContenusPage() {
     mutationFn: async () =>
       rediger({ data: { idee, reseau: brouillon.reseau, ton, consignes: "" } }),
     onSuccess: (resultat) => {
+      setTexteAvant(brouillon.texte);
       setBrouillon((etat) => ({
         ...etat,
         titre: etat.titre || resultat.titre,
@@ -225,8 +263,42 @@ function StudioContenusPage() {
         },
       }),
     onSuccess: (resultat) => {
+      setTexteAvant(brouillon.texte);
       setBrouillon((etat) => ({ ...etat, texte: resultat.texte }));
       toast.success("Nouvelle version proposée");
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+
+  const mutationDecliner = useMutation({
+    mutationFn: async () =>
+      decliner({ data: { texte: brouillon.texte, reseau: brouillon.reseau } }),
+    onSuccess: (crees) => {
+      invalider();
+      toast.success(
+        crees.length > 0
+          ? `Décliné en ${crees.length} brouillon${crees.length > 1 ? "s" : ""}`
+          : "Aucune déclinaison générée",
+      );
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+
+  const mutationSerie = useMutation({
+    mutationFn: async () => genererSerie({ data: { idee, reseau: brouillon.reseau, ton } }),
+    onSuccess: (posts) => {
+      setSerie(posts);
+      toast.success("Mario propose une série de posts");
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+
+  const mutationHashtags = useMutation({
+    mutationFn: async () =>
+      genererHashtags({ data: { texte: brouillon.texte, reseau: brouillon.reseau } }),
+    onSuccess: (liste) => {
+      setHashtagsProposes(liste);
+      if (liste.length === 0) toast.info("Aucun hashtag proposé");
     },
     onError: (error: Error) => toast.error(error.message),
   });
@@ -242,6 +314,11 @@ function StudioContenusPage() {
       datePlanifiee: isoVersInput(contenu.date_planifiee),
       mediaIds: contenu.medias.map((m) => m.id),
     });
+    setBrouillonRecupere(false);
+    setEnregistreA(null);
+    setSerie([]);
+    setHashtagsProposes([]);
+    setTexteAvant(null);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -251,6 +328,78 @@ function StudioContenusPage() {
     setBrouillon((etat) => ({ ...etat, tags: [...etat.tags, propre] }));
     setNouveauTag("");
   };
+
+  const ajouterHashtag = (tag: string) => {
+    setBrouillon((etat) =>
+      etat.tags.includes(tag) || etat.tags.length >= 8
+        ? etat
+        : { ...etat, tags: [...etat.tags, tag] },
+    );
+  };
+
+  const mutationEnregistrerRef = useRef(mutationEnregistrer);
+  mutationEnregistrerRef.current = mutationEnregistrer;
+  const brouillonRef = useRef(brouillon);
+  brouillonRef.current = brouillon;
+
+  const enregistrerMaintenant = useCallback(() => {
+    const valeurs = brouillonRef.current;
+    if (valeurs.texte.trim().length === 0) return;
+    mutationEnregistrerRef.current.mutate(valeurs);
+  }, []);
+
+  // Brouillon jamais perdu : on relit la dernière saisie au retour sur la page.
+  useEffect(() => {
+    const local = lireBrouillonLocal();
+    if (local && local.texte.trim().length > 0) {
+      setBrouillon(local);
+      setBrouillonRecupere(true);
+    }
+  }, []);
+
+  // Sauvegarde locale à la frappe.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      if (brouillon.texte.trim().length === 0 && !brouillon.id) {
+        window.localStorage.removeItem(CLE_BROUILLON);
+      } else {
+        window.localStorage.setItem(CLE_BROUILLON, JSON.stringify(brouillon));
+      }
+    } catch {
+      /* stockage indisponible : on continue sans sauvegarde locale */
+    }
+  }, [brouillon]);
+
+  // Enregistrement automatique une fois le contenu créé.
+  const dernierEnvoi = useRef<string>("");
+  useEffect(() => {
+    if (!brouillon.id || brouillon.texte.trim().length === 0) return;
+    const signature = JSON.stringify(brouillon);
+    if (signature === dernierEnvoi.current) return;
+    const minuteur = setTimeout(() => {
+      dernierEnvoi.current = signature;
+      mutationEnregistrerRef.current.mutate({ ...brouillon, silencieux: true });
+    }, 1200);
+    return () => clearTimeout(minuteur);
+  }, [brouillon]);
+
+  // Raccourcis clavier : enregistrer et générer.
+  useEffect(() => {
+    const surTouche = (event: KeyboardEvent) => {
+      if (!(event.metaKey || event.ctrlKey)) return;
+      if (event.key === "s" || event.key === "S") {
+        event.preventDefault();
+        enregistrerMaintenant();
+      }
+      if (event.key === "Enter") {
+        event.preventDefault();
+        if (idee.trim().length >= 5 && !mutationRediger.isPending) mutationRediger.mutate();
+      }
+    };
+    window.addEventListener("keydown", surTouche);
+    return () => window.removeEventListener("keydown", surTouche);
+  }, [enregistrerMaintenant, idee, mutationRediger]);
 
   useEffect(() => {
     if (!selecteurMedias) return;
@@ -523,30 +672,114 @@ function StudioContenusPage() {
                 ))}
               </select>
             </label>
-            <button
-              type="button"
-              disabled={idee.trim().length < 5 || mutationRediger.isPending}
-              onClick={() => mutationRediger.mutate()}
-              className="cami-btn-accent w-full disabled:pointer-events-none disabled:opacity-50 sm:w-auto"
-            >
-              {mutationRediger.isPending ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Wand2 className="h-4 w-4" />
-              )}
-              Générer le post
-            </button>
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                disabled={idee.trim().length < 5 || mutationSerie.isPending}
+                onClick={() => mutationSerie.mutate()}
+                className="cami-btn-secondary flex-nowrap whitespace-nowrap disabled:pointer-events-none disabled:opacity-50"
+              >
+                {mutationSerie.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Layers className="h-4 w-4" />
+                )}
+                Série de 3 posts
+              </button>
+              <button
+                type="button"
+                disabled={idee.trim().length < 5 || mutationRediger.isPending}
+                onClick={() => mutationRediger.mutate()}
+                className="cami-btn-accent flex-1 disabled:pointer-events-none disabled:opacity-50 sm:flex-none"
+              >
+                {mutationRediger.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Wand2 className="h-4 w-4" />
+                )}
+                Générer le post
+              </button>
+            </div>
           </div>
+
+          {serie.length > 0 ? (
+            <div className="mt-4 flex flex-col gap-2">
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+                  Série proposée
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setSerie([])}
+                  className="text-[11px] font-semibold text-muted-foreground hover:text-[var(--coral)]"
+                >
+                  Fermer
+                </button>
+              </div>
+              {serie.map((post, index) => (
+                <article
+                  key={`${post.titre}-${index}`}
+                  className="rounded-2xl border border-border bg-muted p-3"
+                >
+                  <p className="text-xs font-bold text-primary">
+                    {index + 1}. {post.titre}
+                  </p>
+                  <p className="mt-1 line-clamp-4 whitespace-pre-wrap text-[11px] leading-relaxed text-muted-foreground">
+                    {post.texte}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTexteAvant(brouillon.texte);
+                      setBrouillon(({ id: _id, ...etat }) => ({
+                        ...etat,
+                        titre: post.titre,
+                        texte: post.texte,
+                        tags: post.tags,
+                      }));
+
+                      toast.success("Post chargé dans l'éditeur");
+                    }}
+                    className="mt-2 inline-flex min-h-9 items-center gap-1 rounded-full border border-border bg-card px-3 text-[11px] font-semibold text-primary transition hover:border-[var(--coral)] hover:text-[var(--coral)]"
+                  >
+                    <Pencil className="h-3.5 w-3.5" /> Reprendre ce post
+                  </button>
+                </article>
+              ))}
+            </div>
+          ) : null}
         </section>
 
         {/* Éditeur */}
         <section className="cami-card flex flex-col gap-4 p-4">
-          <input
-            value={brouillon.titre}
-            onChange={(event) => setBrouillon((etat) => ({ ...etat, titre: event.target.value }))}
-            placeholder="Titre interne"
-            className="w-full rounded-2xl border border-border bg-muted px-3 py-2.5 text-sm font-semibold text-primary outline-none focus:border-[var(--info)]"
-          />
+          {brouillonRecupere ? (
+            <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-[color-mix(in_srgb,var(--info)_35%,transparent)] bg-[color-mix(in_srgb,var(--info)_10%,white)] px-3 py-2">
+              <p className="text-[11px] font-semibold text-[var(--info)]">
+                Brouillon récupéré : on reprend là où tu t'étais arrêtée.
+              </p>
+              <button
+                type="button"
+                onClick={() => setBrouillonRecupere(false)}
+                className="text-[11px] font-semibold text-muted-foreground hover:text-[var(--coral)]"
+              >
+                Ok
+              </button>
+            </div>
+          ) : null}
+
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <input
+              value={brouillon.titre}
+              onChange={(event) => setBrouillon((etat) => ({ ...etat, titre: event.target.value }))}
+              placeholder="Titre interne"
+              className="min-w-0 flex-1 rounded-2xl border border-border bg-muted px-3 py-2.5 text-sm font-semibold text-primary outline-none focus:border-[var(--info)]"
+            />
+            {enregistreA ? (
+              <span className="text-[11px] font-semibold text-muted-foreground">
+                {mutationEnregistrer.isPending ? "Enregistrement…" : `Enregistré à ${enregistreA}`}
+              </span>
+            ) : null}
+          </div>
 
           <div className="flex flex-wrap gap-2">
             {RESEAUX.map((option) => (
@@ -581,15 +814,13 @@ function StudioContenusPage() {
               placeholder="Écris ton post ici, ou laisse Mario proposer une première version."
               className="w-full resize-y rounded-2xl border border-border bg-muted p-3 text-sm leading-relaxed text-primary outline-none focus:border-[var(--info)]"
             />
-            <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
-              <span
-                className={[
-                  "text-[11px] font-semibold",
-                  depassement ? "text-destructive" : "text-muted-foreground",
-                ].join(" ")}
-              >
-                {longueur} / {reseau.limite} caractères
-              </span>
+            <div className="mt-2 flex flex-col gap-2">
+              <JaugeLongueur texte={brouillon.texte} limite={reseau.limite} />
+              {depassement ? (
+                <p className="text-[11px] font-semibold text-destructive">
+                  Le post dépasse la limite de {reseau.label}.
+                </p>
+              ) : null}
               <div className="flex flex-wrap items-center gap-2">
                 <CopyButton value={brouillon.texte} />
                 {VARIANTES.map((variante) => (
@@ -603,15 +834,72 @@ function StudioContenusPage() {
                     {variante.label}
                   </button>
                 ))}
+                {texteAvant !== null && texteAvant !== brouillon.texte ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const precedent = texteAvant;
+                      setTexteAvant(brouillon.texte);
+                      setBrouillon((etat) => ({ ...etat, texte: precedent }));
+                    }}
+                    className="inline-flex min-h-11 items-center gap-1 rounded-full border border-border bg-card px-3 text-xs font-semibold text-muted-foreground transition hover:border-[var(--info)] hover:text-[var(--info)] sm:min-h-9"
+                  >
+                    <Undo2 className="h-3.5 w-3.5" /> Version précédente
+                  </button>
+                ) : null}
+                <button
+                  type="button"
+                  disabled={brouillon.texte.trim().length < 10 || mutationDecliner.isPending}
+                  onClick={() => mutationDecliner.mutate()}
+                  className="inline-flex min-h-11 items-center gap-1 rounded-full border border-border bg-card px-3 text-xs font-semibold text-primary transition hover:border-[var(--coral)] hover:text-[var(--coral)] disabled:pointer-events-none disabled:opacity-50 sm:min-h-9"
+                >
+                  {mutationDecliner.isPending ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <Share2 className="h-3.5 w-3.5" />
+                  )}
+                  Décliner sur les autres réseaux
+                </button>
               </div>
+            </div>
+          </div>
+
+          {/* Aperçu tel qu'il apparaîtra */}
+          <div>
+            <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+              Aperçu
+            </p>
+            <div className="mt-2 max-w-sm">
+              <ApercuPost
+                texte={brouillon.texte}
+                reseau={brouillon.reseau}
+                tags={brouillon.tags}
+                medias={mediasChoisis}
+              />
             </div>
           </div>
 
           {/* Hashtags */}
           <div>
-            <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
-              Hashtags
-            </p>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+                Hashtags
+              </p>
+              <button
+                type="button"
+                disabled={brouillon.texte.trim().length < 10 || mutationHashtags.isPending}
+                onClick={() => mutationHashtags.mutate()}
+                className="inline-flex items-center gap-1 text-xs font-semibold text-[var(--info)] disabled:pointer-events-none disabled:opacity-50"
+              >
+                {mutationHashtags.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Hash className="h-4 w-4" />
+                )}
+                Proposer des hashtags
+              </button>
+            </div>
+
             <div className="mt-2 flex flex-wrap items-center gap-2">
               {brouillon.tags.map((tag) => (
                 <span
@@ -646,6 +934,31 @@ function StudioContenusPage() {
                 className="min-h-11 rounded-full border border-border bg-muted px-3 text-xs text-primary outline-none focus:border-[var(--info)] sm:min-h-9"
               />
             </div>
+            {hashtagsProposes.length > 0 ? (
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                <span className="text-[11px] font-semibold text-muted-foreground">
+                  Propositions de Mario :
+                </span>
+                {hashtagsProposes
+                  .filter((tag) => !brouillon.tags.includes(tag))
+                  .map((tag) => (
+                    <button
+                      key={tag}
+                      type="button"
+                      onClick={() =>
+                        setBrouillon((etat) =>
+                          etat.tags.includes(tag) || etat.tags.length >= 8
+                            ? etat
+                            : { ...etat, tags: [...etat.tags, tag] },
+                        )
+                      }
+                      className="inline-flex min-h-9 items-center gap-1 rounded-full border border-dashed border-border bg-card px-3 text-xs font-semibold text-muted-foreground transition hover:border-[var(--coral)] hover:text-[var(--coral)]"
+                    >
+                      <Plus className="h-3 w-3" /> #{tag}
+                    </button>
+                  ))}
+              </div>
+            ) : null}
           </div>
 
           {/* Médias liés */}

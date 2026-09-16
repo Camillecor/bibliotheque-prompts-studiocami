@@ -38,11 +38,18 @@ export const Route = createFileRoute("/_authenticated/studio/calendrier")({
 });
 
 const JOURS = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
+const CLE_CRENEAU = "cami:studio-creneau";
+
+function debutSemaine(reference: Date) {
+  const debut = new Date(reference);
+  debut.setDate(reference.getDate() - ((reference.getDay() + 6) % 7));
+  debut.setHours(0, 0, 0, 0);
+  return debut;
+}
 
 function grilleDuMois(reference: Date) {
   const premier = new Date(reference.getFullYear(), reference.getMonth(), 1);
-  const debut = new Date(premier);
-  debut.setDate(premier.getDate() - ((premier.getDay() + 6) % 7));
+  const debut = debutSemaine(premier);
   return Array.from({ length: 42 }, (_, index) => {
     const jour = new Date(debut);
     jour.setDate(debut.getDate() + index);
@@ -50,10 +57,39 @@ function grilleDuMois(reference: Date) {
   });
 }
 
+function grilleSemaine(reference: Date) {
+  const debut = debutSemaine(reference);
+  return Array.from({ length: 7 }, (_, index) => {
+    const jour = new Date(debut);
+    jour.setDate(debut.getDate() + index);
+    return jour;
+  });
+}
+
+/** Créneau habituel retenu localement (heure du dernier dépôt). */
+function lireCreneau() {
+  if (typeof window === "undefined") return { heure: 9, minute: 0 };
+  try {
+    const brut = window.localStorage.getItem(CLE_CRENEAU);
+    if (!brut) return { heure: 9, minute: 0 };
+    const parse = JSON.parse(brut) as { heure?: number; minute?: number };
+    return {
+      heure: Number.isInteger(parse.heure) ? Math.min(23, Math.max(0, parse.heure as number)) : 9,
+      minute: Number.isInteger(parse.minute)
+        ? Math.min(59, Math.max(0, parse.minute as number))
+        : 0,
+    };
+  } catch {
+    return { heure: 9, minute: 0 };
+  }
+}
+
 function StudioCalendrierPage() {
   const queryClient = useQueryClient();
+  const [vue, setVue] = useState<"mois" | "semaine">("mois");
   const [mois, setMois] = useState(() => new Date());
   const [glisse, setGlisse] = useState<string | null>(null);
+  const [survol, setSurvol] = useState<string | null>(null);
   const [apercu, setApercu] = useState<ContenuRow | null>(null);
 
   const fetchContenus = useServerFn(listContenus);
@@ -100,15 +136,53 @@ function StudioCalendrierPage() {
   }, [contenus]);
 
   const aPlanifier = contenus.filter((c) => !c.date_planifiee && c.statut !== "publie");
-  const jours = grilleDuMois(mois);
+  const jours = vue === "mois" ? grilleDuMois(mois) : grilleSemaine(mois);
   const aujourdhui = cleJour(new Date());
+
+  // Contenus de la semaine en cours, pour le bandeau du haut.
+  const semaineCourante = useMemo(() => {
+    const debut = debutSemaine(new Date());
+    const fin = new Date(debut);
+    fin.setDate(debut.getDate() + 7);
+    return contenus
+      .filter((c) => {
+        if (!c.date_planifiee) return false;
+        const date = new Date(c.date_planifiee);
+        return date >= debut && date < fin;
+      })
+      .sort(
+        (a, b) =>
+          new Date(a.date_planifiee ?? "").getTime() - new Date(b.date_planifiee ?? "").getTime(),
+      );
+  }, [contenus]);
+
+  const enRetard = semaineCourante.filter(
+    (c) => c.statut !== "publie" && new Date(c.date_planifiee ?? "") < new Date(),
+  );
 
   const deposer = (jour: Date) => {
     if (!glisse) return;
+    const contenu = contenus.find((c) => c.id === glisse);
     const date = new Date(jour);
-    date.setHours(9, 0, 0, 0);
+    if (contenu?.date_planifiee) {
+      // On replanifie : on garde l'heure d'origine.
+      const origine = new Date(contenu.date_planifiee);
+      date.setHours(origine.getHours(), origine.getMinutes(), 0, 0);
+    } else {
+      const creneau = lireCreneau();
+      date.setHours(creneau.heure, creneau.minute, 0, 0);
+    }
+    try {
+      window.localStorage.setItem(
+        CLE_CRENEAU,
+        JSON.stringify({ heure: date.getHours(), minute: date.getMinutes() }),
+      );
+    } catch {
+      /* stockage indisponible : sans conséquence */
+    }
     mutationPlanifier.mutate({ id: glisse, date_planifiee: date.toISOString() });
     setGlisse(null);
+    setSurvol(null);
   };
 
   const panneau = (
@@ -145,7 +219,8 @@ function StudioCalendrierPage() {
         </ul>
       )}
       <p className="text-[11px] text-muted-foreground">
-        Astuce : fais glisser une carte sur une date du calendrier pour la planifier à 9 h.
+        Astuce : fais glisser une carte sur une date. Un contenu déjà planifié garde son heure, un
+        nouveau prend ton créneau habituel.
       </p>
     </div>
   );
@@ -163,22 +238,56 @@ function StudioCalendrierPage() {
                 Ton mois de publication, relié à tes contenus.
               </p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="flex items-center gap-1 rounded-full border border-border bg-card p-1">
+                {(["mois", "semaine"] as const).map((option) => (
+                  <button
+                    key={option}
+                    type="button"
+                    onClick={() => setVue(option)}
+                    className={[
+                      "min-h-9 rounded-full px-3 text-xs font-semibold capitalize transition",
+                      vue === option
+                        ? "bg-primary text-primary-foreground"
+                        : "text-primary hover:text-[var(--coral)]",
+                    ].join(" ")}
+                  >
+                    {option}
+                  </button>
+                ))}
+              </div>
               <button
                 type="button"
-                aria-label="Mois précédent"
-                onClick={() => setMois(new Date(mois.getFullYear(), mois.getMonth() - 1, 1))}
+                aria-label={vue === "mois" ? "Mois précédent" : "Semaine précédente"}
+                onClick={() =>
+                  setMois((actuel) => {
+                    const suivant = new Date(actuel);
+                    if (vue === "mois") suivant.setMonth(actuel.getMonth() - 1, 1);
+                    else suivant.setDate(actuel.getDate() - 7);
+                    return suivant;
+                  })
+                }
+
                 className="cami-icon-btn"
               >
                 <ChevronLeft className="h-4 w-4" />
               </button>
               <span className="min-w-40 text-center text-sm font-bold capitalize text-primary">
-                {mois.toLocaleDateString("fr-FR", { month: "long", year: "numeric" })}
+                {vue === "mois"
+                  ? mois.toLocaleDateString("fr-FR", { month: "long", year: "numeric" })
+                  : `Semaine du ${debutSemaine(mois).toLocaleDateString("fr-FR", { day: "numeric", month: "long" })}`}
               </span>
               <button
                 type="button"
-                aria-label="Mois suivant"
-                onClick={() => setMois(new Date(mois.getFullYear(), mois.getMonth() + 1, 1))}
+                aria-label={vue === "mois" ? "Mois suivant" : "Semaine suivante"}
+                onClick={() =>
+                  setMois((actuel) => {
+                    const suivant = new Date(actuel);
+                    if (vue === "mois") suivant.setMonth(actuel.getMonth() + 1, 1);
+                    else suivant.setDate(actuel.getDate() + 7);
+                    return suivant;
+                  })
+                }
                 className="cami-icon-btn"
               >
                 <ChevronRight className="h-4 w-4" />
@@ -186,6 +295,7 @@ function StudioCalendrierPage() {
             </div>
           </div>
           <StudioTabs />
+
           <div className="flex flex-wrap items-center gap-2">
             {RESEAUX.map((reseau) => (
               <span
@@ -202,6 +312,63 @@ function StudioCalendrierPage() {
             ))}
           </div>
         </header>
+
+        {semaineCourante.length > 0 ? (
+          <section className="cami-card p-4">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h2 className="font-display text-sm font-bold text-primary">Cette semaine</h2>
+              {enRetard.length > 0 ? (
+                <span className="rounded-full bg-[color-mix(in_srgb,var(--coral)_14%,white)] px-3 py-1 text-[11px] font-semibold text-[var(--coral)]">
+                  {enRetard.length} contenu{enRetard.length > 1 ? "s" : ""} à marquer comme publié
+                </span>
+              ) : null}
+            </div>
+            <ul className="mt-3 flex flex-col gap-2">
+              {semaineCourante.map((contenu) => {
+                const info = reseauInfo(contenu.reseau);
+                const passe =
+                  contenu.statut !== "publie" &&
+                  new Date(contenu.date_planifiee ?? "") < new Date();
+                return (
+                  <li
+                    key={contenu.id}
+                    className="flex flex-wrap items-center gap-2 rounded-2xl border-l-[3px] border border-border bg-card px-3 py-2"
+                    style={{ borderLeftColor: info.couleur }}
+                  >
+                    <span className="text-[11px] font-bold" style={{ color: info.couleur }}>
+                      {formatDateHeure(contenu.date_planifiee ?? "")}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setApercu(contenu)}
+                      className="min-w-0 flex-1 truncate text-left text-xs font-semibold text-primary hover:text-[var(--coral)]"
+                    >
+                      {contenu.titre || "Sans titre"}
+                    </button>
+                    {contenu.statut === "publie" ? (
+                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-muted-foreground">
+                        <CheckCircle2 className="h-3.5 w-3.5" /> Publié
+                      </span>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => mutationPublier.mutate(contenu.id)}
+                        className={[
+                          "inline-flex min-h-9 items-center gap-1 rounded-full border px-3 text-[11px] font-semibold transition",
+                          passe
+                            ? "border-[var(--coral)] text-[var(--coral)]"
+                            : "border-border text-primary hover:border-[var(--coral)] hover:text-[var(--coral)]",
+                        ].join(" ")}
+                      >
+                        <CheckCircle2 className="h-3.5 w-3.5" /> Marquer comme publié
+                      </button>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        ) : null}
 
         {isLoading ? (
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -222,17 +389,24 @@ function StudioCalendrierPage() {
             <div className="grid grid-cols-7 gap-1.5">
               {jours.map((jour) => {
                 const cle = cleJour(jour);
-                const duMois = jour.getMonth() === mois.getMonth();
+                const duMois = vue === "semaine" || jour.getMonth() === mois.getMonth();
                 const items = parJour.get(cle) ?? [];
                 return (
                   <div
                     key={cle}
-                    onDragOver={(event) => event.preventDefault()}
+                    onDragOver={(event) => {
+                      event.preventDefault();
+                      if (glisse && survol !== cle) setSurvol(cle);
+                    }}
+                    onDragLeave={() => setSurvol((actuel) => (actuel === cle ? null : actuel))}
                     onDrop={() => deposer(jour)}
                     className={[
-                      "min-h-28 rounded-xl border p-2 transition",
+                      vue === "semaine" ? "min-h-56" : "min-h-28",
+                      "rounded-xl border p-2 transition",
                       duMois ? "border-border bg-card" : "border-transparent bg-muted/40",
-                      glisse ? "hover:border-[var(--coral)]" : "",
+                      glisse && survol === cle
+                        ? "border-[var(--coral)] bg-[color-mix(in_srgb,var(--coral)_8%,white)]"
+                        : "",
                     ].join(" ")}
                   >
                     <span
