@@ -71,6 +71,49 @@ function fichierVersUrl(fichier: File) {
   });
 }
 
+/**
+ * Récupère les polices Google utilisées par la page et les intègre directement
+ * (en données) pour que l'export PNG conserve exactement les mêmes typographies.
+ */
+let cachePolices: Promise<string> | null = null;
+function cssPolices() {
+  if (cachePolices) return cachePolices;
+  cachePolices = (async () => {
+    const liens = Array.from(
+      document.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]'),
+    ).filter((lien) => lien.href.startsWith("https://fonts.googleapis.com"));
+    const morceaux = await Promise.all(
+      liens.map(async (lien) => {
+        try {
+          const css = await (await fetch(lien.href)).text();
+          const urls = Array.from(new Set(css.match(/https:\/\/fonts\.gstatic\.com[^)]+/g) ?? []));
+          let resultat = css;
+          await Promise.all(
+            urls.map(async (url) => {
+              try {
+                const blob = await (await fetch(url)).blob();
+                const donnee = await new Promise<string>((resolve) => {
+                  const lecteur = new FileReader();
+                  lecteur.onload = () => resolve(String(lecteur.result ?? ""));
+                  lecteur.readAsDataURL(blob);
+                });
+                resultat = resultat.split(url).join(donnee);
+              } catch {
+                /* police ignorée */
+              }
+            }),
+          );
+          return resultat;
+        } catch {
+          return "";
+        }
+      }),
+    );
+    return morceaux.join("\n");
+  })();
+  return cachePolices;
+}
+
 function fondCss(fond: Fond): React.CSSProperties {
   if (fond.type === "couleur") return { background: fond.couleur };
   if (fond.type === "degrade")
