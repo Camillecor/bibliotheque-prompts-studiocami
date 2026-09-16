@@ -34,7 +34,7 @@ function cleAnthropic() {
   return apiKey;
 }
 
-async function appelClaude(system: string, message: string) {
+async function appelClaudeJson(system: string, message: string): Promise<unknown> {
   const response = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: {
@@ -44,7 +44,7 @@ async function appelClaude(system: string, message: string) {
     },
     body: JSON.stringify({
       model: "claude-sonnet-5",
-      max_tokens: 2048,
+      max_tokens: 4096,
       system,
       messages: [{ role: "user", content: [{ type: "text", text: message }] }],
     }),
@@ -71,16 +71,7 @@ async function appelClaude(system: string, message: string) {
   const nettoye = debut !== -1 && fin > debut ? brut.slice(debut, fin + 1) : brut;
 
   try {
-    const parsed = JSON.parse(nettoye) as {
-      titre?: unknown;
-      texte?: unknown;
-      tags?: unknown;
-    };
-    return {
-      titre: String(parsed.titre ?? "Publication sans titre").slice(0, 120),
-      texte: String(parsed.texte ?? "").trim(),
-      tags: Array.isArray(parsed.tags) ? parsed.tags.map(String).slice(0, 5) : [],
-    };
+    return JSON.parse(nettoye) as unknown;
   } catch (error) {
     console.error("[studio] JSON parse failed", error, brut.slice(0, 400));
     throw Object.assign(
@@ -89,6 +80,20 @@ async function appelClaude(system: string, message: string) {
     );
   }
 }
+
+function normaliserPost(valeur: unknown) {
+  const parsed = (valeur ?? {}) as { titre?: unknown; texte?: unknown; tags?: unknown };
+  return {
+    titre: String(parsed.titre ?? "Publication sans titre").slice(0, 120),
+    texte: String(parsed.texte ?? "").trim(),
+    tags: Array.isArray(parsed.tags) ? parsed.tags.map(String).slice(0, 5) : [],
+  };
+}
+
+async function appelClaude(system: string, message: string) {
+  return normaliserPost(await appelClaudeJson(system, message));
+}
+
 
 export async function redigerPost(input: {
   idee: string;
