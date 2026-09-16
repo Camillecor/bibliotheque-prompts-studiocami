@@ -308,6 +308,8 @@ export function EditeurCreation({ creation }: Props) {
   const scèneRef = useRef<HTMLDivElement | null>(null);
   const zoneRef = useRef<HTMLDivElement | null>(null);
   const fichierRef = useRef<HTMLInputElement | null>(null);
+  // « calque » : l'image devient un élément déplaçable ; « fond » : elle remplit l'arrière-plan.
+  const cibleImport = useRef<"calque" | "fond">("calque");
 
   const fnSave = useServerFn(saveCreation);
   const fnMedias = useServerFn(listMedias);
