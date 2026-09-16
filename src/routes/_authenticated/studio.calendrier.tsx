@@ -218,8 +218,10 @@ function StudioCalendrierPage() {
         </ul>
       )}
       <p className="text-[11px] text-muted-foreground">
-        Astuce : fais glisser une carte sur une date du calendrier pour la planifier à 9 h.
+        Astuce : fais glisser une carte sur une date. Un contenu déjà planifié garde son heure, un
+        nouveau prend ton créneau habituel.
       </p>
+
     </div>
   );
 
