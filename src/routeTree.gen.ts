@@ -33,6 +33,7 @@ import { Route as AuthenticatedStudioStatistiquesRouteImport } from './routes/_a
 import { Route as AuthenticatedVeilleIndexRouteImport } from './routes/_authenticated/veille.index'
 import { Route as AuthenticatedVeilleFavorisRouteImport } from './routes/_authenticated/veille.favoris'
 import { Route as ApiPublicVeilleCronRouteImport } from './routes/api/public/veille-cron'
+import { Route as AuthenticatedStudioCreationIndexRouteImport } from './routes/_authenticated/studio.creation.index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -163,6 +164,12 @@ const ApiPublicVeilleCronRoute = ApiPublicVeilleCronRouteImport.update({
   path: '/api/public/veille-cron',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedStudioCreationIndexRoute =
+  AuthenticatedStudioCreationIndexRouteImport.update({
+    id: '/creation/',
+    path: '/creation/',
+    getParentRoute: () => AuthenticatedStudioRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -188,6 +195,7 @@ export interface FileRoutesByFullPath {
   '/projets/': typeof AuthenticatedProjetsIndexRoute
   '/studio/': typeof AuthenticatedStudioIndexRoute
   '/veille/': typeof AuthenticatedVeilleIndexRoute
+  '/studio/creation/': typeof AuthenticatedStudioCreationIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -209,6 +217,7 @@ export interface FileRoutesByTo {
   '/projets': typeof AuthenticatedProjetsIndexRoute
   '/studio': typeof AuthenticatedStudioIndexRoute
   '/veille': typeof AuthenticatedVeilleIndexRoute
+  '/studio/creation': typeof AuthenticatedStudioCreationIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -236,6 +245,7 @@ export interface FileRoutesById {
   '/_authenticated/projets/': typeof AuthenticatedProjetsIndexRoute
   '/_authenticated/studio/': typeof AuthenticatedStudioIndexRoute
   '/_authenticated/veille/': typeof AuthenticatedVeilleIndexRoute
+  '/_authenticated/studio/creation/': typeof AuthenticatedStudioCreationIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -263,6 +273,7 @@ export interface FileRouteTypes {
     | '/projets/'
     | '/studio/'
     | '/veille/'
+    | '/studio/creation/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -284,6 +295,7 @@ export interface FileRouteTypes {
     | '/projets'
     | '/studio'
     | '/veille'
+    | '/studio/creation'
   id:
     | '__root__'
     | '/'
@@ -310,6 +322,7 @@ export interface FileRouteTypes {
     | '/_authenticated/projets/'
     | '/_authenticated/studio/'
     | '/_authenticated/veille/'
+    | '/_authenticated/studio/creation/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -490,6 +503,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicVeilleCronRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/studio/creation/': {
+      id: '/_authenticated/studio/creation/'
+      path: '/creation'
+      fullPath: '/studio/creation/'
+      preLoaderRoute: typeof AuthenticatedStudioCreationIndexRouteImport
+      parentRoute: typeof AuthenticatedStudioRoute
+    }
   }
 }
 
@@ -524,6 +544,7 @@ interface AuthenticatedStudioRouteChildren {
   AuthenticatedStudioMediasRoute: typeof AuthenticatedStudioMediasRoute
   AuthenticatedStudioStatistiquesRoute: typeof AuthenticatedStudioStatistiquesRoute
   AuthenticatedStudioIndexRoute: typeof AuthenticatedStudioIndexRoute
+  AuthenticatedStudioCreationIndexRoute: typeof AuthenticatedStudioCreationIndexRoute
 }
 
 const AuthenticatedStudioRouteChildren: AuthenticatedStudioRouteChildren = {
@@ -531,6 +552,7 @@ const AuthenticatedStudioRouteChildren: AuthenticatedStudioRouteChildren = {
   AuthenticatedStudioMediasRoute: AuthenticatedStudioMediasRoute,
   AuthenticatedStudioStatistiquesRoute: AuthenticatedStudioStatistiquesRoute,
   AuthenticatedStudioIndexRoute: AuthenticatedStudioIndexRoute,
+  AuthenticatedStudioCreationIndexRoute: AuthenticatedStudioCreationIndexRoute,
 }
 
 const AuthenticatedStudioRouteWithChildren =
