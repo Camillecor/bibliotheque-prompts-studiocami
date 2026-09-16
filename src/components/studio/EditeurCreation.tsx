@@ -1061,24 +1061,41 @@ function ReglagesFond({
       {fond.type === "image" ? (
         <div className="space-y-3">
           <p className="text-xs text-muted-foreground">
-            Ajoute d'abord l'image comme élément, puis agrandis-la au format complet, ou colle
-            ci-dessous l'adresse d'une image.
+            Choisis une image de fond (PNG, JPG ou SVG) depuis ton ordinateur ou ta bibliothèque
+            Médias.
           </p>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={onImage}
+              className="min-h-10 flex-1 rounded-xl border border-border text-sm font-semibold text-primary"
+            >
+              Importer
+            </button>
+            <button
+              type="button"
+              onClick={onMedias}
+              className="min-h-10 flex-1 rounded-xl border border-border text-sm font-semibold text-primary"
+            >
+              Médias
+            </button>
+          </div>
+          {fond.url ? (
+            <img
+              src={fond.url}
+              alt="Aperçu du fond"
+              className="h-24 w-full rounded-xl border border-border object-cover"
+            />
+          ) : null}
           <Champ label="Adresse de l'image">
             <input
-              value={fond.url}
+              value={fond.url.startsWith("data:") ? "" : fond.url}
               onChange={(e) => onChange({ ...fond, url: e.target.value })}
               className={inputClasse}
               placeholder="https://…"
             />
           </Champ>
-          <button
-            type="button"
-            onClick={onImage}
-            className="min-h-10 w-full rounded-xl border border-border text-sm font-semibold text-primary"
-          >
-            Importer une image
-          </button>
+
           <Champ label={`Voile : ${Math.round(fond.voile * 100)} %`}>
             <input
               type="range"
