@@ -43,23 +43,43 @@ import { listMedias, uploadMedia } from "@/lib/studio.functions";
 
 const MAX_IMPORT = 1600;
 
-/** Réduit une image et la convertit en donnée embarquée (PNG) pour rester autonome. */
-async function imageVersDonnee(source: string): Promise<string> {
-  const image = new Image();
-  image.crossOrigin = "anonymous";
-  await new Promise<void>((resolve, reject) => {
-    image.onload = () => resolve();
+function estSvg(source: string) {
+  return source.startsWith("data:image/svg+xml") || /\.svg($|\?)/i.test(source);
+}
+
+function chargerImage(source: string) {
+  return new Promise<HTMLImageElement>((resolve, reject) => {
+    const image = new Image();
+    image.crossOrigin = "anonymous";
+    image.onload = () => resolve(image);
     image.onerror = () => reject(new Error("Image illisible."));
     image.src = source;
   });
-  const ratio = Math.min(1, MAX_IMPORT / Math.max(image.naturalWidth, image.naturalHeight));
+}
+
+/**
+ * Prépare une image (PNG, JPG, WebP ou SVG) pour l'éditeur : les SVG sont
+ * gardés tels quels pour rester nets, les autres sont réduits et embarqués.
+ */
+async function preparerImage(
+  source: string,
+): Promise<{ url: string; largeur: number; hauteur: number }> {
+  const image = await chargerImage(source);
+  const largeurSource = image.naturalWidth || 800;
+  const hauteurSource = image.naturalHeight || 800;
+
+  if (estSvg(source)) {
+    return { url: source, largeur: largeurSource, hauteur: hauteurSource };
+  }
+
+  const ratio = Math.min(1, MAX_IMPORT / Math.max(largeurSource, hauteurSource));
   const canvas = document.createElement("canvas");
-  canvas.width = Math.max(1, Math.round(image.naturalWidth * ratio));
-  canvas.height = Math.max(1, Math.round(image.naturalHeight * ratio));
+  canvas.width = Math.max(1, Math.round(largeurSource * ratio));
+  canvas.height = Math.max(1, Math.round(hauteurSource * ratio));
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("Impossible de préparer l'image.");
   ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-  return canvas.toDataURL("image/png");
+  return { url: canvas.toDataURL("image/png"), largeur: canvas.width, hauteur: canvas.height };
 }
 
 function fichierVersUrl(fichier: File) {
@@ -287,6 +307,8 @@ export function EditeurCreation({ creation }: Props) {
   const scèneRef = useRef<HTMLDivElement | null>(null);
   const zoneRef = useRef<HTMLDivElement | null>(null);
   const fichierRef = useRef<HTMLInputElement | null>(null);
+  // « calque » : l'image devient un élément déplaçable ; « fond » : elle remplit l'arrière-plan.
+  const cibleImport = useRef<"calque" | "fond">("calque");
 
   const fnSave = useServerFn(saveCreation);
   const fnMedias = useServerFn(listMedias);
@@ -426,14 +448,9 @@ export function EditeurCreation({ creation }: Props) {
 
   const ajouterImage = async (source: string) => {
     try {
-      const url = await imageVersDonnee(source);
-      const image = new Image();
-      image.src = url;
-      await new Promise((r) => {
-        image.onload = r;
-      });
+      const { url, largeur: lSource, hauteur: hSource } = await preparerImage(source);
       const largeur = Math.round(creation.largeur * 0.5);
-      const hauteur = Math.round((largeur * image.naturalHeight) / image.naturalWidth);
+      const hauteur = Math.round((largeur * hSource) / (lSource || largeur));
       ajouter({
         id: nouvelId(),
         type: "image",
@@ -447,12 +464,40 @@ export function EditeurCreation({ creation }: Props) {
         verrouille: false,
         arrondi: 0,
         retourne: false,
-        ajustement: "cover",
+        ajustement: estSvg(url) ? "contain" : "cover",
       } satisfies CalqueImage);
       setOuvrirMedias(false);
     } catch {
       toast.error("Cette image n'a pas pu être ajoutée.");
     }
+  };
+
+  /** Place une image en fond de la création (import ou bibliothèque Médias). */
+  const definirFondImage = async (source: string) => {
+    try {
+      const { url } = await preparerImage(source);
+      appliquer((d) => ({
+        ...d,
+        fond:
+          d.fond.type === "image"
+            ? { ...d.fond, url }
+            : { type: "image", url, voile: 0, voileCouleur: "#000000" },
+      }));
+      setSelection(null);
+      setOuvrirMedias(false);
+    } catch {
+      toast.error("Cette image n'a pas pu être utilisée en fond.");
+    }
+  };
+
+  /** Transforme le calque image sélectionné en fond de la création. */
+  const calqueVersFond = (calque: CalqueImage) => {
+    appliquer((d) => ({
+      ...d,
+      fond: { type: "image", url: calque.url, voile: 0, voileCouleur: "#000000" },
+      calques: d.calques.filter((c) => c.id !== calque.id),
+    }));
+    setSelection(null);
   };
 
   const supprimerCalque = (id: string) => {
@@ -731,22 +776,38 @@ export function EditeurCreation({ creation }: Props) {
           <button type="button" onClick={() => ajouterForme("trait")} className={boutonOutil}>
             <Minus className="h-4 w-4" /> Trait
           </button>
-          <button type="button" onClick={() => setOuvrirMedias(true)} className={boutonOutil}>
+          <button
+            type="button"
+            onClick={() => {
+              cibleImport.current = "calque";
+              setOuvrirMedias(true);
+            }}
+            className={boutonOutil}
+          >
             <Shapes className="h-4 w-4" /> Depuis Médias
           </button>
-          <button type="button" onClick={() => fichierRef.current?.click()} className={boutonOutil}>
-            <Upload className="h-4 w-4" /> Importer
+          <button
+            type="button"
+            onClick={() => {
+              cibleImport.current = "calque";
+              fichierRef.current?.click();
+            }}
+            className={boutonOutil}
+          >
+            <Upload className="h-4 w-4" /> Importer PNG/SVG
           </button>
           <input
             ref={fichierRef}
             type="file"
-            accept="image/*"
+            accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml,.svg"
             className="hidden"
             onChange={async (event) => {
               const fichier = event.target.files?.[0];
               event.target.value = "";
               if (!fichier) return;
-              await ajouterImage(await fichierVersUrl(fichier));
+              const source = await fichierVersUrl(fichier);
+              if (cibleImport.current === "fond") await definirFondImage(source);
+              else await ajouterImage(source);
             }}
           />
         </aside>
@@ -852,12 +913,20 @@ export function EditeurCreation({ creation }: Props) {
               onSupprimer={() => supprimerCalque(calqueActif.id)}
               onDupliquer={() => dupliquerCalque(calqueActif.id)}
               onOrdre={(sens) => deplacerCalque(calqueActif.id, sens)}
+              onFond={calqueActif.type === "image" ? () => calqueVersFond(calqueActif) : undefined}
             />
           ) : (
             <ReglagesFond
               fond={doc.fond}
               onChange={(fond) => appliquer((d) => ({ ...d, fond }))}
-              onImage={async () => fichierRef.current?.click()}
+              onImage={() => {
+                cibleImport.current = "fond";
+                fichierRef.current?.click();
+              }}
+              onMedias={() => {
+                cibleImport.current = "fond";
+                setOuvrirMedias(true);
+              }}
             />
           )}
         </aside>
@@ -886,7 +955,11 @@ export function EditeurCreation({ creation }: Props) {
                   <button
                     key={media.id}
                     type="button"
-                    onClick={() => void ajouterImage(media.url)}
+                    onClick={() =>
+                      void (cibleImport.current === "fond"
+                        ? definirFondImage(media.url)
+                        : ajouterImage(media.url))
+                    }
                     className="overflow-hidden rounded-xl border border-border"
                   >
                     <img
@@ -914,10 +987,12 @@ function ReglagesFond({
   fond,
   onChange,
   onImage,
+  onMedias,
 }: {
   fond: Fond;
   onChange: (fond: Fond) => void;
   onImage: () => void;
+  onMedias: () => void;
 }) {
   return (
     <div className="space-y-3">
@@ -983,24 +1058,41 @@ function ReglagesFond({
       {fond.type === "image" ? (
         <div className="space-y-3">
           <p className="text-xs text-muted-foreground">
-            Ajoute d'abord l'image comme élément, puis agrandis-la au format complet, ou colle
-            ci-dessous l'adresse d'une image.
+            Choisis une image de fond (PNG, JPG ou SVG) depuis ton ordinateur ou ta bibliothèque
+            Médias.
           </p>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={onImage}
+              className="min-h-10 flex-1 rounded-xl border border-border text-sm font-semibold text-primary"
+            >
+              Importer
+            </button>
+            <button
+              type="button"
+              onClick={onMedias}
+              className="min-h-10 flex-1 rounded-xl border border-border text-sm font-semibold text-primary"
+            >
+              Médias
+            </button>
+          </div>
+          {fond.url ? (
+            <img
+              src={fond.url}
+              alt="Aperçu du fond"
+              className="h-24 w-full rounded-xl border border-border object-cover"
+            />
+          ) : null}
           <Champ label="Adresse de l'image">
             <input
-              value={fond.url}
+              value={fond.url.startsWith("data:") ? "" : fond.url}
               onChange={(e) => onChange({ ...fond, url: e.target.value })}
               className={inputClasse}
               placeholder="https://…"
             />
           </Champ>
-          <button
-            type="button"
-            onClick={onImage}
-            className="min-h-10 w-full rounded-xl border border-border text-sm font-semibold text-primary"
-          >
-            Importer une image
-          </button>
+
           <Champ label={`Voile : ${Math.round(fond.voile * 100)} %`}>
             <input
               type="range"
@@ -1029,12 +1121,14 @@ function ReglagesCalque({
   onSupprimer,
   onDupliquer,
   onOrdre,
+  onFond,
 }: {
   calque: Calque;
   onChange: (champs: Partial<Calque>) => void;
   onSupprimer: () => void;
   onDupliquer: () => void;
   onOrdre: (sens: -1 | 1) => void;
+  onFond?: (() => void) | undefined;
 }) {
   return (
     <div className="space-y-3">
@@ -1236,6 +1330,16 @@ function ReglagesCalque({
 
       {calque.type === "image" ? (
         <div className="space-y-3">
+          {onFond ? (
+            <button
+              type="button"
+              onClick={onFond}
+              className="min-h-10 w-full rounded-xl border border-border text-sm font-semibold text-primary"
+            >
+              Utiliser comme fond
+            </button>
+          ) : null}
+
           <Champ label={`Angles arrondis : ${calque.arrondi}px`}>
             <input
               type="range"
