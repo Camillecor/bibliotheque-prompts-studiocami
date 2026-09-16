@@ -992,10 +992,12 @@ function ReglagesFond({
   fond,
   onChange,
   onImage,
+  onMedias,
 }: {
   fond: Fond;
   onChange: (fond: Fond) => void;
   onImage: () => void;
+  onMedias: () => void;
 }) {
   return (
     <div className="space-y-3">
