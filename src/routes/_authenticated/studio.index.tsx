@@ -759,12 +759,35 @@ function StudioContenusPage() {
 
         {/* Éditeur */}
         <section className="cami-card flex flex-col gap-4 p-4">
-          <input
-            value={brouillon.titre}
-            onChange={(event) => setBrouillon((etat) => ({ ...etat, titre: event.target.value }))}
-            placeholder="Titre interne"
-            className="w-full rounded-2xl border border-border bg-muted px-3 py-2.5 text-sm font-semibold text-primary outline-none focus:border-[var(--info)]"
-          />
+          {brouillonRecupere ? (
+            <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-[color-mix(in_srgb,var(--info)_35%,transparent)] bg-[color-mix(in_srgb,var(--info)_10%,white)] px-3 py-2">
+              <p className="text-[11px] font-semibold text-[var(--info)]">
+                Brouillon récupéré : on reprend là où tu t'étais arrêtée.
+              </p>
+              <button
+                type="button"
+                onClick={() => setBrouillonRecupere(false)}
+                className="text-[11px] font-semibold text-muted-foreground hover:text-[var(--coral)]"
+              >
+                Ok
+              </button>
+            </div>
+          ) : null}
+
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <input
+              value={brouillon.titre}
+              onChange={(event) => setBrouillon((etat) => ({ ...etat, titre: event.target.value }))}
+              placeholder="Titre interne"
+              className="min-w-0 flex-1 rounded-2xl border border-border bg-muted px-3 py-2.5 text-sm font-semibold text-primary outline-none focus:border-[var(--info)]"
+            />
+            {enregistreA ? (
+              <span className="text-[11px] font-semibold text-muted-foreground">
+                {mutationEnregistrer.isPending ? "Enregistrement…" : `Enregistré à ${enregistreA}`}
+              </span>
+            ) : null}
+          </div>
+
 
           <div className="flex flex-wrap gap-2">
             {RESEAUX.map((option) => (
