@@ -318,8 +318,14 @@ function StudioContenusPage() {
       datePlanifiee: isoVersInput(contenu.date_planifiee),
       mediaIds: contenu.medias.map((m) => m.id),
     });
+    setBrouillonRecupere(false);
+    setEnregistreA(null);
+    setSerie([]);
+    setHashtagsProposes([]);
+    setTexteAvant(null);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
 
   const ajouterTag = () => {
     const propre = nouveauTag.trim().toLowerCase().replace(/^#/, "");
