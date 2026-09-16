@@ -82,7 +82,6 @@ async function preparerImage(
   return { url: canvas.toDataURL("image/png"), largeur: canvas.width, hauteur: canvas.height };
 }
 
-
 function fichierVersUrl(fichier: File) {
   return new Promise<string>((resolve, reject) => {
     const lecteur = new FileReader();
@@ -501,7 +500,6 @@ export function EditeurCreation({ creation }: Props) {
     setSelection(null);
   };
 
-
   const supprimerCalque = (id: string) => {
     appliquer((d) => ({ ...d, calques: d.calques.filter((c) => c.id !== id) }));
     setSelection(null);
@@ -814,7 +812,6 @@ export function EditeurCreation({ creation }: Props) {
           />
         </aside>
 
-
         {/* zone de travail */}
         <div
           ref={zoneRef}
@@ -916,9 +913,7 @@ export function EditeurCreation({ creation }: Props) {
               onSupprimer={() => supprimerCalque(calqueActif.id)}
               onDupliquer={() => dupliquerCalque(calqueActif.id)}
               onOrdre={(sens) => deplacerCalque(calqueActif.id, sens)}
-              onFond={
-                calqueActif.type === "image" ? () => calqueVersFond(calqueActif) : undefined
-              }
+              onFond={calqueActif.type === "image" ? () => calqueVersFond(calqueActif) : undefined}
             />
           ) : (
             <ReglagesFond
