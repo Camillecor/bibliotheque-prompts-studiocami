@@ -1,5 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { BarChart3, CalendarDays, Images, PenLine } from "lucide-react";
+import { StudioModeTabs } from "@/components/StudioModeTabs";
 
 const ONGLETS = [
   { to: "/studio", label: "Contenus", icon: PenLine, exact: true },
