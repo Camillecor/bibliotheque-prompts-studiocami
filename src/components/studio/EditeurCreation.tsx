@@ -960,7 +960,11 @@ export function EditeurCreation({ creation }: Props) {
                   <button
                     key={media.id}
                     type="button"
-                    onClick={() => void ajouterImage(media.url)}
+                    onClick={() =>
+                      void (cibleImport.current === "fond"
+                        ? definirFondImage(media.url)
+                        : ajouterImage(media.url))
+                    }
                     className="overflow-hidden rounded-xl border border-border"
                   >
                     <img
