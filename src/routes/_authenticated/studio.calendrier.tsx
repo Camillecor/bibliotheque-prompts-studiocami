@@ -238,22 +238,57 @@ function StudioCalendrierPage() {
                 Ton mois de publication, relié à tes contenus.
               </p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="flex items-center gap-1 rounded-full border border-border bg-card p-1">
+                {(["mois", "semaine"] as const).map((option) => (
+                  <button
+                    key={option}
+                    type="button"
+                    onClick={() => setVue(option)}
+                    className={[
+                      "min-h-9 rounded-full px-3 text-xs font-semibold capitalize transition",
+                      vue === option
+                        ? "bg-primary text-primary-foreground"
+                        : "text-primary hover:text-[var(--coral)]",
+                    ].join(" ")}
+                  >
+                    {option}
+                  </button>
+                ))}
+              </div>
               <button
                 type="button"
-                aria-label="Mois précédent"
-                onClick={() => setMois(new Date(mois.getFullYear(), mois.getMonth() - 1, 1))}
+                aria-label={vue === "mois" ? "Mois précédent" : "Semaine précédente"}
+                onClick={() =>
+                  setVue === undefined
+                    ? undefined
+                    : setMois((actuel) => {
+                        const suivant = new Date(actuel);
+                        if (vue === "mois") suivant.setMonth(actuel.getMonth() - 1, 1);
+                        else suivant.setDate(actuel.getDate() - 7);
+                        return suivant;
+                      })
+                }
                 className="cami-icon-btn"
               >
                 <ChevronLeft className="h-4 w-4" />
               </button>
               <span className="min-w-40 text-center text-sm font-bold capitalize text-primary">
-                {mois.toLocaleDateString("fr-FR", { month: "long", year: "numeric" })}
+                {vue === "mois"
+                  ? mois.toLocaleDateString("fr-FR", { month: "long", year: "numeric" })
+                  : `Semaine du ${debutSemaine(mois).toLocaleDateString("fr-FR", { day: "numeric", month: "long" })}`}
               </span>
               <button
                 type="button"
-                aria-label="Mois suivant"
-                onClick={() => setMois(new Date(mois.getFullYear(), mois.getMonth() + 1, 1))}
+                aria-label={vue === "mois" ? "Mois suivant" : "Semaine suivante"}
+                onClick={() =>
+                  setMois((actuel) => {
+                    const suivant = new Date(actuel);
+                    if (vue === "mois") suivant.setMonth(actuel.getMonth() + 1, 1);
+                    else suivant.setDate(actuel.getDate() + 7);
+                    return suivant;
+                  })
+                }
                 className="cami-icon-btn"
               >
                 <ChevronRight className="h-4 w-4" />
@@ -261,6 +296,7 @@ function StudioCalendrierPage() {
             </div>
           </div>
           <StudioTabs />
+
           <div className="flex flex-wrap items-center gap-2">
             {RESEAUX.map((reseau) => (
               <span
