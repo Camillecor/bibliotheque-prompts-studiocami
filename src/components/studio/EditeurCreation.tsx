@@ -1126,12 +1126,14 @@ function ReglagesCalque({
   onSupprimer,
   onDupliquer,
   onOrdre,
+  onFond,
 }: {
   calque: Calque;
   onChange: (champs: Partial<Calque>) => void;
   onSupprimer: () => void;
   onDupliquer: () => void;
   onOrdre: (sens: -1 | 1) => void;
+  onFond?: () => void;
 }) {
   return (
     <div className="space-y-3">
