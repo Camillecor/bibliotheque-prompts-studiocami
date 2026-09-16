@@ -447,14 +447,9 @@ export function EditeurCreation({ creation }: Props) {
 
   const ajouterImage = async (source: string) => {
     try {
-      const url = await imageVersDonnee(source);
-      const image = new Image();
-      image.src = url;
-      await new Promise((r) => {
-        image.onload = r;
-      });
+      const { url, largeur: lSource, hauteur: hSource } = await preparerImage(source);
       const largeur = Math.round(creation.largeur * 0.5);
-      const hauteur = Math.round((largeur * image.naturalHeight) / image.naturalWidth);
+      const hauteur = Math.round((largeur * hSource) / (lSource || largeur));
       ajouter({
         id: nouvelId(),
         type: "image",
@@ -468,13 +463,42 @@ export function EditeurCreation({ creation }: Props) {
         verrouille: false,
         arrondi: 0,
         retourne: false,
-        ajustement: "cover",
+        ajustement: estSvg(url) ? "contain" : "cover",
       } satisfies CalqueImage);
       setOuvrirMedias(false);
     } catch {
       toast.error("Cette image n'a pas pu être ajoutée.");
     }
   };
+
+  /** Place une image en fond de la création (import ou bibliothèque Médias). */
+  const definirFondImage = async (source: string) => {
+    try {
+      const { url } = await preparerImage(source);
+      appliquer((d) => ({
+        ...d,
+        fond:
+          d.fond.type === "image"
+            ? { ...d.fond, url }
+            : { type: "image", url, voile: 0, voileCouleur: "#000000" },
+      }));
+      setSelection(null);
+      setOuvrirMedias(false);
+    } catch {
+      toast.error("Cette image n'a pas pu être utilisée en fond.");
+    }
+  };
+
+  /** Transforme le calque image sélectionné en fond de la création. */
+  const calqueVersFond = (calque: CalqueImage) => {
+    appliquer((d) => ({
+      ...d,
+      fond: { type: "image", url: calque.url, voile: 0, voileCouleur: "#000000" },
+      calques: d.calques.filter((c) => c.id !== calque.id),
+    }));
+    setSelection(null);
+  };
+
 
   const supprimerCalque = (id: string) => {
     appliquer((d) => ({ ...d, calques: d.calques.filter((c) => c.id !== id) }));
