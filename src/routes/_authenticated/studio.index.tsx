@@ -244,6 +244,7 @@ function StudioContenusPage() {
     mutationFn: async () =>
       rediger({ data: { idee, reseau: brouillon.reseau, ton, consignes: "" } }),
     onSuccess: (resultat) => {
+      setTexteAvant(brouillon.texte);
       setBrouillon((etat) => ({
         ...etat,
         titre: etat.titre || resultat.titre,
@@ -265,11 +266,46 @@ function StudioContenusPage() {
         },
       }),
     onSuccess: (resultat) => {
+      setTexteAvant(brouillon.texte);
       setBrouillon((etat) => ({ ...etat, texte: resultat.texte }));
       toast.success("Nouvelle version proposée");
     },
     onError: (error: Error) => toast.error(error.message),
   });
+
+  const mutationDecliner = useMutation({
+    mutationFn: async () =>
+      decliner({ data: { texte: brouillon.texte, reseau: brouillon.reseau } }),
+    onSuccess: (crees) => {
+      invalider();
+      toast.success(
+        crees.length > 0
+          ? `Décliné en ${crees.length} brouillon${crees.length > 1 ? "s" : ""}`
+          : "Aucune déclinaison générée",
+      );
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+
+  const mutationSerie = useMutation({
+    mutationFn: async () => genererSerie({ data: { idee, reseau: brouillon.reseau, ton } }),
+    onSuccess: (posts) => {
+      setSerie(posts);
+      toast.success("Mario propose une série de posts");
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+
+  const mutationHashtags = useMutation({
+    mutationFn: async () =>
+      genererHashtags({ data: { texte: brouillon.texte, reseau: brouillon.reseau } }),
+    onSuccess: (liste) => {
+      setHashtagsProposes(liste);
+      if (liste.length === 0) toast.info("Aucun hashtag proposé");
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+
 
   const chargerContenu = (contenu: ContenuRow) => {
     setBrouillon({
