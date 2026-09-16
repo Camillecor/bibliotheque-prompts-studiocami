@@ -328,6 +328,79 @@ function StudioContenusPage() {
     setNouveauTag("");
   };
 
+  const ajouterHashtag = (tag: string) => {
+    setBrouillon((etat) =>
+      etat.tags.includes(tag) || etat.tags.length >= 8
+        ? etat
+        : { ...etat, tags: [...etat.tags, tag] },
+    );
+  };
+
+  const mutationEnregistrerRef = useRef(mutationEnregistrer);
+  mutationEnregistrerRef.current = mutationEnregistrer;
+  const brouillonRef = useRef(brouillon);
+  brouillonRef.current = brouillon;
+
+  const enregistrerMaintenant = useCallback(() => {
+    const valeurs = brouillonRef.current;
+    if (valeurs.texte.trim().length === 0) return;
+    mutationEnregistrerRef.current.mutate(valeurs);
+  }, []);
+
+  // Brouillon jamais perdu : on relit la dernière saisie au retour sur la page.
+  useEffect(() => {
+    const local = lireBrouillonLocal();
+    if (local && local.texte.trim().length > 0) {
+      setBrouillon(local);
+      setBrouillonRecupere(true);
+    }
+  }, []);
+
+  // Sauvegarde locale à la frappe.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      if (brouillon.texte.trim().length === 0 && !brouillon.id) {
+        window.localStorage.removeItem(CLE_BROUILLON);
+      } else {
+        window.localStorage.setItem(CLE_BROUILLON, JSON.stringify(brouillon));
+      }
+    } catch {
+      /* stockage indisponible : on continue sans sauvegarde locale */
+    }
+  }, [brouillon]);
+
+  // Enregistrement automatique une fois le contenu créé.
+  const dernierEnvoi = useRef<string>("");
+  useEffect(() => {
+    if (!brouillon.id || brouillon.texte.trim().length === 0) return;
+    const signature = JSON.stringify(brouillon);
+    if (signature === dernierEnvoi.current) return;
+    const minuteur = setTimeout(() => {
+      dernierEnvoi.current = signature;
+      mutationEnregistrerRef.current.mutate({ ...brouillon, silencieux: true });
+    }, 1200);
+    return () => clearTimeout(minuteur);
+  }, [brouillon]);
+
+  // Raccourcis clavier : enregistrer et générer.
+  useEffect(() => {
+    const surTouche = (event: KeyboardEvent) => {
+      if (!(event.metaKey || event.ctrlKey)) return;
+      if (event.key === "s" || event.key === "S") {
+        event.preventDefault();
+        enregistrerMaintenant();
+      }
+      if (event.key === "Enter") {
+        event.preventDefault();
+        if (idee.trim().length >= 5 && !mutationRediger.isPending) mutationRediger.mutate();
+      }
+    };
+    window.addEventListener("keydown", surTouche);
+    return () => window.removeEventListener("keydown", surTouche);
+  }, [enregistrerMaintenant, idee, mutationRediger]);
+
+
   useEffect(() => {
     if (!selecteurMedias) return;
     const fermer = (event: KeyboardEvent) => {
