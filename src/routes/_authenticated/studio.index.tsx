@@ -941,7 +941,33 @@ function StudioContenusPage() {
                 className="min-h-11 rounded-full border border-border bg-muted px-3 text-xs text-primary outline-none focus:border-[var(--info)] sm:min-h-9"
               />
             </div>
+            {hashtagsProposes.length > 0 ? (
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                <span className="text-[11px] font-semibold text-muted-foreground">
+                  Propositions de Mario :
+                </span>
+                {hashtagsProposes
+                  .filter((tag) => !brouillon.tags.includes(tag))
+                  .map((tag) => (
+                    <button
+                      key={tag}
+                      type="button"
+                      onClick={() =>
+                        setBrouillon((etat) =>
+                          etat.tags.includes(tag) || etat.tags.length >= 8
+                            ? etat
+                            : { ...etat, tags: [...etat.tags, tag] },
+                        )
+                      }
+                      className="inline-flex min-h-9 items-center gap-1 rounded-full border border-dashed border-border bg-card px-3 text-xs font-semibold text-muted-foreground transition hover:border-[var(--coral)] hover:text-[var(--coral)]"
+                    >
+                      <Plus className="h-3 w-3" /> #{tag}
+                    </button>
+                  ))}
+              </div>
+            ) : null}
           </div>
+
 
           {/* Médias liés */}
           <div>
