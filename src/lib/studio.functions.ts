@@ -3,11 +3,13 @@ import { z } from "zod";
 import {
   RESEAU_VALUES,
   STATUT_VALUES,
+  VARIANTE_VALUES,
   type ContenuRow,
   type MediaRow,
   type StatsStudio,
   RESEAUX,
 } from "@/lib/studio";
+
 import { COMPTE_ID } from "@/lib/compte";
 import { erreurBase } from "@/lib/erreurs";
 
