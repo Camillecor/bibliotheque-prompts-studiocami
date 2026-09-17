@@ -626,9 +626,7 @@ export function EditeurCreation({ creation }: Props) {
       setDoc((d) => ({
         ...d,
         calques: d.calques.map((c) =>
-          c.id === etat.id
-            ? { ...c, x: Math.round(x), y: Math.round(y) }
-            : c,
+          c.id === etat.id ? { ...c, x: Math.round(x), y: Math.round(y) } : c,
         ),
       }));
       return;
@@ -638,11 +636,20 @@ export function EditeurCreation({ creation }: Props) {
       const angle = (-etat.calque.rotation * Math.PI) / 180;
       const localX = dx * Math.cos(angle) - dy * Math.sin(angle);
       const localY = dx * Math.sin(angle) + dy * Math.cos(angle);
-      const largeur = Math.max(16, Math.min(creation.largeur - etat.calque.x, etat.calque.l + localX));
-      const hauteurLibre = Math.max(8, Math.min(creation.hauteur - etat.calque.y, etat.calque.h + localY));
+      const largeur = Math.max(
+        16,
+        Math.min(creation.largeur - etat.calque.x, etat.calque.l + localX),
+      );
+      const hauteurLibre = Math.max(
+        8,
+        Math.min(creation.hauteur - etat.calque.y, etat.calque.h + localY),
+      );
       const hauteur =
         etat.calque.type === "image"
-          ? Math.max(8, Math.min(creation.hauteur - etat.calque.y, largeur / (etat.calque.l / etat.calque.h)))
+          ? Math.max(
+              8,
+              Math.min(creation.hauteur - etat.calque.y, largeur / (etat.calque.l / etat.calque.h)),
+            )
           : hauteurLibre;
       setDoc((d) => ({
         ...d,
@@ -830,10 +837,18 @@ export function EditeurCreation({ creation }: Props) {
         {/* outils et templates */}
         <aside className="order-2 min-w-0 overflow-hidden rounded-xl border border-border bg-card xl:order-1">
           <div className="grid grid-cols-2 border-b border-border p-2">
-            <button type="button" onClick={() => setOutilActif("templates")} className={ongletOutil(outilActif === "templates")}>
+            <button
+              type="button"
+              onClick={() => setOutilActif("templates")}
+              className={ongletOutil(outilActif === "templates")}
+            >
               <LayoutTemplate className="h-4 w-4" /> Templates
             </button>
-            <button type="button" onClick={() => setOutilActif("elements")} className={ongletOutil(outilActif === "elements")}>
+            <button
+              type="button"
+              onClick={() => setOutilActif("elements")}
+              className={ongletOutil(outilActif === "elements")}
+            >
               <Shapes className="h-4 w-4" /> Éléments
             </button>
           </div>
@@ -842,21 +857,54 @@ export function EditeurCreation({ creation }: Props) {
               {MODELES.map((modele) => {
                 const document = modele.construire();
                 return (
-                  <button key={modele.value} type="button" onClick={() => appliquerTemplate(modele)} className="min-w-0 space-y-2 rounded-lg border border-border bg-background p-2 text-left transition hover:border-[var(--coral)]">
+                  <button
+                    key={modele.value}
+                    type="button"
+                    onClick={() => appliquerTemplate(modele)}
+                    className="min-w-0 space-y-2 rounded-lg border border-border bg-background p-2 text-left transition hover:border-[var(--coral)]"
+                  >
                     <ApercuTemplate document={document} format={modele.format} />
-                    <span className="block truncate text-xs font-semibold text-primary">{modele.label}</span>
+                    <span className="block truncate text-xs font-semibold text-primary">
+                      {modele.label}
+                    </span>
                   </button>
                 );
               })}
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-2 p-3 sm:grid-cols-3 xl:grid-cols-1">
-              <button type="button" onClick={ajouterTexte} className={boutonOutil}><Type className="h-4 w-4" /> Texte</button>
-              <button type="button" onClick={() => ajouterForme("rect")} className={boutonOutil}><Square className="h-4 w-4" /> Rectangle</button>
-              <button type="button" onClick={() => ajouterForme("cercle")} className={boutonOutil}><Circle className="h-4 w-4" /> Cercle</button>
-              <button type="button" onClick={() => ajouterForme("trait")} className={boutonOutil}><Minus className="h-4 w-4" /> Trait</button>
-              <button type="button" onClick={() => { cibleImport.current = "calque"; setOuvrirMedias(true); }} className={boutonOutil}><ImagePlus className="h-4 w-4" /> Médias</button>
-              <button type="button" onClick={() => { cibleImport.current = "calque"; fichierRef.current?.click(); }} className={boutonOutil}><Upload className="h-4 w-4" /> Importer</button>
+              <button type="button" onClick={ajouterTexte} className={boutonOutil}>
+                <Type className="h-4 w-4" /> Texte
+              </button>
+              <button type="button" onClick={() => ajouterForme("rect")} className={boutonOutil}>
+                <Square className="h-4 w-4" /> Rectangle
+              </button>
+              <button type="button" onClick={() => ajouterForme("cercle")} className={boutonOutil}>
+                <Circle className="h-4 w-4" /> Cercle
+              </button>
+              <button type="button" onClick={() => ajouterForme("trait")} className={boutonOutil}>
+                <Minus className="h-4 w-4" /> Trait
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  cibleImport.current = "calque";
+                  setOuvrirMedias(true);
+                }}
+                className={boutonOutil}
+              >
+                <ImagePlus className="h-4 w-4" /> Médias
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  cibleImport.current = "calque";
+                  fichierRef.current?.click();
+                }}
+                className={boutonOutil}
+              >
+                <Upload className="h-4 w-4" /> Importer
+              </button>
             </div>
           )}
           <input
@@ -916,7 +964,11 @@ export function EditeurCreation({ creation }: Props) {
               ) : null}
 
               {doc.calques.map((calque) => (
-                <div key={calque.id} className="touch-none" onPointerDown={(e) => demarrer(e, "deplacer", calque)}>
+                <div
+                  key={calque.id}
+                  className="touch-none"
+                  onPointerDown={(e) => demarrer(e, "deplacer", calque)}
+                >
                   <RenduCalque calque={calque} />
                   {selection === calque.id ? (
                     <div
