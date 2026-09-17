@@ -277,7 +277,9 @@ function RenduCalque({ calque }: { calque: Calque }) {
       <div
         style={{
           ...base,
-          background: calque.couleur,
+          background: calque.degrade
+            ? `linear-gradient(${calque.degrade.angle}deg, ${calque.degrade.de}, ${calque.degrade.vers})`
+            : calque.couleur,
           borderRadius: calque.arrondi,
         }}
       />
@@ -288,7 +290,9 @@ function RenduCalque({ calque }: { calque: Calque }) {
     <div
       style={{
         ...base,
-        background: calque.couleur,
+        background: calque.degrade
+          ? `linear-gradient(${calque.degrade.angle}deg, ${calque.degrade.de}, ${calque.degrade.vers})`
+          : calque.couleur,
         border: calque.contour ? `${calque.epaisseurContour}px solid ${calque.contour}` : "none",
         borderRadius: calque.forme === "cercle" ? "50%" : calque.arrondi,
       }}
@@ -1569,6 +1573,86 @@ function ReglagesCalque({
 
       {calque.type === "forme" ? (
         <div className="space-y-3">
+          {calque.forme === "cercle" ? (
+            <button
+              type="button"
+              onClick={() =>
+                onChange({
+                  degrade: calque.degrade
+                    ? undefined
+                    : { de: calque.couleur, vers: "#3abef9", angle: 135 },
+                } as Partial<CalqueForme>)
+              }
+              className="min-h-9 w-full rounded-lg border border-border px-3 text-xs font-semibold text-primary"
+            >
+              {calque.degrade ? "Couleur unie" : "Ajouter un dégradé"}
+            </button>
+          ) : null}
+          {calque.degrade ? (
+            <div className="grid grid-cols-2 gap-2">
+              <Champ label="Départ">
+                <input
+                  type="color"
+                  value={calque.degrade.de}
+                  onChange={(e) =>
+                    onChange({
+                      degrade: {
+                        ...(calque.degrade ?? {
+                          de: calque.couleur,
+                          vers: "#3abef9",
+                          angle: 135,
+                        }),
+                        de: e.target.value,
+                      },
+                    })
+                  }
+                  className="h-9 w-full rounded border border-border"
+                />
+              </Champ>
+              <Champ label="Arrivée">
+                <input
+                  type="color"
+                  value={calque.degrade.vers}
+                  onChange={(e) =>
+                    onChange({
+                      degrade: {
+                        ...(calque.degrade ?? {
+                          de: calque.couleur,
+                          vers: "#3abef9",
+                          angle: 135,
+                        }),
+                        vers: e.target.value,
+                      },
+                    })
+                  }
+                  className="h-9 w-full rounded border border-border"
+                />
+              </Champ>
+              <div className="col-span-2">
+                <Champ label={`Angle : ${calque.degrade.angle}°`}>
+                  <input
+                    type="range"
+                    min={0}
+                    max={360}
+                    value={calque.degrade.angle}
+                    onChange={(e) =>
+                      onChange({
+                        degrade: {
+                          ...(calque.degrade ?? {
+                            de: calque.couleur,
+                            vers: "#3abef9",
+                            angle: 135,
+                          }),
+                          angle: Number(e.target.value),
+                        },
+                      })
+                    }
+                    className="w-full"
+                  />
+                </Champ>
+              </div>
+            </div>
+          ) : null}
           <Champ label="Couleur">
             <ChoixCouleur
               valeur={calque.couleur}
