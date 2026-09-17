@@ -38,7 +38,7 @@ function PageEditeur() {
 
   return (
     <AppShell>
-      <div className="space-y-4">
+      <div className="mx-auto w-full max-w-[100rem] space-y-4 px-4 py-5 lg:px-6 lg:py-6">
         <Link
           to="/studio/creation"
           className="inline-flex min-h-10 items-center gap-2 text-sm font-semibold text-primary"

@@ -9,6 +9,7 @@ import {
   Copy,
   Download,
   ImagePlus,
+  LayoutTemplate,
   Loader2,
   Lock,
   Minus,
@@ -26,7 +27,9 @@ import { toast } from "sonner";
 
 import {
   COULEURS_MARQUE,
+  MODELES,
   POLICES,
+  formatCreation,
   nouvelId,
   type Calque,
   type CalqueForme,
@@ -291,6 +294,34 @@ function RenduCalque({ calque }: { calque: Calque }) {
   );
 }
 
+function ApercuTemplate({ document, format }: { document: DocumentCreation; format: string }) {
+  const dimensions = formatCreation(format);
+  const echelle = 132 / dimensions.largeur;
+  return (
+    <div
+      className="relative mx-auto overflow-hidden border border-border shadow-sm"
+      style={{
+        width: dimensions.largeur * echelle,
+        height: Math.min(112, dimensions.hauteur * echelle),
+        ...fondCss(document.fond),
+      }}
+    >
+      <div
+        style={{
+          width: dimensions.largeur,
+          height: dimensions.hauteur,
+          transform: `scale(${echelle})`,
+          transformOrigin: "top left",
+        }}
+      >
+        {document.calques.map((calque) => (
+          <RenduCalque key={calque.id} calque={calque} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /* ------------------------------------------------------------------ éditeur */
 
 type Props = { creation: CreationComplete };
@@ -303,6 +334,7 @@ export function EditeurCreation({ creation }: Props) {
   const [zoomAuto, setZoomAuto] = useState(1);
   const [ouvrirMedias, setOuvrirMedias] = useState(false);
   const [enregistreA, setEnregistreA] = useState<string | null>(null);
+  const [outilActif, setOutilActif] = useState<"templates" | "elements">("templates");
 
   const scèneRef = useRef<HTMLDivElement | null>(null);
   const zoneRef = useRef<HTMLDivElement | null>(null);
@@ -524,6 +556,30 @@ export function EditeurCreation({ creation }: Props) {
     });
   };
 
+  const appliquerTemplate = (modele: (typeof MODELES)[number]) => {
+    if (doc.calques.length > 0 && !confirm("Remplacer le visuel actuel par ce template ?")) return;
+    const source = modele.construire();
+    const dimensionsSource = formatCreation(modele.format);
+    const ratioX = creation.largeur / dimensionsSource.largeur;
+    const ratioY = creation.hauteur / dimensionsSource.hauteur;
+    const ratioTexte = Math.min(ratioX, ratioY);
+    const adapte: DocumentCreation = {
+      ...source,
+      calques: source.calques.map((calque) => ({
+        ...calque,
+        id: nouvelId(),
+        x: Math.round(calque.x * ratioX),
+        y: Math.round(calque.y * ratioY),
+        l: Math.round(calque.l * ratioX),
+        h: Math.round(calque.h * ratioY),
+        ...(calque.type === "texte" ? { taille: Math.round(calque.taille * ratioTexte) } : {}),
+      })),
+    };
+    appliquer(() => adapte);
+    setSelection(null);
+    toast.success(`Template « ${modele.label} » appliqué.`);
+  };
+
   /* --------------------------------------------------- déplacement souris */
 
   const interaction = useRef<{
@@ -542,8 +598,9 @@ export function EditeurCreation({ creation }: Props) {
     calque: Calque,
   ) => {
     if (calque.verrouille) return;
+    event.preventDefault();
     event.stopPropagation();
-    (event.target as HTMLElement).setPointerCapture(event.pointerId);
+    scèneRef.current?.setPointerCapture(event.pointerId);
     const rect = scèneRef.current?.getBoundingClientRect();
     interaction.current = {
       mode,
@@ -564,11 +621,13 @@ export function EditeurCreation({ creation }: Props) {
     const dy = (event.clientY - etat.departY) / zoomAuto;
 
     if (etat.mode === "deplacer") {
+      const x = Math.max(0, Math.min(creation.largeur - etat.calque.l, etat.calque.x + dx));
+      const y = Math.max(0, Math.min(creation.hauteur - etat.calque.h, etat.calque.y + dy));
       setDoc((d) => ({
         ...d,
         calques: d.calques.map((c) =>
           c.id === etat.id
-            ? { ...c, x: Math.round(etat.calque.x + dx), y: Math.round(etat.calque.y + dy) }
+            ? { ...c, x: Math.round(x), y: Math.round(y) }
             : c,
         ),
       }));
@@ -576,14 +635,23 @@ export function EditeurCreation({ creation }: Props) {
     }
 
     if (etat.mode === "redimensionner") {
+      const angle = (-etat.calque.rotation * Math.PI) / 180;
+      const localX = dx * Math.cos(angle) - dy * Math.sin(angle);
+      const localY = dx * Math.sin(angle) + dy * Math.cos(angle);
+      const largeur = Math.max(16, Math.min(creation.largeur - etat.calque.x, etat.calque.l + localX));
+      const hauteurLibre = Math.max(8, Math.min(creation.hauteur - etat.calque.y, etat.calque.h + localY));
+      const hauteur =
+        etat.calque.type === "image"
+          ? Math.max(8, Math.min(creation.hauteur - etat.calque.y, largeur / (etat.calque.l / etat.calque.h)))
+          : hauteurLibre;
       setDoc((d) => ({
         ...d,
         calques: d.calques.map((c) =>
           c.id === etat.id
             ? {
                 ...c,
-                l: Math.max(16, Math.round(etat.calque.l + dx)),
-                h: Math.max(8, Math.round(etat.calque.h + dy)),
+                l: Math.round(largeur),
+                h: Math.round(hauteur),
               }
             : c,
         ),
@@ -690,7 +758,7 @@ export function EditeurCreation({ creation }: Props) {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-xl border border-border bg-card p-2 sm:flex sm:flex-wrap">
         <button
           type="button"
           onClick={() => enregistrer.mutate()}
@@ -733,7 +801,7 @@ export function EditeurCreation({ creation }: Props) {
           )}
           Envoyer dans Médias
         </button>
-        <div className="ml-auto flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2 sm:ml-auto">
           {enregistreA ? (
             <span className="text-xs text-muted-foreground">Enregistré à {enregistreA}</span>
           ) : null}
@@ -758,44 +826,39 @@ export function EditeurCreation({ creation }: Props) {
         </div>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-[13rem_minmax(0,1fr)_19rem]">
-        {/* barre d'outils */}
-        <aside className="order-2 flex flex-wrap gap-2 rounded-2xl border border-border bg-card p-3 lg:order-1 lg:flex-col lg:content-start">
-          <p className="hidden text-xs font-semibold uppercase tracking-wide text-muted-foreground lg:block">
-            Ajouter
-          </p>
-          <button type="button" onClick={ajouterTexte} className={boutonOutil}>
-            <Type className="h-4 w-4" /> Texte
-          </button>
-          <button type="button" onClick={() => ajouterForme("rect")} className={boutonOutil}>
-            <Square className="h-4 w-4" /> Rectangle
-          </button>
-          <button type="button" onClick={() => ajouterForme("cercle")} className={boutonOutil}>
-            <Circle className="h-4 w-4" /> Cercle
-          </button>
-          <button type="button" onClick={() => ajouterForme("trait")} className={boutonOutil}>
-            <Minus className="h-4 w-4" /> Trait
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              cibleImport.current = "calque";
-              setOuvrirMedias(true);
-            }}
-            className={boutonOutil}
-          >
-            <Shapes className="h-4 w-4" /> Depuis Médias
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              cibleImport.current = "calque";
-              fichierRef.current?.click();
-            }}
-            className={boutonOutil}
-          >
-            <Upload className="h-4 w-4" /> Importer PNG/SVG
-          </button>
+      <div className="grid min-w-0 gap-4 xl:grid-cols-[18rem_minmax(0,1fr)_19rem]">
+        {/* outils et templates */}
+        <aside className="order-2 min-w-0 overflow-hidden rounded-xl border border-border bg-card xl:order-1">
+          <div className="grid grid-cols-2 border-b border-border p-2">
+            <button type="button" onClick={() => setOutilActif("templates")} className={ongletOutil(outilActif === "templates")}>
+              <LayoutTemplate className="h-4 w-4" /> Templates
+            </button>
+            <button type="button" onClick={() => setOutilActif("elements")} className={ongletOutil(outilActif === "elements")}>
+              <Shapes className="h-4 w-4" /> Éléments
+            </button>
+          </div>
+          {outilActif === "templates" ? (
+            <div className="grid max-h-[34rem] grid-cols-2 gap-2 overflow-y-auto p-3 sm:grid-cols-3 xl:grid-cols-2">
+              {MODELES.map((modele) => {
+                const document = modele.construire();
+                return (
+                  <button key={modele.value} type="button" onClick={() => appliquerTemplate(modele)} className="min-w-0 space-y-2 rounded-lg border border-border bg-background p-2 text-left transition hover:border-[var(--coral)]">
+                    <ApercuTemplate document={document} format={modele.format} />
+                    <span className="block truncate text-xs font-semibold text-primary">{modele.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-2 p-3 sm:grid-cols-3 xl:grid-cols-1">
+              <button type="button" onClick={ajouterTexte} className={boutonOutil}><Type className="h-4 w-4" /> Texte</button>
+              <button type="button" onClick={() => ajouterForme("rect")} className={boutonOutil}><Square className="h-4 w-4" /> Rectangle</button>
+              <button type="button" onClick={() => ajouterForme("cercle")} className={boutonOutil}><Circle className="h-4 w-4" /> Cercle</button>
+              <button type="button" onClick={() => ajouterForme("trait")} className={boutonOutil}><Minus className="h-4 w-4" /> Trait</button>
+              <button type="button" onClick={() => { cibleImport.current = "calque"; setOuvrirMedias(true); }} className={boutonOutil}><ImagePlus className="h-4 w-4" /> Médias</button>
+              <button type="button" onClick={() => { cibleImport.current = "calque"; fichierRef.current?.click(); }} className={boutonOutil}><Upload className="h-4 w-4" /> Importer</button>
+            </div>
+          )}
           <input
             ref={fichierRef}
             type="file"
@@ -815,10 +878,10 @@ export function EditeurCreation({ creation }: Props) {
         {/* zone de travail */}
         <div
           ref={zoneRef}
-          className="order-1 flex items-start justify-center overflow-hidden rounded-2xl border border-border bg-muted p-2 lg:order-2"
+          className="order-1 flex min-h-[22rem] min-w-0 items-start justify-center overflow-hidden rounded-xl border border-border bg-muted p-3 sm:p-5 xl:order-2"
           onPointerMove={bouger}
           onPointerUp={terminer}
-          onPointerLeave={terminer}
+          onPointerCancel={terminer}
         >
           <div
             style={{
@@ -837,6 +900,7 @@ export function EditeurCreation({ creation }: Props) {
                 transformOrigin: "top left",
                 position: "relative",
                 overflow: "hidden",
+                touchAction: "none",
                 ...fondCss(doc.fond),
               }}
             >
@@ -852,7 +916,7 @@ export function EditeurCreation({ creation }: Props) {
               ) : null}
 
               {doc.calques.map((calque) => (
-                <div key={calque.id} onPointerDown={(e) => demarrer(e, "deplacer", calque)}>
+                <div key={calque.id} className="touch-none" onPointerDown={(e) => demarrer(e, "deplacer", calque)}>
                   <RenduCalque calque={calque} />
                   {selection === calque.id ? (
                     <div
@@ -905,7 +969,7 @@ export function EditeurCreation({ creation }: Props) {
         </div>
 
         {/* panneau de réglages */}
-        <aside className="order-3 space-y-4 rounded-2xl border border-border bg-card p-3">
+        <aside className="order-3 min-w-0 space-y-4 rounded-xl border border-border bg-card p-3 xl:max-h-[calc(100dvh-15rem)] xl:overflow-y-auto">
           {calqueActif ? (
             <ReglagesCalque
               calque={calqueActif}
@@ -979,7 +1043,10 @@ export function EditeurCreation({ creation }: Props) {
 }
 
 const boutonOutil =
-  "inline-flex min-h-10 flex-1 items-center justify-start gap-2 rounded-xl border border-border px-3 text-sm font-semibold text-primary transition hover:border-[var(--coral)] hover:text-[var(--coral)] lg:w-full lg:flex-none";
+  "inline-flex min-h-11 min-w-0 items-center justify-start gap-2 rounded-lg border border-border px-3 text-sm font-semibold text-primary transition hover:border-[var(--coral)] hover:text-[var(--coral)]";
+
+const ongletOutil = (actif: boolean) =>
+  `inline-flex min-h-11 items-center justify-center gap-2 rounded-lg text-xs font-bold transition ${actif ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-secondary hover:text-primary"}`;
 
 /* --------------------------------------------------------- panneaux réglages */
 

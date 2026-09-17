@@ -114,7 +114,7 @@ function GalerieCreations() {
 
   return (
     <AppShell>
-      <div className="space-y-5">
+      <div className="mx-auto w-full max-w-5xl space-y-5 px-4 py-6 lg:px-8">
         <StudioModeTabs />
         <EnTetePage
           titre="Création"
