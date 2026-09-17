@@ -52,7 +52,17 @@ function PageEditeur() {
           <p className="text-sm text-muted-foreground">Cette création est introuvable.</p>
         ) : (
           <>
-            <h1 className="font-display text-2xl font-bold text-primary">{data.nom}</h1>
+            <header className="flex flex-wrap items-end justify-between gap-3">
+              <div>
+                <p className="text-xs font-semibold uppercase text-muted-foreground">
+                  Atelier Création
+                </p>
+                <h1 className="mt-1 text-2xl font-semibold text-primary sm:text-3xl">{data.nom}</h1>
+              </div>
+              <p className="rounded-lg bg-secondary px-3 py-2 text-xs font-semibold text-primary">
+                {data.largeur} × {data.hauteur} px
+              </p>
+            </header>
             <EditeurCreation creation={data} />
           </>
         )}

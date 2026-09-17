@@ -15,6 +15,7 @@ import {
   Minus,
   Redo2,
   Save,
+  Search,
   Shapes,
   Square,
   Trash2,
@@ -24,6 +25,7 @@ import {
   Upload,
 } from "lucide-react";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 
 import {
   COULEURS_MARQUE,
@@ -296,28 +298,35 @@ function RenduCalque({ calque }: { calque: Calque }) {
 
 function ApercuTemplate({ document, format }: { document: DocumentCreation; format: string }) {
   const dimensions = formatCreation(format);
-  const echelle = 132 / dimensions.largeur;
   return (
     <div
-      className="relative mx-auto overflow-hidden border border-border shadow-sm"
+      className="relative mx-auto flex w-full items-center justify-center overflow-hidden rounded-md border border-border bg-muted shadow-sm"
       style={{
-        width: dimensions.largeur * echelle,
-        height: Math.min(112, dimensions.hauteur * echelle),
-        ...fondCss(document.fond),
+        aspectRatio: `${dimensions.largeur} / ${dimensions.hauteur}`,
+        maxHeight: 250,
       }}
     >
-      <div
-        style={{
-          width: dimensions.largeur,
-          height: dimensions.hauteur,
-          transform: `scale(${echelle})`,
-          transformOrigin: "top left",
-        }}
+      <svg
+        viewBox={`0 0 ${dimensions.largeur} ${dimensions.hauteur}`}
+        className="block h-full w-full"
+        aria-hidden="true"
       >
-        {document.calques.map((calque) => (
-          <RenduCalque key={calque.id} calque={calque} />
-        ))}
-      </div>
+        <foreignObject width={dimensions.largeur} height={dimensions.hauteur}>
+          <div
+            style={{
+              width: dimensions.largeur,
+              height: dimensions.hauteur,
+              position: "relative",
+              overflow: "hidden",
+              ...fondCss(document.fond),
+            }}
+          >
+            {document.calques.map((calque) => (
+              <RenduCalque key={calque.id} calque={calque} />
+            ))}
+          </div>
+        </foreignObject>
+      </svg>
     </div>
   );
 }
@@ -335,6 +344,10 @@ export function EditeurCreation({ creation }: Props) {
   const [ouvrirMedias, setOuvrirMedias] = useState(false);
   const [enregistreA, setEnregistreA] = useState<string | null>(null);
   const [outilActif, setOutilActif] = useState<"templates" | "elements">("templates");
+  const [rechercheTemplate, setRechercheTemplate] = useState("");
+  const [categorieTemplate, setCategorieTemplate] = useState<"Tous" | "LinkedIn" | "Instagram">(
+    "Tous",
+  );
 
   const scèneRef = useRef<HTMLDivElement | null>(null);
   const zoneRef = useRef<HTMLDivElement | null>(null);
@@ -760,17 +773,32 @@ export function EditeurCreation({ creation }: Props) {
     () => doc.calques.find((c) => c.id === selection) ?? null,
     [doc.calques, selection],
   );
+  const modelesVisibles = useMemo(() => {
+    const recherche = rechercheTemplate.trim().toLocaleLowerCase("fr");
+    return MODELES.filter((modele) => {
+      const categorieOk =
+        categorieTemplate === "Tous" ||
+        modele.categorie === categorieTemplate ||
+        modele.categorie === "Essentiels";
+      const rechercheOk =
+        !recherche ||
+        `${modele.label} ${modele.description} ${modele.categorie}`
+          .toLocaleLowerCase("fr")
+          .includes(recherche);
+      return categorieOk && rechercheOk;
+    });
+  }, [categorieTemplate, rechercheTemplate]);
 
   /* ------------------------------------------------------------- rendu UI */
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-xl border border-border bg-card p-2 sm:flex sm:flex-wrap">
-        <button
+      <div className="flex min-w-0 flex-wrap items-center gap-2 rounded-xl border border-border bg-card p-2 shadow-sm">
+        <Button
           type="button"
           onClick={() => enregistrer.mutate()}
           disabled={enregistrer.isPending}
-          className="inline-flex min-h-11 items-center gap-2 rounded-full bg-primary px-4 text-sm font-semibold text-primary-foreground disabled:opacity-60"
+          className="h-10 rounded-lg px-4 font-semibold"
         >
           {enregistrer.isPending ? (
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -778,28 +806,31 @@ export function EditeurCreation({ creation }: Props) {
             <Save className="h-4 w-4" />
           )}
           Enregistrer
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="outline"
           type="button"
           onClick={() => telecharger.mutate(1)}
-          className="inline-flex min-h-11 items-center gap-2 rounded-full border border-border px-4 text-sm font-semibold text-primary"
+          className="h-10 rounded-lg px-4 font-semibold"
         >
           <Download className="h-4 w-4" />
           PNG
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="outline"
           type="button"
           onClick={() => telecharger.mutate(2)}
-          className="inline-flex min-h-11 items-center gap-2 rounded-full border border-border px-4 text-sm font-semibold text-primary"
+          className="h-10 rounded-lg px-4 font-semibold"
         >
           <Download className="h-4 w-4" />
           PNG 2x
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="outline"
           type="button"
           onClick={() => envoyerDansMedias.mutate()}
           disabled={envoyerDansMedias.isPending}
-          className="inline-flex min-h-11 items-center gap-2 rounded-full border border-border px-4 text-sm font-semibold text-primary disabled:opacity-60"
+          className="h-10 rounded-lg px-4 font-semibold"
         >
           {envoyerDansMedias.isPending ? (
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -807,7 +838,7 @@ export function EditeurCreation({ creation }: Props) {
             <ImagePlus className="h-4 w-4" />
           )}
           Envoyer dans Médias
-        </button>
+        </Button>
         <div className="flex shrink-0 items-center gap-2 sm:ml-auto">
           {enregistreA ? (
             <span className="text-xs text-muted-foreground">Enregistré à {enregistreA}</span>
@@ -816,7 +847,7 @@ export function EditeurCreation({ creation }: Props) {
             type="button"
             onClick={annuler}
             disabled={historique.length === 0}
-            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-border text-primary disabled:opacity-40"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-border text-primary disabled:opacity-40"
             aria-label="Annuler"
           >
             <Undo2 className="h-4 w-4" />
@@ -825,7 +856,7 @@ export function EditeurCreation({ creation }: Props) {
             type="button"
             onClick={retablir}
             disabled={futur.length === 0}
-            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-border text-primary disabled:opacity-40"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-border text-primary disabled:opacity-40"
             aria-label="Rétablir"
           >
             <Redo2 className="h-4 w-4" />
@@ -833,7 +864,7 @@ export function EditeurCreation({ creation }: Props) {
         </div>
       </div>
 
-      <div className="grid min-w-0 gap-4 xl:grid-cols-[18rem_minmax(0,1fr)_19rem]">
+      <div className="grid min-w-0 gap-4 xl:grid-cols-[19rem_minmax(0,1fr)_19rem]">
         {/* outils et templates */}
         <aside className="order-2 min-w-0 overflow-hidden rounded-xl border border-border bg-card xl:order-1">
           <div className="grid grid-cols-2 border-b border-border p-2">
@@ -853,23 +884,65 @@ export function EditeurCreation({ creation }: Props) {
             </button>
           </div>
           {outilActif === "templates" ? (
-            <div className="grid max-h-[34rem] grid-cols-2 gap-2 overflow-y-auto p-3 sm:grid-cols-3 xl:grid-cols-2">
-              {MODELES.map((modele) => {
-                const document = modele.construire();
-                return (
+            <div className="space-y-4 p-3">
+              <div>
+                <h2 className="text-base font-semibold text-primary">Templates</h2>
+                <p className="mt-0.5 text-xs text-muted-foreground">Choisis un point de départ.</p>
+              </div>
+              <label className="flex h-10 items-center gap-2 rounded-lg bg-muted px-3 text-muted-foreground focus-within:ring-2 focus-within:ring-ring">
+                <Search className="h-4 w-4 shrink-0" />
+                <input
+                  value={rechercheTemplate}
+                  onChange={(event) => setRechercheTemplate(event.target.value)}
+                  placeholder="Rechercher un template"
+                  className="min-w-0 flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
+                />
+              </label>
+              <div className="flex gap-1 overflow-x-auto pb-1">
+                {(["Tous", "LinkedIn", "Instagram"] as const).map((categorie) => (
                   <button
-                    key={modele.value}
+                    key={categorie}
                     type="button"
-                    onClick={() => appliquerTemplate(modele)}
-                    className="min-w-0 space-y-2 rounded-lg border border-border bg-background p-2 text-left transition hover:border-[var(--coral)]"
+                    onClick={() => setCategorieTemplate(categorie)}
+                    className={[
+                      "h-8 shrink-0 rounded-full px-3 text-xs font-semibold transition",
+                      categorieTemplate === categorie
+                        ? "bg-secondary text-primary"
+                        : "text-muted-foreground hover:bg-muted hover:text-primary",
+                    ].join(" ")}
                   >
-                    <ApercuTemplate document={document} format={modele.format} />
-                    <span className="block truncate text-xs font-semibold text-primary">
-                      {modele.label}
-                    </span>
+                    {categorie}
                   </button>
-                );
-              })}
+                ))}
+              </div>
+              <div className="grid max-h-[31rem] grid-cols-2 gap-3 overflow-y-auto pr-1 sm:grid-cols-3 xl:grid-cols-1">
+                {modelesVisibles.map((modele) => {
+                  const document = modele.construire();
+                  return (
+                    <button
+                      key={modele.value}
+                      type="button"
+                      onClick={() => appliquerTemplate(modele)}
+                      className="group min-w-0 space-y-2 rounded-lg border border-border bg-background p-2.5 text-left transition hover:-translate-y-0.5 hover:border-[var(--coral)] hover:shadow-sm"
+                    >
+                      <ApercuTemplate document={document} format={modele.format} />
+                      <span className="flex min-w-0 items-start justify-between gap-2">
+                        <span className="min-w-0">
+                          <span className="block truncate text-xs font-semibold text-primary">
+                            {modele.label}
+                          </span>
+                          <span className="mt-0.5 block truncate text-[10px] text-muted-foreground">
+                            {modele.description}
+                          </span>
+                        </span>
+                        <span className="shrink-0 rounded bg-muted px-1.5 py-1 text-[9px] font-semibold text-muted-foreground">
+                          {modele.format}
+                        </span>
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-2 p-3 sm:grid-cols-3 xl:grid-cols-1">
