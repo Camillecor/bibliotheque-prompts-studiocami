@@ -132,6 +132,7 @@ export function documentVide(): DocumentCreation {
 /* ------------------------------------------------------------------ modèles */
 
 function texte(partiel: Partial<CalqueTexte> & { texte: string }): CalqueTexte {
+  const { taille = 84, ...proprietes } = partiel;
   return {
     id: nouvelId(),
     type: "texte",
@@ -143,7 +144,7 @@ function texte(partiel: Partial<CalqueTexte> & { texte: string }): CalqueTexte {
     opacite: 1,
     verrouille: false,
     police: "Bricolage Grotesque",
-    taille: 84,
+    taille: Math.round(taille * 1.15),
     graisse: 800,
     italique: false,
     souligne: false,
@@ -153,7 +154,7 @@ function texte(partiel: Partial<CalqueTexte> & { texte: string }): CalqueTexte {
     interlettre: -1,
     ombre: false,
     fondTexte: null,
-    ...partiel,
+    ...proprietes,
   };
 }
 
