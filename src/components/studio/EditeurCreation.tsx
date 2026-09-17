@@ -910,26 +910,32 @@ export function EditeurCreation({ creation }: Props) {
                 ))}
               </div>
               <div className="grid max-h-[31rem] grid-cols-2 gap-3 overflow-y-auto pr-1 sm:grid-cols-3 xl:grid-cols-1">
-              {modelesVisibles.map((modele) => {
-                const document = modele.construire();
-                return (
-                  <button
-                    key={modele.value}
-                    type="button"
-                    onClick={() => appliquerTemplate(modele)}
-                    className="group min-w-0 space-y-2 rounded-lg border border-border bg-background p-2.5 text-left transition hover:-translate-y-0.5 hover:border-[var(--coral)] hover:shadow-sm"
-                  >
-                    <ApercuTemplate document={document} format={modele.format} />
-                    <span className="flex min-w-0 items-start justify-between gap-2">
-                      <span className="min-w-0">
-                        <span className="block truncate text-xs font-semibold text-primary">{modele.label}</span>
-                        <span className="mt-0.5 block truncate text-[10px] text-muted-foreground">{modele.description}</span>
+                {modelesVisibles.map((modele) => {
+                  const document = modele.construire();
+                  return (
+                    <button
+                      key={modele.value}
+                      type="button"
+                      onClick={() => appliquerTemplate(modele)}
+                      className="group min-w-0 space-y-2 rounded-lg border border-border bg-background p-2.5 text-left transition hover:-translate-y-0.5 hover:border-[var(--coral)] hover:shadow-sm"
+                    >
+                      <ApercuTemplate document={document} format={modele.format} />
+                      <span className="flex min-w-0 items-start justify-between gap-2">
+                        <span className="min-w-0">
+                          <span className="block truncate text-xs font-semibold text-primary">
+                            {modele.label}
+                          </span>
+                          <span className="mt-0.5 block truncate text-[10px] text-muted-foreground">
+                            {modele.description}
+                          </span>
+                        </span>
+                        <span className="shrink-0 rounded bg-muted px-1.5 py-1 text-[9px] font-semibold text-muted-foreground">
+                          {modele.format}
+                        </span>
                       </span>
-                      <span className="shrink-0 rounded bg-muted px-1.5 py-1 text-[9px] font-semibold text-muted-foreground">{modele.format}</span>
-                    </span>
-                  </button>
-                );
-              })}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           ) : (

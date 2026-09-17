@@ -156,7 +156,9 @@ function GalerieCreations() {
                     ].join(" ")}
                   >
                     <span className="block text-sm font-semibold">{m.label}</span>
-                    <span className="mt-1 block text-xs text-muted-foreground">{m.description}</span>
+                    <span className="mt-1 block text-xs text-muted-foreground">
+                      {m.description}
+                    </span>
                     <span className="mt-2 inline-flex rounded bg-muted px-1.5 py-1 text-[10px] font-semibold text-muted-foreground">
                       {m.categorie} · {m.format}
                     </span>
