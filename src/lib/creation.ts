@@ -430,7 +430,8 @@ export const MODELES: ModeleCreation[] = [
           l: 850,
           h: 300,
           taille: 270,
-          police: "Archivo Black",
+          police: "Bricolage Grotesque",
+          graisse: 800,
           couleur: "#050c9c",
         }),
         texte({
@@ -792,7 +793,7 @@ export const MODELES: ModeleCreation[] = [
           l: 520,
           h: 42,
           taille: 22,
-          police: "Hind",
+          police: "Bricolage Grotesque",
           graisse: 700,
           couleur: "#3abef9",
           interlettre: 2,
