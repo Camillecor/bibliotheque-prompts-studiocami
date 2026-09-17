@@ -49,6 +49,13 @@ const CalqueSchema = z.union([
     type: z.literal("forme"),
     forme: z.enum(["rect", "cercle", "trait"]),
     couleur: z.string().max(40),
+    degrade: z
+      .object({
+        de: z.string().max(40),
+        vers: z.string().max(40),
+        angle: z.number(),
+      })
+      .optional(),
     contour: z.string().max(40).nullable(),
     epaisseurContour: z.number(),
     arrondi: z.number(),
