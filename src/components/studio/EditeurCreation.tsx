@@ -1595,7 +1595,16 @@ function ReglagesCalque({
                   type="color"
                   value={calque.degrade.de}
                   onChange={(e) =>
-                    onChange({ degrade: { ...calque.degrade, de: e.target.value } })
+                    onChange({
+                      degrade: {
+                        ...(calque.degrade ?? {
+                          de: calque.couleur,
+                          vers: "#3abef9",
+                          angle: 135,
+                        }),
+                        de: e.target.value,
+                      },
+                    })
                   }
                   className="h-9 w-full rounded border border-border"
                 />
@@ -1605,7 +1614,16 @@ function ReglagesCalque({
                   type="color"
                   value={calque.degrade.vers}
                   onChange={(e) =>
-                    onChange({ degrade: { ...calque.degrade, vers: e.target.value } })
+                    onChange({
+                      degrade: {
+                        ...(calque.degrade ?? {
+                          de: calque.couleur,
+                          vers: "#3abef9",
+                          angle: 135,
+                        }),
+                        vers: e.target.value,
+                      },
+                    })
                   }
                   className="h-9 w-full rounded border border-border"
                 />
@@ -1619,7 +1637,14 @@ function ReglagesCalque({
                     value={calque.degrade.angle}
                     onChange={(e) =>
                       onChange({
-                        degrade: { ...calque.degrade, angle: Number(e.target.value) },
+                        degrade: {
+                          ...(calque.degrade ?? {
+                            de: calque.couleur,
+                            vers: "#3abef9",
+                            angle: 135,
+                          }),
+                          angle: Number(e.target.value),
+                        },
                       })
                     }
                     className="w-full"

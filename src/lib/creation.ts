@@ -92,7 +92,7 @@ export type CalqueForme = Base & {
   type: "forme";
   forme: "rect" | "cercle" | "trait";
   couleur: string;
-  degrade?: { de: string; vers: string; angle: number };
+  degrade?: { de: string; vers: string; angle: number } | undefined;
   contour: string | null;
   epaisseurContour: number;
   arrondi: number;
