@@ -298,29 +298,35 @@ function RenduCalque({ calque }: { calque: Calque }) {
 
 function ApercuTemplate({ document, format }: { document: DocumentCreation; format: string }) {
   const dimensions = formatCreation(format);
-  const largeur = 214;
-  const echelle = largeur / dimensions.largeur;
   return (
     <div
-      className="relative mx-auto w-full overflow-hidden rounded-md border border-border bg-muted shadow-sm"
+      className="relative mx-auto flex w-full items-center justify-center overflow-hidden rounded-md border border-border bg-muted shadow-sm"
       style={{
         aspectRatio: `${dimensions.largeur} / ${dimensions.hauteur}`,
         maxHeight: 250,
-        ...fondCss(document.fond),
       }}
     >
-      <div
-        style={{
-          width: dimensions.largeur,
-          height: dimensions.hauteur,
-          transform: `scale(${echelle})`,
-          transformOrigin: "top left",
-        }}
+      <svg
+        viewBox={`0 0 ${dimensions.largeur} ${dimensions.hauteur}`}
+        className="block h-full w-full"
+        aria-hidden="true"
       >
-        {document.calques.map((calque) => (
-          <RenduCalque key={calque.id} calque={calque} />
-        ))}
-      </div>
+        <foreignObject width={dimensions.largeur} height={dimensions.hauteur}>
+          <div
+            style={{
+              width: dimensions.largeur,
+              height: dimensions.hauteur,
+              position: "relative",
+              overflow: "hidden",
+              ...fondCss(document.fond),
+            }}
+          >
+            {document.calques.map((calque) => (
+              <RenduCalque key={calque.id} calque={calque} />
+            ))}
+          </div>
+        </foreignObject>
+      </svg>
     </div>
   );
 }
