@@ -481,7 +481,7 @@ export const MODELES: ModeleCreation[] = [
           texte: "des équipes créatives utilisent\ndéjà l’IA chaque semaine.",
           x: 84,
           y: 610,
-          l: 780,
+          l: 660,
           h: 200,
           taille: 50,
           graisse: 600,
