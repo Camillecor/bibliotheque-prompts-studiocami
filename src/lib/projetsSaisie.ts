@@ -14,12 +14,12 @@ export type SaisieAnalysee = {
   projetNom: string | null;
 };
 
-function sansAccents(texte: string) {
-  return texte.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-}
-
 function normaliser(texte: string) {
-  return sansAccents(texte.toLowerCase()).trim();
+  return texte
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
 }
 
 const JOURS_SEMAINE: Record<string, number> = {
@@ -55,44 +55,37 @@ const MOIS: Record<string, number> = {
   decembre: 11,
 };
 
-function debutDeJour(date = new Date()) {
-  const copie = new Date(date);
-  copie.setHours(9, 0, 0, 0);
-  return copie;
-}
-
-function finDeJournee(date: Date) {
-  const copie = new Date(date);
+/** Date à 9 h 00 (repère stable pour « aujourd'hui »). */
+function aNeufHeures(base = new Date()) {
+  const copie = new Date(base);
   copie.setHours(9, 0, 0, 0);
   return copie;
 }
 
 /** Prochain jour de semaine demandé, aujourd'hui inclus. */
 function prochainJour(jour: number): Date {
-  const date = debutDeJour();
-  const ecart = (jour - date.getDay() + 7) % 7;
-  date.setDate(date.getDate() + ecart);
+  const date = aNeufHeures();
+  date.setDate(date.getDate() + ((jour - date.getDay() + 7) % 7));
   return date;
 }
 
 function formatCourteDate(date: Date) {
-  return date.toLocaleDateString("fr-FR", { weekday: "short", day: "numeric", month: "short" });
+  return date.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "short" });
 }
 
 /** Extrait et retire les segments reconnus d'un texte libre. */
 export function analyserSaisie(brut: string, projets: ProjetRow[]): SaisieAnalysee {
   let texte = ` ${brut.trim()} `;
-  const echeance: { date: Date; label: string } | null = { date: new Date(NaN), label: "" };
-  let echeanceFinale: { date: Date; label: string } | null = null;
+  const detection: { date: Date; label: string } = { date: new Date(NaN), label: "" };
   let priorite = 0;
   const etiquettes: string[] = [];
   let projetId: string | null = null;
   let projetNom: string | null = null;
 
-  const retirer = (motif: RegExp, action: (correspondance: RegExpMatchArray) => void) => {
-    texte = texte.replace(motif, (suite, ...args) => {
-      const groupes = (args.slice(0, -2) as unknown[]) as RegExpMatchArray;
-      action(groupes.length > 0 ? groupes : ([suite] as unknown as RegExpMatchArray));
+  const retirer = (motif: RegExp, action: (groupes: string[]) => void) => {
+    texte = texte.replace(motif, (...args) => {
+      const groupes = args.slice(0, -2) as string[];
+      action(groupes);
       return " ";
     });
   };
@@ -101,80 +94,85 @@ export function analyserSaisie(brut: string, projets: ProjetRow[]): SaisieAnalys
   retirer(/\b(urgentissime|urgent|asap|prioritaire)\b/gi, () => {
     priorite = Math.max(priorite, 3);
   });
-  retirer(/\b(important)\b/gi, () => {
+  retirer(/\bimportant\b/gi, () => {
     priorite = Math.max(priorite, 2);
   });
-  retirer(/\b(basse priorite|peu urgent|pas urgent|pas urgent)\b/gi, () => {
+  retirer(/\b(basse[- ]priorite|peu urgent|pas urgent)\b/gi, () => {
     priorite = Math.max(priorite, 1);
   });
 
   // Dates relatives
-  retirer(/\baujourd'?hui\b/gi, (g) => {
-    echeance.date = debutDeJour();
-    echeance.label = "Aujourd'hui";
-    void g;
+  retirer(/\baujourd'?hui\b/gi, () => {
+    detection.date = aNeufHeures();
+    detection.label = "Aujourd'hui";
   });
   retirer(/\bdemain\b/gi, () => {
-    const d = debutDeJour();
+    const d = aNeufHeures();
     d.setDate(d.getDate() + 1);
-    echeance.date = d;
-    echeance.label = "Demain";
+    detection.date = d;
+    detection.label = "Demain";
   });
   retirer(/\bapres[- ]?demain\b/gi, () => {
-    const d = debutDeJour();
+    const d = aNeufHeures();
     d.setDate(d.getDate() + 2);
-    echeance.date = d;
-    echeance.label = "Après-demain";
+    detection.date = d;
+    detection.label = "Après-demain";
   });
   retirer(/\bfin de mois\b/gi, () => {
-    const d = debutDeJour();
+    const d = aNeufHeures();
     d.setDate(1);
     d.setMonth(d.getMonth() + 1, 0);
-    echeance.date = d;
-    echeance.label = "Fin de mois";
+    detection.date = d;
+    detection.label = "Fin de mois";
   });
   retirer(/\bsemaine prochaine\b/gi, () => {
-    const d = debutDeJour();
+    const d = aNeufHeures();
     d.setDate(d.getDate() + 7);
-    echeance.date = d;
-    echeance.label = "Semaine prochaine";
+    detection.date = d;
+    detection.label = "Semaine prochaine";
   });
-  retirer(/\bdans\s+(\d{1,3})\s*(j|jour|jours|sem|semaine|semaines)\b/gi, (g) => {
+  retirer(/\bdans\s+(\d{1,3})\s*(j|jours?|semaines?)\b/gi, (g) => {
     const n = Number(g[1]);
-    const semaines = /^s/i.test(String(g[2]));
-    const d = debutDeJour();
+    const semaines = /^s/i.test(g[2] ?? "");
+    const d = aNeufHeures();
     d.setDate(d.getDate() + (semaines ? n * 7 : n));
-    echeance.date = d;
-    echeance.label = semaines ? `Dans ${n} semaine(s)` : `Dans ${n} jour(s)`;
+    detection.date = d;
+    detection.label = semaines ? `Dans ${n} semaine(s)` : `Dans ${n} jour(s)`;
   });
 
   // Jour de semaine (« vendredi », « mardi prochain »)
-  retirer(/\b(lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche|lun|mar|mer|jeu|ven|sam|dim)(\s+prochain)?\b/gi, (g) => {
-    const jour = JOURS_SEMAINE[normaliser(String(g[1]))];
-    if (jour === undefined) return;
-    echeance.date = prochainJour(jour);
-    echeance.label = formatCourteDate(echeance.date);
-  });
+  retirer(
+    /\b(lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche|lun|mar|mer|jeu|ven|sam|dim)(\s+prochain)?\b/gi,
+    (g) => {
+      const jour = JOURS_SEMAINE[normaliser(g[1] ?? "")];
+      if (jour === undefined) return;
+      detection.date = prochainJour(jour);
+      detection.label = formatCourteDate(detection.date);
+    },
+  );
 
   // « 12 octobre », « 12 oct »
-  retirer(/\b(\d{1,2})\s+(janvier|fevrier|mars|avril|mai|juin|juillet|aout|septembre|oct|octobre|novembre|decembre)\b/gi, (g) => {
-    const jour = Number(g[1]);
-    const mois = MOIS[normaliser(String(g[2]))];
-    if (!mois === undefined || jour < 1 || jour > 31) return;
-    const d = debutDeJour();
-    d.setDate(jour);
-    d.setMonth(mois);
-    if (d < new Date()) d.setFullYear(d.getFullYear() + 1);
-    echeance.date = d;
-    echeance.label = formatCourteDate(d);
-  });
+  retirer(
+    /\b(\d{1,2})\s+(janvier|fevrier|mars|avril|mai|juin|juillet|aout|septembre|oct|octobre|novembre|decembre)\b/gi,
+    (g) => {
+      const jour = Number(g[1]);
+      const mois = MOIS[normaliser(g[2] ?? "")];
+      if (mois === undefined || jour < 1 || jour > 31) return;
+      const d = aNeufHeures();
+      d.setDate(jour);
+      d.setMonth(mois);
+      if (d < new Date()) d.setFullYear(d.getFullYear() + 1);
+      detection.date = d;
+      detection.label = formatCourteDate(d);
+    },
+  );
 
   // « 12/10 », « 12-10-2026 »
-  retirer(/\b(\d{1,2})[\/-](\d{1,2})(?:[\/-](\d{2,4}))?\b/g, (g) => {
+  retirer(/\b(\d{1,2})[/-](\d{1,2})(?:[/-](\d{2,4}))?\b/g, (g) => {
     const jour = Number(g[1]);
     const mois = Number(g[2]);
     if (jour < 1 || jour > 31 || mois < 1 || mois > 12) return;
-    const d = debutDeJour();
+    const d = aNeufHeures();
     d.setDate(jour);
     d.setMonth(mois - 1);
     if (g[3]) {
@@ -183,24 +181,22 @@ export function analyserSaisie(brut: string, projets: ProjetRow[]): SaisieAnalys
     } else if (d < new Date()) {
       d.setFullYear(d.getFullYear() + 1);
     }
-    echeance.date = d;
-    echeance.label = formatCourteDate(d);
+    detection.date = d;
+    detection.label = formatCourteDate(d);
   });
 
-  if (!Number.isNaN(echeance.date.getTime())) {
-    echeanceFinale = { date: finDeJournee(echeance.date), label: echeance.label };
-  }
+  const echeanceValide = !Number.isNaN(detection.date.getTime());
 
   // Étiquettes #tag
   retirer(/#([\p{L}\d_-]{1,40})/gu, (g) => {
-    const tag = String(g[1]).trim();
+    const tag = (g[1] ?? "").trim();
     if (tag && etiquettes.length < 8 && !etiquettes.includes(tag)) etiquettes.push(tag);
   });
 
-  // Projet @nom : correspond au nom d'un projet existant (sans accents, préfixe accepté)
+  // Projet @nom : correspond à un projet existant (sans accents, préfixe accepté)
   retirer(/@([\p{L}\d][\p{L}\d '_-]{0,39})/gu, (g) => {
     if (projetId) return;
-    const saisi = normaliser(String(g[1]));
+    const saisi = normaliser(g[1] ?? "");
     if (!saisi) return;
     const trouve = projets.find((projet) => {
       const nom = normaliser(projet.nom);
@@ -213,12 +209,11 @@ export function analyserSaisie(brut: string, projets: ProjetRow[]): SaisieAnalys
   });
 
   const titre = texte.replace(/\s+/g, " ").trim();
-  const echeanceIso = echeanceFinale ? echeanceFinale.date.toISOString() : null;
 
   return {
     titre,
-    echeance: echeanceIso,
-    echeanceLabel: echeanceFinale ? echeanceFinale.label : null,
+    echeance: echeanceValide ? detection.date.toISOString() : null,
+    echeanceLabel: echeanceValide ? detection.label : null,
     priorite,
     etiquettes,
     projetId,
@@ -235,19 +230,21 @@ export type TachePourScore = {
   created_at: string;
 };
 
-export type EtatEcheanceScore = "aucune" | "retard" | "aujourdhui" | "avenir" | "semaine";
+export type EtatEcheanceScore = "aucune" | "retard" | "aujourdhui" | "semaine" | "avenir";
 
 export function etatEcheanceScore(echeance: string | null, statut: string): EtatEcheanceScore {
   if (!echeance || statut === "termine") return "aucune";
   const date = new Date(echeance);
   const maintenant = new Date();
-  const finAujourdhui = new Date(maintenant);
-  finAujourdhui.setHours(23, 59, 59, 999);
+  const debutAujourdhui = new Date(maintenant);
+  debutAujourdhui.setHours(0, 0, 0, 0);
+  const finAujourdhui = new Date(debutAujourdhui);
+  finAujourdhui.setDate(finAujourdhui.getDate() + 1);
   const finSemaine = new Date(finAujourdhui);
   finSemaine.setDate(finSemaine.getDate() + 6);
-  if (date < new Date(maintenant).setHours(0, 0, 0, 0)) return "retard";
-  if (date <= finAujourdhui) return "aujourdhui";
-  if (date <= finSemaine) return "semaine";
+  if (date < debutAujourdhui) return "retard";
+  if (date < finAujourdhui) return "aujourdhui";
+  if (date < finSemaine) return "semaine";
   return "avenir";
 }
 
