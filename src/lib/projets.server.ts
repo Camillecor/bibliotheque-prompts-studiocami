@@ -88,11 +88,19 @@ export async function decouperObjectif(input: {
       const t = (brute ?? {}) as Record<string, unknown>;
       const sous = Array.isArray(t["sous_taches"]) ? (t["sous_taches"] as unknown[]) : [];
       return {
-        titre: String(t["titre"] ?? "Tâche").trim().slice(0, 160) || "Tâche",
-        note: String(t["note"] ?? "").trim().slice(0, 2000),
+        titre:
+          String(t["titre"] ?? "Tâche")
+            .trim()
+            .slice(0, 160) || "Tâche",
+        note: String(t["note"] ?? "")
+          .trim()
+          .slice(0, 2000),
         priorite: Math.min(3, Math.max(0, Number(t["priorite"] ?? 0) || 0)),
         jours: Math.min(180, Math.max(0, Number(t["jours"] ?? 0) || 0)),
-        sous_taches: sous.slice(0, 3).map((s) => String(s).trim().slice(0, 160)).filter(Boolean),
+        sous_taches: sous
+          .slice(0, 3)
+          .map((s) => String(s).trim().slice(0, 160))
+          .filter(Boolean),
       };
     });
     return { taches };
@@ -187,7 +195,9 @@ export async function analyserListeTaches(taches: TacheAnalyse[]): Promise<Analy
         const e = (entree ?? {}) as Record<string, unknown>;
         return {
           id: String(e["id"] ?? ""),
-          raison: String(e["raison"] ?? "").trim().slice(0, 120),
+          raison: String(e["raison"] ?? "")
+            .trim()
+            .slice(0, 120),
         };
       })
       .filter((e) => idsValides.has(e.id) && e.raison.length > 0);

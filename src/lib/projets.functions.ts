@@ -209,72 +209,64 @@ const TACHE_POUR_ANALYSE = z.object({
 });
 
 /** Analyse intelligente : Mario classe les tâches ouvertes et donne des conseils. */
-export const analyserListeAvecMario = createServerFn({ method: "POST" }).handler(
-  async () => {
-    const { limiterDebit } = await import("@/lib/securite.server");
-    limiterDebit("projets:analyser", 6, 60_000);
+export const analyserListeAvecMario = createServerFn({ method: "POST" }).handler(async () => {
+  const { limiterDebit } = await import("@/lib/securite.server");
+  limiterDebit("projets:analyser", 6, 60_000);
 
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { analyserListeTaches } = await import("@/lib/projets.server");
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { analyserListeTaches } = await import("@/lib/projets.server");
 
-    const [reponseTaches, reponseProjets] = await Promise.all([
-      supabaseAdmin
-        .from("taches")
-        .select(COLONNES_TACHE)
-        .eq("user_id", COMPTE_ID)
-        .limit(2000),
-      supabaseAdmin
-        .from("projets")
-        .select(COLONNES_PROJET)
-        .eq("user_id", COMPTE_ID)
-        .eq("archive", false),
-    ]);
-    if (reponseTaches.error) throw erreurBase("projets", reponseTaches.error);
-    if (reponseProjets.error) throw erreurBase("projets", reponseProjets.error);
+  const [reponseTaches, reponseProjets] = await Promise.all([
+    supabaseAdmin.from("taches").select(COLONNES_TACHE).eq("user_id", COMPTE_ID).limit(2000),
+    supabaseAdmin
+      .from("projets")
+      .select(COLONNES_PROJET)
+      .eq("user_id", COMPTE_ID)
+      .eq("archive", false),
+  ]);
+  if (reponseTaches.error) throw erreurBase("projets", reponseTaches.error);
+  if (reponseProjets.error) throw erreurBase("projets", reponseProjets.error);
 
-    const projets = reponseProjets.data ?? [];
-    const nomProjet = new Map(projets.map((p) => [p.id as string, p.nom as string]));
-    const ouvertes = (reponseTaches.data ?? []).filter(
-      (t) => t.statut !== "termine" && !t.parent_id,
-    );
+  const projets = reponseProjets.data ?? [];
+  const nomProjet = new Map(projets.map((p) => [p.id as string, p.nom as string]));
+  const ouvertes = (reponseTaches.data ?? []).filter((t) => t.statut !== "termine" && !t.parent_id);
 
-    if (ouvertes.length === 0) {
-      return { focus: [], conseils: [] };
-    }
+  if (ouvertes.length === 0) {
+    return { focus: [], conseils: [] };
+  }
 
-    const sousTotaux = new Map<string, { faites: number; total: number }>();
-    for (const tache of reponseTaches.data ?? []) {
-      if (!tache.parent_id) continue;
-      const compteur = sousTotaux.get(tache.parent_id) ?? { faites: 0, total: 0 };
-      compteur.total += 1;
-      if (tache.statut === "termine") compteur.faites += 1;
-      sousTotaux.set(tache.parent_id, compteur);
-    }
+  const sousTotaux = new Map<string, { faites: number; total: number }>();
+  for (const tache of reponseTaches.data ?? []) {
+    if (!tache.parent_id) continue;
+    const compteur = sousTotaux.get(tache.parent_id) ?? { faites: 0, total: 0 };
+    compteur.total += 1;
+    if (tache.statut === "termine") compteur.faites += 1;
+    sousTotaux.set(tache.parent_id, compteur);
+  }
 
-    const entree = ouvertes
-      // Les plus proches dans le temps d'abord, pour rester dans une taille raisonnable.
-      .sort((a, b) => {
-        const da = a.echeance ? new Date(a.echeance).getTime() : Number.MAX_SAFE_INTEGER;
-        const db = b.echeance ? new Date(b.echeance).getTime() : Number.MAX_SAFE_INTEGER;
-        return da - db;
-      })
-      .slice(0, 40)
-      .map((tache) => {
-        const sous = sousTotaux.get(tache.id) ?? { faites: 0, total: 0 };
-        return {
-          id: tache.id,
-          titre: tache.titre,
-          priorite: tache.priorite,
-          echeance: tache.echeance,
-          projet: tache.projet_id ? (nomProjet.get(tache.projet_id) ?? null) : null,
-          sous_faites: sous.faites,
-          sous_total: sous.total,
-        };
-      });
+  const entree = ouvertes
+    // Les plus proches dans le temps d'abord, pour rester dans une taille raisonnable.
+    .sort((a, b) => {
+      const da = a.echeance ? new Date(a.echeance).getTime() : Number.MAX_SAFE_INTEGER;
+      const db = b.echeance ? new Date(b.echeance).getTime() : Number.MAX_SAFE_INTEGER;
+      return da - db;
+    })
+    .slice(0, 40)
+    .map((tache) => {
+      const sous = sousTotaux.get(tache.id) ?? { faites: 0, total: 0 };
+      return {
+        id: tache.id,
+        titre: tache.titre,
+        priorite: tache.priorite,
+        echeance: tache.echeance,
+        projet: tache.projet_id ? (nomProjet.get(tache.projet_id) ?? null) : null,
+        sous_faites: sous.faites,
+        sous_total: sous.total,
+      };
+    });
 
-    return analyserListeTaches(entree);
-  },
-);
+  return analyserListeTaches(entree);
+});
 
 const AjoutLotInput = z.object({
   projet_id: z.string().uuid().nullable().default(null),

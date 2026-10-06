@@ -103,9 +103,7 @@ function grouperParEcheance(taches: TacheRow[]): Groupe[] {
     .map(([cle, titre]) => ({
       cle,
       titre,
-      taches: [...(groupes[cle] ?? [])].sort(
-        (a, b) => scoreTache(b) - scoreTache(a),
-      ),
+      taches: [...(groupes[cle] ?? [])].sort((a, b) => scoreTache(b) - scoreTache(a)),
     }))
     .filter((groupe) => groupe.taches.length > 0);
 }
@@ -252,10 +250,7 @@ function LigneTache({
 
 function ApercuSaisie({ saisie }: { saisie: SaisieAnalysee }) {
   const detecte =
-    saisie.echeanceLabel ||
-    saisie.priorite > 0 ||
-    saisie.etiquettes.length > 0 ||
-    saisie.projetNom;
+    saisie.echeanceLabel || saisie.priorite > 0 || saisie.etiquettes.length > 0 || saisie.projetNom;
   if (!detecte) return null;
 
   return (
@@ -304,9 +299,10 @@ function ProjetsListePage() {
   const [vue, setVue] = useState<VueRapide | null>(null);
   const [nouvelleTache, setNouvelleTache] = useState("");
   const [tacheOuverte, setTacheOuverte] = useState<string | null>(null);
-  const [analyse, setAnalyse] = useState<{ focus: { id: string; raison: string }[]; conseils: string[] } | null>(
-    null,
-  );
+  const [analyse, setAnalyse] = useState<{
+    focus: { id: string; raison: string }[];
+    conseils: string[];
+  } | null>(null);
 
   const fetchProjets = useServerFn(listProjets);
   const fetchTaches = useServerFn(listTaches);
@@ -398,7 +394,11 @@ function ProjetsListePage() {
       .map((tache) => {
         const sous = sousTachesPar.get(tache.id) ?? [];
         const faites = sous.filter((s) => s.statut === "termine").length;
-        return { tache, score: scoreTache(tache, faites, sous.length), raisons: raisonsTache(tache, faites, sous.length) };
+        return {
+          tache,
+          score: scoreTache(tache, faites, sous.length),
+          raisons: raisonsTache(tache, faites, sous.length),
+        };
       })
       .sort((a, b) => b.score - a.score)
       .slice(0, 3);
