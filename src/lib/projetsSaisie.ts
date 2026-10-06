@@ -137,7 +137,9 @@ export function analyserSaisie(brut: string, projets: ProjetRow[]): SaisieAnalys
     const d = aNeufHeures();
     d.setDate(d.getDate() + (semaines ? n * 7 : n));
     detection.date = d;
-    detection.label = semaines ? `Dans ${n} semaine(s)` : `Dans ${n} jour(s)`;
+    detection.label = semaines
+      ? `Dans ${n} semaine${n > 1 ? "s" : ""}`
+      : `Dans ${n} jour${n > 1 ? "s" : ""}`;
   });
 
   // Jour de semaine (« vendredi », « mardi prochain »)
