@@ -104,3 +104,103 @@ export async function decouperObjectif(input: {
     );
   }
 }
+
+/* ------------------------------------------------- Analyse de la liste (Mario) */
+
+const SYSTEM_ANALYSE = `Tu es Mario le renard, l'agent IA de Studio Cami.
+On te donne la liste des tâches ouvertes d'un utilisateur (titre, priorité, échéance, projet, avancement des sous-tâches).
+Tu analyses cette liste comme un assistant productif et tu réponds en français.
+
+Règles :
+- focus : les 5 tâches au maximum à traiter en priorité, classées de la plus urgente à la moins urgente.
+- raison : une explication courte (8 mots maximum), concrète, liée aux données (retard, échéance, priorité, dépendances).
+- conseils : 3 conseils courts et actionnables au maximum (tâche sans échéance à dater, tâche trop vague à découper, tâche obsolète à supprimer, priorités à arbitrer). Chaque conseil cite la tâche concernée entre guillets.
+- N'invente aucune tâche, aucune donnée personnelle, aucun chiffre.
+
+Réponds UNIQUEMENT avec ce JSON, sans texte autour et sans bloc de code :
+{ "focus": [ { "id": "uuid", "raison": "…" } ], "conseils": ["…"] }`;
+
+type TacheAnalyse = {
+  id: string;
+  titre: string;
+  priorite: number;
+  echeance: string | null;
+  projet: string | null;
+  sous_faites: number;
+  sous_total: number;
+};
+
+export type AnalyseListe = {
+  focus: { id: string; raison: string }[];
+  conseils: string[];
+};
+
+export async function analyserListeTaches(taches: TacheAnalyse[]): Promise<AnalyseListe> {
+  const message = [
+    "Voici mes tâches ouvertes :",
+    JSON.stringify(taches, null, 2),
+    "Classe mes priorités et donne-moi tes conseils.",
+  ].join("\n\n");
+
+  const response = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      "x-api-key": cleAnthropic(),
+      "anthropic-version": "2023-06-01",
+    },
+    body: JSON.stringify({
+      model: "claude-sonnet-5",
+      max_tokens: 1024,
+      system: SYSTEM_ANALYSE,
+      messages: [{ role: "user", content: [{ type: "text", text: message }] }],
+    }),
+  });
+
+  if (!response.ok) {
+    const detail = await response.text();
+    console.error("[projets] Anthropic analyse error", response.status, detail);
+    if (response.status === 429) {
+      throw new Error("Trop de requêtes vers l'IA. Réessaie dans quelques instants.");
+    }
+    throw new Error(`L'appel à l'IA a échoué (${response.status}).`);
+  }
+
+  const payload = (await response.json()) as { content?: BlocTexte[] };
+  const brut = (payload.content ?? [])
+    .filter((bloc) => bloc.type === "text")
+    .map((bloc) => bloc.text ?? "")
+    .join("")
+    .trim();
+
+  const debut = brut.indexOf("{");
+  const fin = brut.lastIndexOf("}");
+  const nettoye = debut !== -1 && fin > debut ? brut.slice(debut, fin + 1) : brut;
+
+  try {
+    const parsed = JSON.parse(nettoye) as Record<string, unknown>;
+    const focusBrut = Array.isArray(parsed["focus"]) ? parsed["focus"] : [];
+    const idsValides = new Set(taches.map((t) => t.id));
+    const focus = focusBrut
+      .slice(0, 5)
+      .map((entree) => {
+        const e = (entree ?? {}) as Record<string, unknown>;
+        return {
+          id: String(e["id"] ?? ""),
+          raison: String(e["raison"] ?? "").trim().slice(0, 120),
+        };
+      })
+      .filter((e) => idsValides.has(e.id) && e.raison.length > 0);
+    const conseils = (Array.isArray(parsed["conseils"]) ? parsed["conseils"] : [])
+      .slice(0, 3)
+      .map((c) => String(c).trim().slice(0, 240))
+      .filter(Boolean);
+    return { focus, conseils };
+  } catch (error) {
+    console.error("[projets] JSON analyse parse failed", error, brut.slice(0, 400));
+    throw Object.assign(
+      new Error("La réponse de l'IA n'était pas exploitable. Relance l'analyse."),
+      { statusCode: 502 },
+    );
+  }
+}
