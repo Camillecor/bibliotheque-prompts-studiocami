@@ -7,6 +7,7 @@ import {
   Check,
   Flag,
   Flame,
+  Folder,
   Loader2,
   Plus,
   Sparkles,
