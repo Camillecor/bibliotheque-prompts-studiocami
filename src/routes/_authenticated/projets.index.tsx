@@ -2,7 +2,17 @@ import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { CalendarClock, Check, Flag, Loader2, Plus, Sparkles, Trash2, X } from "lucide-react";
+import {
+  CalendarClock,
+  Check,
+  Flag,
+  Flame,
+  Loader2,
+  Plus,
+  Sparkles,
+  Tag,
+  X,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
@@ -10,7 +20,6 @@ import { ProjetsTabs } from "@/components/ProjetsTabs";
 import { PanneauProjets } from "@/components/projets/PanneauProjets";
 import { DetailTache } from "@/components/projets/DetailTache";
 import {
-  PRIORITES,
   etatEcheance,
   formatEcheance,
   prioriteInfo,
@@ -18,21 +27,28 @@ import {
   type TacheRow,
   type VueRapide,
 } from "@/lib/projets";
-import { listProjets, listTaches, saveTache, changerStatutTache } from "@/lib/projets.functions";
+import { analyserSaisie, scoreTache, raisonsTache, type SaisieAnalysee } from "@/lib/projetsSaisie";
+import {
+  listProjets,
+  listTaches,
+  saveTache,
+  changerStatutTache,
+  analyserListeAvecMario,
+} from "@/lib/projets.functions";
 
 export const Route = createFileRoute("/_authenticated/projets/")({
   head: () => ({
     meta: [
-      { title: "Projets — Tâches et échéances | Studio Cami IA" },
+      { title: "Projets — Todo-list intelligente | Studio Cami IA" },
       {
         name: "description",
         content:
-          "Organise tes projets, coche tes tâches, suis tes échéances et laisse Mario découper tes objectifs.",
+          "Saisis tes tâches en langage naturel, laisse Mario classer tes priorités et suis tes échéances sans effort.",
       },
-      { property: "og:title", content: "Projets — Tâches et échéances" },
+      { property: "og:title", content: "Projets — Todo-list intelligente" },
       {
         property: "og:description",
-        content: "Un espace de gestion de projet relié à tes contenus, fiches et prompts.",
+        content: "Une todo-list qui comprend ce que tu écris et trie tes priorités pour toi.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -83,7 +99,13 @@ function grouperParEcheance(taches: TacheRow[]): Groupe[] {
   ];
 
   return libelles
-    .map(([cle, titre]) => ({ cle, titre, taches: groupes[cle] ?? [] }))
+    .map(([cle, titre]) => ({
+      cle,
+      titre,
+      taches: [...(groupes[cle] ?? [])].sort(
+        (a, b) => scoreTache(b) - scoreTache(a),
+      ),
+    }))
     .filter((groupe) => groupe.taches.length > 0);
 }
 
@@ -227,17 +249,69 @@ function LigneTache({
   );
 }
 
+function ApercuSaisie({ saisie }: { saisie: SaisieAnalysee }) {
+  const detecte =
+    saisie.echeanceLabel ||
+    saisie.priorite > 0 ||
+    saisie.etiquettes.length > 0 ||
+    saisie.projetNom;
+  if (!detecte) return null;
+
+  return (
+    <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[11px]">
+      <span className="text-muted-foreground">Détecté :</span>
+      {saisie.echeanceLabel ? (
+        <span className="inline-flex items-center gap-1 rounded-full bg-orange-50 px-2 py-0.5 font-semibold text-orange-600">
+          <CalendarClock className="h-3 w-3" />
+          {saisie.echeanceLabel}
+        </span>
+      ) : null}
+      {saisie.priorite > 0 ? (
+        <span
+          className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-semibold"
+          style={{
+            backgroundColor: `color-mix(in srgb, ${prioriteInfo(saisie.priorite).couleur} 14%, white)`,
+            color: prioriteInfo(saisie.priorite).couleur,
+          }}
+        >
+          <Flag className="h-3 w-3" />
+          {prioriteInfo(saisie.priorite).label}
+        </span>
+      ) : null}
+      {saisie.projetNom ? (
+        <span className="inline-flex items-center gap-1 rounded-full bg-secondary px-2 py-0.5 font-semibold text-primary">
+          <Folder className="h-3 w-3" />
+          {saisie.projetNom}
+        </span>
+      ) : null}
+      {saisie.etiquettes.map((etiquette) => (
+        <span
+          key={etiquette}
+          className="inline-flex items-center gap-1 rounded-full bg-secondary px-2 py-0.5 font-semibold text-primary"
+        >
+          <Tag className="h-3 w-3" />
+          {etiquette}
+        </span>
+      ))}
+    </div>
+  );
+}
+
 function ProjetsListePage() {
   const queryClient = useQueryClient();
   const [projetActif, setProjetActif] = useState<string | null>(null);
   const [vue, setVue] = useState<VueRapide | null>(null);
   const [nouvelleTache, setNouvelleTache] = useState("");
   const [tacheOuverte, setTacheOuverte] = useState<string | null>(null);
+  const [analyse, setAnalyse] = useState<{ focus: { id: string; raison: string }[]; conseils: string[] } | null>(
+    null,
+  );
 
   const fetchProjets = useServerFn(listProjets);
   const fetchTaches = useServerFn(listTaches);
   const enregistrer = useServerFn(saveTache);
   const changerStatut = useServerFn(changerStatutTache);
+  const analyser = useServerFn(analyserListeAvecMario);
 
   const projets = useQuery({ queryKey: ["projets"], queryFn: () => fetchProjets() });
   const taches = useQuery({ queryKey: ["taches"], queryFn: () => fetchTaches() });
@@ -246,14 +320,22 @@ function ProjetsListePage() {
     void queryClient.invalidateQueries({ queryKey: ["taches"] });
   };
 
+  const listeProjets = projets.data ?? [];
+  const saisie = useMemo(
+    () => analyserSaisie(nouvelleTache, listeProjets),
+    [nouvelleTache, listeProjets],
+  );
+
   const ajout = useMutation({
-    mutationFn: (titre: string) =>
+    mutationFn: (aAnalyser: SaisieAnalysee) =>
       enregistrer({
         data: {
-          titre,
-          projet_id: projetActif,
-          priorite: 0,
+          titre: aAnalyser.titre,
+          projet_id: aAnalyser.projetId ?? projetActif,
+          priorite: aAnalyser.priorite,
           statut: "a_faire",
+          echeance: aAnalyser.echeance,
+          etiquettes: aAnalyser.etiquettes,
         },
       }),
     onSuccess: () => {
@@ -272,6 +354,18 @@ function ProjetsListePage() {
     onError: (erreur: Error) => toast.error(erreur.message),
   });
 
+  const analyseMario = useMutation({
+    mutationFn: () => analyser(),
+    onSuccess: (resultat) => {
+      if (resultat.focus.length === 0 && resultat.conseils.length === 0) {
+        toast.info("Aucune tâche ouverte à analyser. Ajoute d'abord une tâche.");
+        return;
+      }
+      setAnalyse(resultat);
+    },
+    onError: (erreur: Error) => toast.error(erreur.message),
+  });
+
   const toutes = taches.data ?? [];
   const sousTachesPar = useMemo(() => {
     const carte = new Map<string, TacheRow[]>();
@@ -285,8 +379,8 @@ function ProjetsListePage() {
   }, [toutes]);
 
   const projetsParId = useMemo(
-    () => new Map((projets.data ?? []).map((projet) => [projet.id, projet])),
-    [projets.data],
+    () => new Map(listeProjets.map((projet) => [projet.id, projet])),
+    [listeProjets],
   );
 
   const visibles = useMemo(
@@ -295,6 +389,19 @@ function ProjetsListePage() {
   );
   const groupes = useMemo(() => grouperParEcheance(visibles), [visibles]);
   const detail = toutes.find((tache) => tache.id === tacheOuverte) ?? null;
+
+  const focus = useMemo(() => {
+    if (vue === "termine") return [];
+    return visibles
+      .filter((tache) => tache.statut !== "termine")
+      .map((tache) => {
+        const sous = sousTachesPar.get(tache.id) ?? [];
+        const faites = sous.filter((s) => s.statut === "termine").length;
+        return { tache, score: scoreTache(tache, faites, sous.length), raisons: raisonsTache(tache, faites, sous.length) };
+      })
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 3);
+  }, [visibles, vue, sousTachesPar]);
 
   const titre = vue
     ? {
@@ -316,10 +423,12 @@ function ProjetsListePage() {
           onProjet={(id) => {
             setProjetActif(id);
             setVue(null);
+            setAnalyse(null);
           }}
           onVue={(valeur) => {
             setVue(valeur);
             setProjetActif(null);
+            setAnalyse(null);
           }}
         />
       }
@@ -327,37 +436,142 @@ function ProjetsListePage() {
       <div className="mx-auto w-full max-w-4xl px-4 py-5 sm:px-6 sm:py-7">
         <ProjetsTabs />
 
-        <header className="mt-5">
-          <h1 className="font-display text-2xl font-bold text-primary sm:text-3xl">{titre}</h1>
-          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-            {visibles.filter((t) => t.statut !== "termine").length} tâche(s) en cours
-          </p>
+        <header className="mt-5 flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h1 className="font-display text-2xl font-bold text-primary sm:text-3xl">{titre}</h1>
+            <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+              {visibles.filter((t) => t.statut !== "termine").length} tâche(s) en cours
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => analyseMario.mutate()}
+            disabled={analyseMario.isPending}
+            className="cami-btn-accent shrink-0 disabled:opacity-50"
+          >
+            {analyseMario.isPending ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Sparkles className="h-4 w-4" />
+            )}
+            Analyse Mario
+          </button>
         </header>
 
         <form
-          className="mt-4 flex items-center gap-2 rounded-[20px] border border-border bg-card px-3 py-2"
+          className="mt-4 rounded-[20px] border border-border bg-card px-3 py-2"
           onSubmit={(event) => {
             event.preventDefault();
-            const titreTache = nouvelleTache.trim();
+            const titreTache = saisie.titre.trim();
             if (!titreTache) return;
-            ajout.mutate(titreTache);
+            ajout.mutate(saisie);
           }}
         >
-          <Plus className="h-4 w-4 shrink-0 text-[var(--coral)]" />
-          <input
-            value={nouvelleTache}
-            onChange={(event) => setNouvelleTache(event.target.value)}
-            placeholder="Ajouter une tâche…"
-            className="min-h-11 w-full bg-transparent text-sm text-primary outline-none placeholder:text-muted-foreground"
-          />
-          <button
-            type="submit"
-            disabled={ajout.isPending || !nouvelleTache.trim()}
-            className="cami-btn-accent shrink-0 disabled:opacity-50"
-          >
-            {ajout.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Ajouter"}
-          </button>
+          <div className="flex items-center gap-2">
+            <Plus className="h-4 w-4 shrink-0 text-[var(--coral)]" />
+            <input
+              value={nouvelleTache}
+              onChange={(event) => setNouvelleTache(event.target.value)}
+              placeholder="Ajouter une tâche… (ex. Devis Cami vendredi urgent #client)"
+              className="min-h-11 w-full bg-transparent text-sm text-primary outline-none placeholder:text-muted-foreground"
+            />
+            <button
+              type="submit"
+              disabled={ajout.isPending || !saisie.titre.trim()}
+              className="cami-btn-accent shrink-0 disabled:opacity-50"
+            >
+              {ajout.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Ajouter"}
+            </button>
+          </div>
+          <ApercuSaisie saisie={saisie} />
         </form>
+
+        {analyse ? (
+          <section className="mt-5 rounded-[20px] border border-[var(--coral)]/40 bg-[var(--coral)]/5 p-4">
+            <div className="flex items-center justify-between gap-2">
+              <h2 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-[var(--coral)]">
+                <Flame className="h-3.5 w-3.5" />
+                Mario a classé tes priorités
+              </h2>
+              <button
+                type="button"
+                onClick={() => setAnalyse(null)}
+                aria-label="Fermer l'analyse"
+                className="cami-icon-btn"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <ol className="mt-3 space-y-2">
+              {analyse.focus.map((entree, index) => {
+                const tache = toutes.find((t) => t.id === entree.id);
+                if (!tache) return null;
+                return (
+                  <li key={entree.id}>
+                    <button
+                      type="button"
+                      onClick={() => setTacheOuverte(entree.id)}
+                      className="flex w-full items-start gap-3 rounded-2xl border border-border bg-card px-3 py-2.5 text-left transition hover:border-[var(--coral)]/60"
+                    >
+                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
+                        {index + 1}
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-sm font-semibold text-primary">
+                          {tache.titre}
+                        </span>
+                        <span className="mt-0.5 block text-xs text-muted-foreground">
+                          {entree.raison}
+                        </span>
+                      </span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ol>
+            {analyse.conseils.length > 0 ? (
+              <ul className="mt-3 space-y-1.5 text-xs leading-relaxed text-muted-foreground">
+                {analyse.conseils.map((conseil, index) => (
+                  <li key={index} className="flex gap-2">
+                    <Sparkles className="mt-0.5 h-3 w-3 shrink-0 text-[var(--coral)]" />
+                    {conseil}
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </section>
+        ) : null}
+
+        {focus.length > 1 && !analyse ? (
+          <section className="mt-5 rounded-[20px] border border-[var(--coral)]/40 bg-[var(--coral)]/5 p-4">
+            <h2 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-[var(--coral)]">
+              <Flame className="h-3.5 w-3.5" />
+              Focus du moment
+            </h2>
+            <div className="mt-3 space-y-2">
+              {focus.map(({ tache, raisons }, index) => (
+                <button
+                  key={tache.id}
+                  type="button"
+                  onClick={() => setTacheOuverte(tache.id)}
+                  className="flex w-full items-start gap-3 rounded-2xl border border-border bg-card px-3 py-2.5 text-left transition hover:border-[var(--coral)]/60"
+                >
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--coral)] text-xs font-bold text-white">
+                    {index + 1}
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-sm font-semibold text-primary">{tache.titre}</span>
+                    {raisons.length > 0 ? (
+                      <span className="mt-0.5 block text-xs text-muted-foreground">
+                        {raisons.join(" · ")}
+                      </span>
+                    ) : null}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </section>
+        ) : null}
 
         {taches.isLoading ? (
           <p className="mt-8 text-sm text-muted-foreground">Chargement…</p>
@@ -366,8 +580,8 @@ function ProjetsListePage() {
             <Sparkles className="mx-auto h-6 w-6 text-[var(--coral)]" />
             <p className="mt-3 text-sm font-semibold text-primary">Aucune tâche ici</p>
             <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-              Ajoute une tâche ci-dessus, ou demande à Mario de découper un objectif dans le panneau
-              de droite.
+              Ajoute une tâche ci-dessus avec une date et une priorité en langage naturel, ou
+              demande à Mario de découper un objectif dans le panneau de droite.
             </p>
           </div>
         ) : (
@@ -422,5 +636,3 @@ function ProjetsListePage() {
     </AppShell>
   );
 }
-
-export { PRIORITES };
